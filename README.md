@@ -14,7 +14,7 @@
    
  - **Grouped capsules:** Special feature allowing users to create groups of capsules around a common theme.
  
- - **Capsule goal(s):** Short text containing questions or aspirations that users can add upon capsule creation. Can remain hidden until the capsule times out. Optionally, once a user opens a capsule they can mark the goal as completed and add a short text message.
+ - **Capsule goal(s):** Short text messages containing questions or aspirations that users can add upon capsule creation. Can remain hidden until the capsule times out. Optionally, once a user opens a capsule they can mark the goal as completed and add a short text message.
  
  - Capsules can be:
     - Short-term
