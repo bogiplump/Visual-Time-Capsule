@@ -16,7 +16,11 @@ Visual Time Capsules enable users and their friends to save safe-keep their prec
  
  - Each capsule or group of capsules can have a goal associated with it that can be marked as completed upon opening the capsule
  
- - Each capsule can be either short-term or long-term and can be either personal or shared
+ - Capsules can be
+    - Short-term
+    - Long-term
+    - Private
+    - Public
 
 ## Database Diagram
 ![DB Diagram](https://github.com/bogiplump/Visual-Time-Capsule/blob/main/database%20diagram.png)
