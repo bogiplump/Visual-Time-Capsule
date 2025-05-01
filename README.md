@@ -1,2 +1,2 @@
 # Visual Time Capsule
-![](Visual-Time-Capsule/"database diagram"
+![DB Diagram](Visual-Time-Capsule/database diagram.png)
