@@ -6,7 +6,7 @@
  
  - **Friendship system:** Encourages capsule sharing by allowing friends to link up their accounts
  
- - **Memories:** The time capsules' contents. Can be:
+ - **Memories:** The time capsules' contents:
     - Text messages
     - Precious images
     - Video recordings
