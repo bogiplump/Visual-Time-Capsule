@@ -6,7 +6,7 @@ Visual Time Capsules enable users and their friends to save safe-keep their prec
  
  - Friendship system meant to encourage capsule sharing
  
- - Users can create time capsules containing their **memories**
+ - Users can create time capsules containing their **memories:**
     - Text messages
     - Precious images
     - Video recordings
@@ -16,7 +16,7 @@ Visual Time Capsules enable users and their friends to save safe-keep their prec
  
  - Each capsule or group of capsules can have a goal associated with it that can be marked as completed upon opening the capsule
  
- - Capsules can be
+ - Capsules can be:
     - Short-term
     - Long-term
     - Private
