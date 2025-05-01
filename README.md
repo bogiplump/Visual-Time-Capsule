@@ -3,14 +3,19 @@ Visual Time Capsules enable users and their friends to save safe-keep their prec
 
 ## Features
  - Users can create and manage accounts
+ 
  - Friendship system meant to encourage capsule sharing
+ 
  - Users can create time capsules containing their **memories**
     - Text messages
     - Precious images
     - Video recordings
     - Audio files
+   
  - Users can create groups of capsules around a common theme
+ 
  - Each capsule or group of capsules can have a goal associated with it that can be marked as completed upon opening the capsule
+ 
  - Each capsule can be either short-term or long-term and can be either personal or shared
 
 ## Database Diagram
