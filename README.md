@@ -1,5 +1,5 @@
 # Visual Time Capsule
-Visual Time Capsules enable users and their friends to save safe-keep their precious memories and aspirations and send them to their future selves.
+**Visual Time Capsules** are meant to be a social platform that enables users and their friends to save safe-keep their precious memories and aspirations and send them to their future selves.
 
 ## Features
  - Users can create and manage accounts
