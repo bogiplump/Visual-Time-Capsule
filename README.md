@@ -2,9 +2,9 @@
 **Visual Time Capsules** are a social platform that enables users and their friends to safe-keep their precious memories and aspirations and send them to their future selves.
 
 ## Features
- - **Accounts:** Managed and created by users
+ - **Accounts:** Managed and created by users.
  
- - **Friendship system:** Encourages capsule sharing by allowing friends to link up their accounts
+ - **Friendship system:** Encourages capsule sharing by allowing friends to link up their accounts.
  
  - **Memories:** The time capsules' contents:
     - Text messages
@@ -12,9 +12,9 @@
     - Video recordings
     - Audio files
    
- - **Grouped capsules:** Special feature allowing users to create groups of capsules around a common theme
+ - **Grouped capsules:** Special feature allowing users to create groups of capsules around a common theme.
  
- - **Capsule goal(s):** Short text containing questions or aspirations that users can add upon capsule creation. Can remain hidden until the capsule times out. Optionally, once a user opens a capsule they can mark the goal as completed and add a short text message
+ - **Capsule goal(s):** Short text containing questions or aspirations that users can add upon capsule creation. Can remain hidden until the capsule times out. Optionally, once a user opens a capsule they can mark the goal as completed and add a short text message.
  
  - Capsules can be:
     - Short-term
