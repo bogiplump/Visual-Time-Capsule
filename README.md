@@ -23,4 +23,4 @@
     - Public
 
 ## Database Diagram
-![DB Diagram](https://github.com/bogiplump/Visual-Time-Capsule/blob/main/database%20diagram.png)
+![DB Diagram](https://github.com/bogiplump/Visual-Time-Capsule/blob/main/images/database%20diagram.png)
