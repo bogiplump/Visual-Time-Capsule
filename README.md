@@ -25,4 +25,5 @@
 ## Database Diagram
 ![DB Diagram](https://github.com/bogiplump/Visual-Time-Capsule/blob/main/images/database%20diagram.png)
 
-Learn more about the project by reading the documentation here https://github.com/bogiplump/Visual-Time-Capsule/blob/main/docs/Visual%20Time%20Capsule%20Project%20Documentation.pdf
+## Documentation
+Learn more about the project by reading the documentation here [View Local Docs](docs/index.md)
