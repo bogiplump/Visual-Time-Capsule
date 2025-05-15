@@ -1,4 +1,4 @@
-# Visual Time Capsule
+# Virtual Time Capsule
 **Visual Time Capsules** are a social platform that enables users and their friends to safe-keep their precious memories and aspirations and send them to their future selves.
 
 ## Features
