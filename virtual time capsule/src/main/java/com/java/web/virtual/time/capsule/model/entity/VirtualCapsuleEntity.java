@@ -1,10 +1,16 @@
 package com.java.web.virtual.time.capsule.model.entity;
 
+import com.java.web.virtual.time.capsule.enums.CapsuleStatus;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 
 import java.util.Date;
 
@@ -14,6 +20,7 @@ import org.springframework.data.annotation.Id;
 
 @Data
 @Entity
+@Table(name = "capsules")
 public class VirtualCapsuleEntity {
     @Id
     @GeneratedValue
@@ -23,17 +30,20 @@ public class VirtualCapsuleEntity {
     private String capsuleName;
     @Column(name = "creation_date")
     private Date creationDate;
-    @Column(name = "locked_on")
+    @Column(name = "lock_date")
     private Date lockDate;
-    @Column(name = "open_on")
+    @Column(name = "open_date")
     private Date openDate;
+
     @Column(name = "status")
+    @Enumerated(EnumType.STRING)
     private CapsuleStatus capsuleStatus;
 
     @ManyToOne
-    @JoinColumn(name = "creator_id")
-    @Column(name = "created_by_id")
-    private AccountEntity creatorId;
+    @JoinColumn(name = "created_by_id")
+    private AccountEntity creator;
 
-    // TODO: add memories, goals and participants when i get home
+    @OneToOne
+    @JoinColumn(name = "goal_id")
+    private GoalEntity goal;
 }
