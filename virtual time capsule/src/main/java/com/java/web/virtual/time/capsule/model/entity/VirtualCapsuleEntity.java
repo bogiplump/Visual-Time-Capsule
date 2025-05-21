@@ -11,12 +11,11 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Id;
 
 import java.util.Date;
 
 import lombok.Data;
-
-import org.springframework.data.annotation.Id;
 
 @Data
 @Entity
@@ -41,7 +40,7 @@ public class VirtualCapsuleEntity {
 
     @ManyToOne
     @JoinColumn(name = "created_by_id")
-    private AccountEntity creator;
+    private UserEntity creator;
 
     @OneToOne
     @JoinColumn(name = "goal_id")
