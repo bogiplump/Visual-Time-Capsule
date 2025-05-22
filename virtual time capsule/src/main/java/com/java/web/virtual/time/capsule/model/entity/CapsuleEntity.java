@@ -20,7 +20,7 @@ import lombok.Data;
 @Data
 @Entity
 @Table(name = "capsules")
-public class VirtualCapsuleEntity {
+public class CapsuleEntity {
     @Id
     @GeneratedValue
     private Integer id;
@@ -45,4 +45,7 @@ public class VirtualCapsuleEntity {
     @OneToOne
     @JoinColumn(name = "goal_id")
     private GoalEntity goal;
+
+//    @OneToMany(mappedBy = "capsules_id")
+//    private Set<MemoryEntity> memoryEntries;
 }
