@@ -9,15 +9,21 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;
 
 import java.util.Date;
+import java.util.Set;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "capsules")
 public class CapsuleEntity {
@@ -27,10 +33,13 @@ public class CapsuleEntity {
 
     @Column(name = "capsule_name")
     private String capsuleName;
+
     @Column(name = "creation_date")
     private Date creationDate;
+
     @Column(name = "lock_date")
     private Date lockDate;
+
     @Column(name = "open_date")
     private Date openDate;
 
@@ -46,6 +55,6 @@ public class CapsuleEntity {
     @JoinColumn(name = "goal_id")
     private GoalEntity goal;
 
-//    @OneToMany(mappedBy = "capsules_id")
-//    private Set<MemoryEntity> memoryEntries;
+    @OneToMany(mappedBy = "capsule")
+    private Set<MemoryEntity> memoryEntries;
 }

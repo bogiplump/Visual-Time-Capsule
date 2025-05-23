@@ -11,9 +11,13 @@ import jakarta.persistence.Table;
 
 import java.util.Date;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "goals")
 public class GoalEntity {
@@ -23,8 +27,10 @@ public class GoalEntity {
 
     @Column(name = "is_visible")
     private boolean isVisible;
+
     @Column(name = "is_achieved")
     private boolean isAchieved;
+
     @Column(name = "created_at")
     private Date creationDate;
 
