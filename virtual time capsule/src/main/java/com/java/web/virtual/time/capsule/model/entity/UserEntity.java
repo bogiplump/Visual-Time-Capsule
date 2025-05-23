@@ -10,9 +10,13 @@ import jakarta.persistence.Table;
 import java.util.Date;
 import java.util.Set;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "users")
 public class UserEntity {
@@ -22,8 +26,10 @@ public class UserEntity {
 
     @Column(name = "first_name")
     private String firstName;
+
     @Column(name = "family_name")
     private String lastName;
+
     @Column(name = "created_at")
     private Date creationDate;
 
@@ -34,8 +40,8 @@ public class UserEntity {
     @OneToMany(mappedBy = "creator")
     private Set<GoalEntity> goals;
 
-//    @OneToMany(mappedBy = "created_by_id")
-//    private Set<MemoryEntity> memoryEntries;
+    @OneToMany(mappedBy = "creator")
+    private Set<MemoryEntity> memoryEntries;
 
     @OneToMany(mappedBy = "creator")
     private Set<CapsuleEntity> capsules;
