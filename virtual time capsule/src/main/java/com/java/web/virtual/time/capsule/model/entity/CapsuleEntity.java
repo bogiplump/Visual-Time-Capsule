@@ -13,24 +13,27 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;
 
 import java.time.LocalDateTime;
 import java.util.Set;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "capsules")
 public class CapsuleEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Setter(AccessLevel.NONE)
     private Long id;
 
     @Column(name = "capsule_name", nullable = false)
@@ -38,15 +41,19 @@ public class CapsuleEntity {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
+    @Setter(AccessLevel.NONE)
     private CapsuleStatus status;
 
-    @Column(name = "creation_date", nullable = false)
+    @Column(name = "creation_date", updatable = false, nullable = false)
+    @Setter(AccessLevel.NONE)
     private LocalDateTime creationDate;
 
     @Column(name = "lock_date")
+    @Setter(AccessLevel.NONE)
     private LocalDateTime lockDate;
 
     @Column(name = "open_date")
+    @Setter(AccessLevel.NONE)
     private LocalDateTime openDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -54,9 +61,31 @@ public class CapsuleEntity {
     private UserEntity creator;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "goal_id")
+    @JoinColumn(name = "goal_id", nullable = false)
     private GoalEntity goal;
 
     @OneToMany(mappedBy = "capsule")
     private Set<MemoryEntity> memoryEntries;
+
+    public CapsuleEntity(String capsuleName, UserEntity creator,
+                         GoalEntity goal, Set<MemoryEntity> memoryEntries) {
+        if (capsuleName == null || creator == null ||
+            goal == null || memoryEntries == null) {
+            throw new IllegalArgumentException("Null reference in CapsuleEntity constructor. ");
+        }
+
+        this.capsuleName = capsuleName;
+        this.creator = creator;
+        this.goal = goal;
+        this.memoryEntries = memoryEntries;
+
+        this.status = CapsuleStatus.CREATED;
+        this.creationDate = LocalDateTime.now();
+    }
+
+    @PrePersist
+    public void onCreate() {
+        this.status = CapsuleStatus.CREATED;
+        this.creationDate = LocalDateTime.now();
+    }
 }
