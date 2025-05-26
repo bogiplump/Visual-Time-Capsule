@@ -64,7 +64,7 @@ public class CapsuleEntity {
     @JoinColumn(name = "goal_id", nullable = false)
     private GoalEntity goal;
 
-    @OneToMany(mappedBy = "capsule")
+    @OneToMany(mappedBy = "capsule", fetch = FetchType.LAZY)
     private Set<MemoryEntity> memoryEntries;
 
     public CapsuleEntity(String capsuleName, UserEntity creator,
@@ -87,5 +87,16 @@ public class CapsuleEntity {
     public void onCreate() {
         this.status = CapsuleStatus.CREATED;
         this.creationDate = LocalDateTime.now();
+    }
+
+    public void lock(LocalDateTime openDate) {
+        lockDate = LocalDateTime.now();
+
+        status = CapsuleStatus.CLOSED;
+        this.openDate = openDate;
+    }
+
+    public void open() {
+        status = CapsuleStatus.OPEN;
     }
 }
