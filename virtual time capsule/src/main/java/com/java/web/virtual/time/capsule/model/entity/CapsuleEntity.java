@@ -6,7 +6,9 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
@@ -14,7 +16,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 import lombok.AllArgsConstructor;
@@ -28,30 +30,30 @@ import lombok.NoArgsConstructor;
 @Table(name = "capsules")
 public class CapsuleEntity {
     @Id
-    @GeneratedValue
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Column(name = "capsule_name")
+    @Column(name = "capsule_name", nullable = false)
     private String capsuleName;
 
-    @Column(name = "creation_date")
-    private Date creationDate;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private CapsuleStatus status;
+
+    @Column(name = "creation_date", nullable = false)
+    private LocalDateTime creationDate;
 
     @Column(name = "lock_date")
-    private Date lockDate;
+    private LocalDateTime lockDate;
 
     @Column(name = "open_date")
-    private Date openDate;
+    private LocalDateTime openDate;
 
-    @Column(name = "status")
-    @Enumerated(EnumType.STRING)
-    private CapsuleStatus capsuleStatus;
-
-    @ManyToOne
-    @JoinColumn(name = "created_by_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by_id", nullable = false)
     private UserEntity creator;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "goal_id")
     private GoalEntity goal;
 
