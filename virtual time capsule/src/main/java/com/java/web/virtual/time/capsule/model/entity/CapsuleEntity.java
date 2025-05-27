@@ -2,6 +2,9 @@ package com.java.web.virtual.time.capsule.model.entity;
 
 import com.java.web.virtual.time.capsule.enums.CapsuleStatus;
 
+import com.java.web.virtual.time.capsule.exception.CapsuleHasBeenLocked;
+import com.java.web.virtual.time.capsule.exception.CapsuleIsOpened;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -13,7 +16,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;
 
@@ -64,7 +66,9 @@ public class CapsuleEntity {
     @JoinColumn(name = "goal_id", nullable = false)
     private GoalEntity goal;
 
-    @OneToMany(mappedBy = "capsule", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "capsule", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Setter(AccessLevel.NONE)
+    @Getter(AccessLevel.NONE)
     private Set<MemoryEntity> memoryEntries;
 
     public CapsuleEntity(String capsuleName, UserEntity creator,
@@ -83,17 +87,50 @@ public class CapsuleEntity {
         this.creationDate = LocalDateTime.now();
     }
 
-    @PrePersist
-    public void onCreate() {
-        this.status = CapsuleStatus.CREATED;
-        this.creationDate = LocalDateTime.now();
-    }
-
     public void lock(LocalDateTime openDate) {
         lockDate = LocalDateTime.now();
 
         status = CapsuleStatus.CLOSED;
         this.openDate = openDate;
+    }
+
+    private void checkIfCapsuleEditable() {
+        if (status == CapsuleStatus.CLOSED) {
+            throw new CapsuleHasBeenLocked("Can not view or add memories in a locked capsule");
+        }
+        if (status == CapsuleStatus.OPEN) {
+            throw new CapsuleIsOpened("Can not add memories after a capsule has been locked and opened");
+        }
+    }
+
+    public void setMemoryEntries(Set<MemoryEntity> memoryEntries) {
+        if (memoryEntries == null) {
+            throw new IllegalArgumentException("Null reference in CapsuleEntity::setMemoryEntries(). ");
+        }
+
+        checkIfCapsuleEditable();
+
+        this.memoryEntries = memoryEntries;
+    }
+
+    public void addMemory(MemoryEntity memory) {
+        if (memory == null) {
+            throw new IllegalArgumentException("Null reference in CapsuleEntity::addMemory(). ");
+        }
+
+        checkIfCapsuleEditable();
+
+        this.memoryEntries.add(memory);
+    }
+
+    public Set<MemoryEntity> getMemoryEntries() {
+        checkIfCapsuleEditable();
+
+        return Set.copyOf(memoryEntries);
+    }
+
+    public boolean isTimeToOpen() {
+        return openDate.isBefore(LocalDateTime.now());
     }
 
     public void open() {
