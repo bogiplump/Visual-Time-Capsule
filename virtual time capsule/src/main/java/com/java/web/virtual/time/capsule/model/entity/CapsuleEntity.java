@@ -62,8 +62,8 @@ public class CapsuleEntity {
     @JoinColumn(name = "created_by_id", nullable = false)
     private UserEntity creator;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "goal_id", nullable = false)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "goal_id")
     private GoalEntity goal;
 
     @OneToMany(mappedBy = "capsule", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
