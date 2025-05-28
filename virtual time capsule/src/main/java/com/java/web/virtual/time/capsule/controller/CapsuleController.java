@@ -55,7 +55,7 @@ public class CapsuleController {
         capsuleService.putMemoryInCapsule(id, memoryId);
     }
 
-    @PatchMapping("{id}")
+    @PatchMapping("/{id}")
     public void removeMemoryFromCapsule(@PathVariable Long id, @RequestParam Long memoryId) {
         capsuleService.removeMemoryFromCapsule(id, memoryId);
     }

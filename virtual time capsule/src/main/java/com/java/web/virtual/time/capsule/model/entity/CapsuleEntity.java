@@ -2,8 +2,8 @@ package com.java.web.virtual.time.capsule.model.entity;
 
 import com.java.web.virtual.time.capsule.enums.CapsuleStatus;
 
-import com.java.web.virtual.time.capsule.exception.CapsuleHasBeenLocked;
-import com.java.web.virtual.time.capsule.exception.CapsuleIsOpened;
+import com.java.web.virtual.time.capsule.exception.capsule.CapsuleHasBeenLocked;
+import com.java.web.virtual.time.capsule.exception.capsule.CapsuleIsOpened;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
