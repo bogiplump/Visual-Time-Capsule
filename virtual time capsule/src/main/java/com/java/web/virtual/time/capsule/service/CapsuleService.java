@@ -1,5 +1,7 @@
 package com.java.web.virtual.time.capsule.service;
 
+import com.java.web.virtual.time.capsule.dto.CapsuleCreateDto;
+import com.java.web.virtual.time.capsule.dto.MemoryCreateDto;
 import com.java.web.virtual.time.capsule.exception.CapsuleHasBeenLocked;
 import com.java.web.virtual.time.capsule.exception.CapsuleIsNotClosedYet;
 import com.java.web.virtual.time.capsule.exception.CapsuleNotFound;
@@ -29,12 +31,19 @@ public interface CapsuleService {
     CapsuleEntity getCapsuleById(Long id);
 
     /**
-     * Saves the capsule in the database.
+     * Retrieves of all the capsules of the current user.
      *
-     * @param capsule must not be null.
+     * @return unmodifiable set of all the capsules of the user.
+     */
+    Set<CapsuleEntity> getAllCapsulesOfUser();
+
+    /**
+     * Creates and saves the capsule in the database.
+     *
+     * @param capsuleDto must not be null.
      * @throws IllegalArgumentException if is null.
      */
-    void saveCapsule(CapsuleEntity capsule);
+    void createCapsule(CapsuleCreateDto capsuleDto);
 
     /**
      * Finds and deletes the capsule with the same id.
@@ -54,7 +63,7 @@ public interface CapsuleService {
      * @throws IllegalArgumentException if id or memory are null.
      * @throws CapsuleNotFound if a capsule with this id does not exist.
      */
-    void addMemoryToCapsule(Long capsuleId, MemoryEntity memory);
+    void addMemoryToCapsule(Long capsuleId, MemoryCreateDto memory);
 
     /**
      * Puts a memory from the users profile into a certain capsule.
@@ -143,13 +152,14 @@ public interface CapsuleService {
      * Locks the capsule and its contents become unavailable until the date of the opening.
      *
      * @param id unique identifier of the capsule, must not be null.
-     * @param openDate the date and time of the opening of the capsule.
+     * @param openDate the date and time of the opening of the capsule,
+     *                 in string format, must not be null.
      *
      * @throws IllegalArgumentException if id or goal are null.
      * @throws CapsuleNotFound if a capsule with this id does not exist.
      * @throws CapsuleHasBeenLocked if the capsule has already been locked.
      */
-    void lockCapsuleById(Long id, LocalDateTime openDate);
+    void lockCapsuleById(Long id, String openDate);
 
     /**
      * Checks if the date for opening of the capsule which has been set at the moment of closing
