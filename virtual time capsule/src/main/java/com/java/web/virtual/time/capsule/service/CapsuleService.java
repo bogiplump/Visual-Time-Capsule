@@ -2,24 +2,22 @@ package com.java.web.virtual.time.capsule.service;
 
 import com.java.web.virtual.time.capsule.dto.CapsuleCreateDto;
 import com.java.web.virtual.time.capsule.dto.MemoryCreateDto;
-import com.java.web.virtual.time.capsule.exception.CapsuleHasBeenLocked;
-import com.java.web.virtual.time.capsule.exception.CapsuleIsNotClosedYet;
-import com.java.web.virtual.time.capsule.exception.CapsuleNotFound;
-import com.java.web.virtual.time.capsule.exception.GoalNotFound;
-import com.java.web.virtual.time.capsule.exception.MemoryNotFound;
-import com.java.web.virtual.time.capsule.exception.MemoryNotInBank;
-import com.java.web.virtual.time.capsule.exception.MemoryNotInCapsule;
+import com.java.web.virtual.time.capsule.exception.capsule.CapsuleHasBeenLocked;
+import com.java.web.virtual.time.capsule.exception.capsule.CapsuleIsNotClosedYet;
+import com.java.web.virtual.time.capsule.exception.capsule.CapsuleNotFound;
+import com.java.web.virtual.time.capsule.exception.goal.GoalNotFound;
+import com.java.web.virtual.time.capsule.exception.memory.MemoryNotFound;
+import com.java.web.virtual.time.capsule.exception.memory.MemoryNotInBank;
+import com.java.web.virtual.time.capsule.exception.memory.MemoryNotInCapsule;
 import com.java.web.virtual.time.capsule.model.entity.CapsuleEntity;
 import com.java.web.virtual.time.capsule.model.entity.GoalEntity;
 import com.java.web.virtual.time.capsule.model.entity.MemoryEntity;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.Set;
 
 @Service
 public interface CapsuleService {
-
     /**
      * Retrieves a CapsuleEntity from the database by its unique identifier.
      *
