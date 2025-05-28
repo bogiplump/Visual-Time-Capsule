@@ -2,21 +2,44 @@ package com.java.web.virtual.time.capsule.service;
 
 import com.java.web.virtual.time.capsule.dto.CapsuleCreateDto;
 import com.java.web.virtual.time.capsule.dto.MemoryCreateDto;
+import com.java.web.virtual.time.capsule.exception.capsule.CapsuleNotFound;
 import com.java.web.virtual.time.capsule.model.entity.CapsuleEntity;
 import com.java.web.virtual.time.capsule.model.entity.GoalEntity;
 import com.java.web.virtual.time.capsule.model.entity.MemoryEntity;
+import com.java.web.virtual.time.capsule.repository.CapsuleRepository;
+import org.springframework.format.datetime.DateFormatter;
+import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Set;
 
+@Service
 public class CapsuleServiceImpl implements CapsuleService {
+    private String dateTimePattern = "HH-mm-ss_dd-MM-yy";
+
+    private SecurityService securityService;
+    private CapsuleRepository repository;
+    private DateTimeFormatter formatter;
+
+    public CapsuleServiceImpl(CapsuleRepository repository, SecurityService securityService) {
+        this.repository = repository;
+        this.securityService = securityService;
+
+        this.formatter = DateTimeFormatter.ofPattern(dateTimePattern);
+    }
+
     @Override
     public CapsuleEntity getCapsuleById(Long id) {
-        return null;
+        return repository.findById(id)
+            .orElseThrow(() -> new CapsuleNotFound("Capsule with this id was not found. "));
     }
 
     @Override
     public Set<CapsuleEntity> getAllCapsulesOfUser() {
-        return Set.of();
+       Long currentUserId = securityService.getCurrentUserId();
+
+       return repository.findByCreatedById(currentUserId);
     }
 
     @Override
@@ -70,12 +93,27 @@ public class CapsuleServiceImpl implements CapsuleService {
     }
 
     @Override
-    public void lockCapsuleById(Long id, String openDate) {
+    public void lockCapsuleById(Long id, String openDateInString) {
+        if (id == null || openDateInString == null) {
+            throw new IllegalArgumentException("Null reference in CapsuleServiceImpl::lockCapsuleById()");
+        }
 
+        CapsuleEntity capsule = repository.findById(id)
+            .orElseThrow(() -> new CapsuleNotFound("Capsule with this id was not found"));
+
+        LocalDateTime openDate = LocalDateTime.parse(openDateInString, formatter);
+
+        capsule.lock(openDate);
     }
 
     @Override
-    public void openCapsuleIfPossible(Long id) {
+    public void openCapsuleIfPossible(CapsuleEntity capsule) {
+        if (capsule == null) {
+            throw new IllegalArgumentException("Null reference in CapsuleServiceImpl::openCapsuleIfPossible()");
+        }
 
+        if (capsule.isTimeToOpen()) {
+            capsule.open();
+        }
     }
 }

@@ -150,24 +150,24 @@ public interface CapsuleService {
      * Locks the capsule and its contents become unavailable until the date of the opening.
      *
      * @param id unique identifier of the capsule, must not be null.
-     * @param openDate the date and time of the opening of the capsule,
-     *                 in string format, must not be null.
+     * @param openDateInString the date and time of the opening of the capsule
+     *                         in string format, must not be null.
      *
      * @throws IllegalArgumentException if id or goal are null.
      * @throws CapsuleNotFound if a capsule with this id does not exist.
      * @throws CapsuleHasBeenLocked if the capsule has already been locked.
      */
-    void lockCapsuleById(Long id, String openDate);
+    void lockCapsuleById(Long id, String openDateInString);
 
     /**
      * Checks if the date for opening of the capsule which has been set at the moment of closing
      * has passed. If so it moves the capsule to state - opened, otherwise nothing happens.
      *
-     * @param id unique identifier of the capsule, must not be null.
+     * @param capsule a reference to the capsule object, must not be null.
      *
      * @throws IllegalArgumentException if id or goal are null.
      * @throws CapsuleNotFound if a capsule with this id does not exist.
      * @throws CapsuleIsNotClosedYet if the capsule is not in stated - locked.
      */
-    void openCapsuleIfPossible(Long id);
+    void openCapsuleIfPossible(CapsuleEntity capsule);
 }
