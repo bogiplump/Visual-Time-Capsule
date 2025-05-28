@@ -1,4 +1,4 @@
-package com.java.web.virtual.time.capsule.exception;
+package com.java.web.virtual.time.capsule.exception.capsule;
 
 public class CapsuleIsNotClosedYet extends RuntimeException {
     public CapsuleIsNotClosedYet(String message) {

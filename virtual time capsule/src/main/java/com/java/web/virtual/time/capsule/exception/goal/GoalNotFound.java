@@ -1,4 +1,4 @@
-package com.java.web.virtual.time.capsule.exception;
+package com.java.web.virtual.time.capsule.exception.goal;
 
 public class GoalNotFound extends RuntimeException {
     public GoalNotFound(String message) {
