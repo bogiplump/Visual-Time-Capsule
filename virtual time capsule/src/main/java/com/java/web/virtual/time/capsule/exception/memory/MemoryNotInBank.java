@@ -1,4 +1,4 @@
-package com.java.web.virtual.time.capsule.exception;
+package com.java.web.virtual.time.capsule.exception.memory;
 
 public class MemoryNotInBank extends RuntimeException {
     public MemoryNotInBank(String message) {
