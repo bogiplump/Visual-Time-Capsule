@@ -39,7 +39,7 @@ public interface CapsuleService {
      * Creates and saves the capsule in the database.
      *
      * @param capsuleDto must not be null.
-     * @throws IllegalArgumentException if is null.
+     * @throws IllegalArgumentException if capsuleDto is null.
      */
     void createCapsule(CapsuleCreateDto capsuleDto);
 
