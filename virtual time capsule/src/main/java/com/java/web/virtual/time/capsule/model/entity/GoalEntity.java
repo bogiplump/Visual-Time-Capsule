@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 public class GoalEntity {
     @Id
     @GeneratedValue
-    private Integer id;
+    private Long id;
 
     @Column(name = "is_visible")
     private boolean isVisible;
