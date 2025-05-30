@@ -1,6 +1,7 @@
 package com.java.web.virtual.time.capsule.controller;
 
 import com.java.web.virtual.time.capsule.dto.CapsuleCreateDto;
+import com.java.web.virtual.time.capsule.dto.CapsuleUpdateDto;
 import com.java.web.virtual.time.capsule.dto.MemoryCreateDto;
 import com.java.web.virtual.time.capsule.model.entity.CapsuleEntity;
 import com.java.web.virtual.time.capsule.service.CapsuleService;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/capsule")
+@RequestMapping("/capsules")
 public class CapsuleController {
     CapsuleService capsuleService;
 
@@ -45,19 +46,24 @@ public class CapsuleController {
         capsuleService.lockCapsuleById(id, openDate);
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping("/{id}/addMemory")
     public void addNewMemoryToCapsule(@PathVariable Long id, @RequestBody MemoryCreateDto memoryDto) {
         capsuleService.addMemoryToCapsule(id, memoryDto);
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping("/{id}/addMemory")
     public void addExistingMemoryToCapsule(@PathVariable Long id, @RequestParam Long memoryId) {
         capsuleService.putMemoryInCapsule(id, memoryId);
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping("/{id}/removeMemory")
     public void removeMemoryFromCapsule(@PathVariable Long id, @RequestParam Long memoryId) {
         capsuleService.removeMemoryFromCapsule(id, memoryId);
+    }
+
+    @PatchMapping("/{id}")
+    public void updateCapsule(@PathVariable Long id, @RequestBody CapsuleUpdateDto capsuleDto) {
+        capsuleService.updateCapsule(id, capsuleDto);
     }
 
     @DeleteMapping("/{id}")
