@@ -66,6 +66,7 @@ public class CapsuleEntity {
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "goal_id")
+    @Setter(AccessLevel.NONE)
     private GoalEntity goal;
 
     @OneToMany(mappedBy = "capsule", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
@@ -98,10 +99,10 @@ public class CapsuleEntity {
 
     private void checkIfCapsuleEditable() {
         if (status == CapsuleStatus.CLOSED) {
-            throw new CapsuleHasBeenLocked("Can not view or add memories in a locked capsule");
+            throw new CapsuleHasBeenLocked("Can not view or add memories or change the goal of a locked capsule");
         }
         if (status == CapsuleStatus.OPEN) {
-            throw new CapsuleIsOpened("Can not add memories after a capsule has been locked and opened");
+            throw new CapsuleIsOpened("Can not add memories or change the capsules goal after a capsule has been locked and opened");
         }
     }
 
@@ -124,6 +125,29 @@ public class CapsuleEntity {
 
         memory.setCapsule(this);
         this.memoryEntries.add(memory);
+    }
+
+    public void setGoal(GoalEntity goal) {
+        if (goal == null) {
+            throw new IllegalArgumentException("Null reference in CapsuleEntity::setGoal");
+        }
+
+        checkIfCapsuleEditable();
+
+        this.goal = goal;
+        goal.setCapsule(this);
+    }
+
+    public void setOpenDate(LocalDateTime openDate) {
+        if (openDate == null) {
+            throw new IllegalArgumentException("Null reference in CapsuleEntity::setOpenDate");
+        }
+
+        switch (status) {
+            case CapsuleStatus.CREATED ->  throw new CapsuleIsNotClosedYet("Trying to change the openDate of a capsule which is not locked");
+            case CapsuleStatus.OPEN -> throw new CapsuleIsOpened("Trying to change the openDate of opened capsule");
+            case CapsuleStatus.CLOSED ->  this.openDate = openDate;
+        }
     }
 
     public Set<MemoryEntity> getMemoryEntries() {
