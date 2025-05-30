@@ -1,6 +1,7 @@
 package com.java.web.virtual.time.capsule.service;
 
 import com.java.web.virtual.time.capsule.dto.CapsuleCreateDto;
+import com.java.web.virtual.time.capsule.dto.CapsuleUpdateDto;
 import com.java.web.virtual.time.capsule.dto.MemoryCreateDto;
 import com.java.web.virtual.time.capsule.exception.capsule.CapsuleHasBeenLocked;
 import com.java.web.virtual.time.capsule.exception.capsule.CapsuleIsNotClosedYet;
@@ -36,12 +37,33 @@ public interface CapsuleService {
     Set<CapsuleEntity> getAllCapsulesOfUser();
 
     /**
+     * Parses capsule data transfer object to CapsuleEntity.
+     *
+     * @param capsuleDto must not be null
+     * @return the GoalEntity object.
+     *
+     * @throws IllegalArgumentException if capsuleDto is null.
+     */
+    CapsuleEntity parseCapsuleCreateDto(CapsuleCreateDto capsuleDto);
+
+    /**
      * Creates and saves the capsule in the database, from a data transfer object.
      *
      * @param capsuleDto must not be null.
      * @throws IllegalArgumentException if capsuleDto is null.
      */
     void createCapsule(CapsuleCreateDto capsuleDto);
+
+    /**
+     * Updates and saves the capsule associated with this id in the database, from a data transfer object.
+     *
+     * @param id unique identifier of the capsule, must not be null.
+     * @param capsuleDto must not be null.
+     *
+     * @throws IllegalArgumentException if id and capsuleDto are null.
+     * @throws CapsuleNotFound if capsule with this id does not exist.
+     */
+    void updateCapsule(Long id, CapsuleUpdateDto capsuleDto);
 
     /**
      * Finds and deletes the capsule with the same id.

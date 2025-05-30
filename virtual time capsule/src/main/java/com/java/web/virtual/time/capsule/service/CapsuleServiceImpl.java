@@ -1,6 +1,7 @@
 package com.java.web.virtual.time.capsule.service;
 
 import com.java.web.virtual.time.capsule.dto.CapsuleCreateDto;
+import com.java.web.virtual.time.capsule.dto.CapsuleUpdateDto;
 import com.java.web.virtual.time.capsule.dto.MemoryCreateDto;
 import com.java.web.virtual.time.capsule.exception.capsule.CapsuleNotFound;
 import com.java.web.virtual.time.capsule.exception.goal.GoalNotFound;
@@ -9,6 +10,7 @@ import com.java.web.virtual.time.capsule.exception.memory.MemoryNotInCapsule;
 import com.java.web.virtual.time.capsule.model.entity.CapsuleEntity;
 import com.java.web.virtual.time.capsule.model.entity.GoalEntity;
 import com.java.web.virtual.time.capsule.model.entity.MemoryEntity;
+import com.java.web.virtual.time.capsule.model.entity.UserEntity;
 import com.java.web.virtual.time.capsule.repository.CapsuleRepository;
 import org.springframework.stereotype.Service;
 
@@ -21,15 +23,23 @@ public class CapsuleServiceImpl implements CapsuleService {
     private String dateTimePattern = "HH-mm-ss_dd-MM-yyyy";
 
     private CapsuleRepository repository;
+
     private SecurityService securityService;
+    private UserService userService;
+
     private GoalService goalService;
     private MemoryService memoryService;
+
     private DateTimeFormatter formatter;
 
     public CapsuleServiceImpl(CapsuleRepository repository, SecurityService securityService,
-                              GoalService goalService, MemoryService memoryService) {
+                              UserService userService, GoalService goalService,
+                              MemoryService memoryService) {
         this.repository = repository;
+
         this.securityService = securityService;
+        this.userService = userService;
+
         this.goalService = goalService;
         this.memoryService = memoryService;
 
@@ -50,8 +60,52 @@ public class CapsuleServiceImpl implements CapsuleService {
     }
 
     @Override
-    public void createCapsule(CapsuleCreateDto capsuleDto) {
+    public CapsuleEntity parseCapsuleCreateDto(CapsuleCreateDto capsuleDto) {
+        if (capsuleDto == null) {
+            throw new IllegalArgumentException("Null reference in CapsuleService::createCapsule()");
+        }
 
+        GoalEntity goal = null;
+        if (capsuleDto.getGoal() != null) {
+            goal = goalService.parseGoalDto(capsuleDto.getGoal());
+        }
+
+        UserEntity creator = userService.getUserById(securityService.getCurrentUserId());
+
+        return new CapsuleEntity(capsuleDto.getCapsuleName(), creator, goal);
+    }
+
+    @Override
+    public void createCapsule(CapsuleCreateDto capsuleDto) {
+        CapsuleEntity capsule = parseCapsuleCreateDto(capsuleDto);
+
+        repository.save(capsule);
+    }
+
+    @Override
+    public void updateCapsule(Long id, CapsuleUpdateDto capsuleDto) {
+        if (id == null || capsuleDto == null) {
+            throw new IllegalArgumentException("Null reference in CapsuleService::updateCapsule()");
+        }
+
+        CapsuleEntity capsule = repository.findById(id)
+            .orElseThrow(() -> new CapsuleNotFound());
+
+        if (capsuleDto.getCapsuleName() != null) {
+            capsule.setCapsuleName(capsuleDto.getCapsuleName());
+        }
+        if (capsuleDto.getOpenDate() != null) {
+            capsule.setOpenDate(capsuleDto.getOpenDate());
+        }
+        if (capsuleDto.getGoal() != null) {
+            GoalEntity goal = goalService.parseGoalDto(capsuleDto.getGoal());
+
+            if (capsule.getGoal() != null) {
+                goalService.deleteGoal(capsule.getGoal().getId());
+            }
+
+            capsule.setGoal(goal);
+        }
     }
 
     @Override
