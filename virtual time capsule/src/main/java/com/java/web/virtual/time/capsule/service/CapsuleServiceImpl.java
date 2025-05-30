@@ -56,12 +56,33 @@ public class CapsuleServiceImpl implements CapsuleService {
 
     @Override
     public void deleteCapsuleById(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("Null reference in CapsuleService::deleteCapsuleById()");
+        }
 
+        if (!repository.existsById(id)) {
+            throw new CapsuleNotFound();
+        }
+
+        repository.deleteById(id);
     }
 
     @Override
-    public void addMemoryToCapsule(Long capsuleId, MemoryCreateDto memory) {
+    public void addMemoryToCapsule(Long capsuleId, MemoryCreateDto memoryDto) {
+        if (capsuleId == null || memoryDto == null) {
+            throw new IllegalArgumentException("Null reference in CapsuleService::addMemoryToCapsule()");
+        }
 
+        CapsuleEntity capsule = repository.findById(capsuleId)
+            .orElseThrow(() -> new CapsuleNotFound());
+
+        MemoryEntity memory = memoryService.parseMemoryDto(memoryDto);
+
+        capsule.addMemory(memory);
+        memory.setCapsule(capsule);
+
+        repository.save(capsule);
+        memoryService.saveMemory(memory);
     }
 
     @Override

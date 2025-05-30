@@ -36,7 +36,7 @@ public interface CapsuleService {
     Set<CapsuleEntity> getAllCapsulesOfUser();
 
     /**
-     * Creates and saves the capsule in the database.
+     * Creates and saves the capsule in the database, from a data transfer object.
      *
      * @param capsuleDto must not be null.
      * @throws IllegalArgumentException if capsuleDto is null.
@@ -56,12 +56,12 @@ public interface CapsuleService {
      * Adds a new memory to the database associated with a certain capsule.
      *
      * @param capsuleId unique identifier of the capsule, must not be null.
-     * @param memory the memory object to add, must not be null.
+     * @param memoryDto the memory object to add, must not be null.
      *
-     * @throws IllegalArgumentException if id or memory are null.
+     * @throws IllegalArgumentException if capsuleId or memoryDto are null.
      * @throws CapsuleNotFound if a capsule with this id does not exist.
      */
-    void addMemoryToCapsule(Long capsuleId, MemoryCreateDto memory);
+    void addMemoryToCapsule(Long capsuleId, MemoryCreateDto memoryDto);
 
     /**
      * Puts a memory from the users profile into a certain capsule.

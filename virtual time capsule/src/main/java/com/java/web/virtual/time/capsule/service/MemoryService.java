@@ -1,5 +1,6 @@
 package com.java.web.virtual.time.capsule.service;
 
+import com.java.web.virtual.time.capsule.dto.MemoryCreateDto;
 import com.java.web.virtual.time.capsule.exception.memory.MemoryNotFound;
 import com.java.web.virtual.time.capsule.model.entity.MemoryEntity;
 
@@ -21,4 +22,20 @@ public interface MemoryService {
      * @throws IllegalArgumentException if memory is null.
      */
     void saveMemory(MemoryEntity memory);
+
+    /**
+     * Creates and saves the memory in the database, from a data transfer object.
+     *
+     * @param memoryDto must not be null.
+     * @throws IllegalArgumentException if memoryDto is null.
+     */
+    void createMemory(MemoryCreateDto memoryDto);
+
+    /**
+     * Parses memory data transfer object to MemoryEntity.
+     *
+     * @param memoryDto must not be null.
+     * @throws IllegalArgumentException if memoryDto is null.
+     */
+    MemoryEntity parseMemoryDto(MemoryCreateDto memoryDto);
 }
