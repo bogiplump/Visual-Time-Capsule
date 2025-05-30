@@ -161,7 +161,15 @@ public class CapsuleServiceImpl implements CapsuleService {
 
     @Override
     public void removeMemoryFromCapsule(Long capsuleId, Long memoryId) {
+        if (capsuleId == null || memoryId == null) {
+            throw new IllegalArgumentException("Null reference in CapsuleService::removeMemoryFromCapsule()");
+        }
 
+        if (!memoryService.isMemoryInCapsule(memoryId, capsuleId)) {
+            throw new MemoryNotInCapsule();
+        }
+
+        memoryService.deleteMemoryById(memoryId);
     }
 
     @Override

@@ -36,6 +36,26 @@ public interface MemoryService {
     void createMemory(MemoryCreateDto memoryDto);
 
     /**
+     * Finds and deletes the memory with the same id.
+     *
+     * @param id unique identifier of the memory, must not be null.
+     * @throws IllegalArgumentException if id is null.
+     * @throws MemoryNotFound if a capsule with this id does not exist.
+     */
+    void deleteMemoryById(Long id);
+
+    /**
+     * Retrieves a MemoryEntity from the database and returns if the memory is in this capsule.
+     *
+     * @param memoryId unique identifier of the memory, must not be null.
+     * @param capsuleId unique identifier of the capsule, must not be null.
+     * @return if the memory is in this capsule.
+     *
+     * @throws IllegalArgumentException if memoryId or capsuleId are null.
+     */
+    boolean isMemoryInCapsule(Long memoryId, Long capsuleId);
+
+    /**
      * Parses memory data transfer object to MemoryEntity.
      *
      * @param memoryDto must not be null.
