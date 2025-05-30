@@ -79,7 +79,6 @@ public class CapsuleServiceImpl implements CapsuleService {
         MemoryEntity memory = memoryService.parseMemoryDto(memoryDto);
 
         capsule.addMemory(memory);
-        memory.setCapsule(capsule);
 
         repository.save(capsule);
         memoryService.saveMemory(memory);
@@ -100,7 +99,6 @@ public class CapsuleServiceImpl implements CapsuleService {
             throw new MemoryNotInBank("Memory is not in memory bank");
         }
 
-        memory.setCapsule(capsule);
         capsule.addMemory(memory);
 
         repository.save(capsule);

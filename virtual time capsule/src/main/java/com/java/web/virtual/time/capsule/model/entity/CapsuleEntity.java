@@ -5,7 +5,6 @@ import com.java.web.virtual.time.capsule.enums.CapsuleStatus;
 import com.java.web.virtual.time.capsule.exception.capsule.CapsuleHasBeenLocked;
 import com.java.web.virtual.time.capsule.exception.capsule.CapsuleIsNotClosedYet;
 import com.java.web.virtual.time.capsule.exception.capsule.CapsuleIsOpened;
-import com.java.web.virtual.time.capsule.exception.capsule.CapsuleNotFound;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -22,6 +21,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Id;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 import lombok.AccessLevel;
@@ -74,16 +74,16 @@ public class CapsuleEntity {
     private Set<MemoryEntity> memoryEntries;
 
     public CapsuleEntity(String capsuleName, UserEntity creator,
-                         GoalEntity goal, Set<MemoryEntity> memoryEntries) {
+                         GoalEntity goal) {
         if (capsuleName == null || creator == null ||
-            goal == null || memoryEntries == null) {
+            goal == null) {
             throw new IllegalArgumentException("Null reference in CapsuleEntity constructor. ");
         }
 
         this.capsuleName = capsuleName;
         this.creator = creator;
         this.goal = goal;
-        this.memoryEntries = memoryEntries;
+        this.memoryEntries = new HashSet<>();
 
         this.status = CapsuleStatus.CREATED;
         this.creationDate = LocalDateTime.now();
@@ -122,6 +122,7 @@ public class CapsuleEntity {
 
         checkIfCapsuleEditable();
 
+        memory.setCapsule(this);
         this.memoryEntries.add(memory);
     }
 
