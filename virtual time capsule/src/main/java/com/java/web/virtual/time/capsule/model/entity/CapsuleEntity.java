@@ -3,7 +3,9 @@ package com.java.web.virtual.time.capsule.model.entity;
 import com.java.web.virtual.time.capsule.enums.CapsuleStatus;
 
 import com.java.web.virtual.time.capsule.exception.capsule.CapsuleHasBeenLocked;
+import com.java.web.virtual.time.capsule.exception.capsule.CapsuleIsNotClosedYet;
 import com.java.web.virtual.time.capsule.exception.capsule.CapsuleIsOpened;
+import com.java.web.virtual.time.capsule.exception.capsule.CapsuleNotFound;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -134,6 +136,10 @@ public class CapsuleEntity {
     }
 
     public void open() {
-        status = CapsuleStatus.OPEN;
+        switch (status) {
+            case CapsuleStatus.CREATED ->  throw new CapsuleIsNotClosedYet("Trying to open a capsule which is not locked");
+            case CapsuleStatus.OPEN -> throw new CapsuleIsOpened("Trying to open an opened capsule");
+            case CapsuleStatus.CLOSED ->  status = CapsuleStatus.OPEN;
+        }
     }
 }
