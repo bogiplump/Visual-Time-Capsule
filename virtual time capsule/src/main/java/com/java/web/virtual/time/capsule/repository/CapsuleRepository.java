@@ -10,4 +10,6 @@ import java.util.Set;
 @Repository
 public interface CapsuleRepository extends JpaRepository<CapsuleEntity, Long> {
     Set<CapsuleEntity> findByCreatedById(Long createdById);
+
+    boolean existsByIdAndCreatedById(Long id, Long createdById);
 }

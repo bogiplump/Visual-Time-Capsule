@@ -4,6 +4,7 @@ import com.java.web.virtual.time.capsule.dto.CapsuleCreateDto;
 import com.java.web.virtual.time.capsule.dto.CapsuleUpdateDto;
 import com.java.web.virtual.time.capsule.dto.MemoryCreateDto;
 import com.java.web.virtual.time.capsule.exception.capsule.CapsuleNotFound;
+import com.java.web.virtual.time.capsule.exception.capsule.CapsuleNotOwnedByYou;
 import com.java.web.virtual.time.capsule.exception.goal.GoalNotFound;
 import com.java.web.virtual.time.capsule.exception.memory.MemoryNotInBank;
 import com.java.web.virtual.time.capsule.exception.memory.MemoryNotInCapsule;
@@ -20,7 +21,8 @@ import java.util.Set;
 
 @Service
 public class CapsuleServiceImpl implements CapsuleService {
-    private String dateTimePattern = "HH-mm-ss_dd-MM-yyyy";
+    private final static String dateTimePattern = "HH-mm-ss_dd-MM-yyyy";
+    private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateTimePattern);
 
     private CapsuleRepository repository;
 
@@ -29,8 +31,6 @@ public class CapsuleServiceImpl implements CapsuleService {
 
     private GoalService goalService;
     private MemoryService memoryService;
-
-    private DateTimeFormatter formatter;
 
     public CapsuleServiceImpl(CapsuleRepository repository, SecurityService securityService,
                               UserService userService, GoalService goalService,
@@ -42,14 +42,32 @@ public class CapsuleServiceImpl implements CapsuleService {
 
         this.goalService = goalService;
         this.memoryService = memoryService;
+    }
 
-        this.formatter = DateTimeFormatter.ofPattern(dateTimePattern);
+    private void handleCapsuleNotOwnedByUser(CapsuleEntity capsule) {
+        if (capsule == null) {
+            throw new IllegalArgumentException("Null reference in CapsuleService::isCapsuleOwnedByCurrentUser()");
+        }
+
+        Long currentUserId = securityService.getCurrentUserId();
+
+        if (!capsule.getCreator().getId().equals(currentUserId)) {
+            throw new CapsuleNotOwnedByYou("Capsule with id " + capsule.getId() + " is not owned by you");
+        }
     }
 
     @Override
-    public CapsuleEntity getCapsuleById(Long id) {
-        return repository.findById(id)
-            .orElseThrow(() -> new CapsuleNotFound("Capsule with this id was not found. "));
+    public CapsuleEntity getCapsuleById(Long id) { //TODO: How a locked capsule is send to client
+        if (id == null) {
+            throw new IllegalArgumentException("Null reference in CapsuleService::getCapsuleById()");
+        }
+
+        CapsuleEntity capsule = repository.findById(id)
+            .orElseThrow(() -> new CapsuleNotFound("Capsule with  id " + id + " was not found. "));
+
+        handleCapsuleNotOwnedByUser(capsule);
+
+        return capsule;
     }
 
     @Override
@@ -89,7 +107,9 @@ public class CapsuleServiceImpl implements CapsuleService {
         }
 
         CapsuleEntity capsule = repository.findById(id)
-            .orElseThrow(() -> new CapsuleNotFound());
+            .orElseThrow(() -> new CapsuleNotFound("Capsule with  id " + id + " was not found. "));
+
+        handleCapsuleNotOwnedByUser(capsule);
 
         if (capsuleDto.getCapsuleName() != null) {
             capsule.setCapsuleName(capsuleDto.getCapsuleName());
@@ -114,8 +134,8 @@ public class CapsuleServiceImpl implements CapsuleService {
             throw new IllegalArgumentException("Null reference in CapsuleService::deleteCapsuleById()");
         }
 
-        if (!repository.existsById(id)) {
-            throw new CapsuleNotFound();
+        if (repository.existsByIdAndCreatedById(id, securityService.getCurrentUserId())) {
+           throw new CapsuleNotFound("Capsule with  id " + id + " was not found or is not owned by you. ");
         }
 
         repository.deleteById(id);
@@ -128,14 +148,15 @@ public class CapsuleServiceImpl implements CapsuleService {
         }
 
         CapsuleEntity capsule = repository.findById(capsuleId)
-            .orElseThrow(() -> new CapsuleNotFound());
+            .orElseThrow(() -> new CapsuleNotFound("Capsule with  id " + capsuleId + " was not found"));
+
+        handleCapsuleNotOwnedByUser(capsule);
 
         MemoryEntity memory = memoryService.parseMemoryDto(memoryDto);
 
         capsule.addMemory(memory);
 
         repository.save(capsule);
-        memoryService.saveMemory(memory);
     }
 
     @Override
@@ -145,18 +166,17 @@ public class CapsuleServiceImpl implements CapsuleService {
         }
 
         CapsuleEntity capsule = repository.findById(capsuleId)
-            .orElseThrow(() -> new CapsuleNotFound());
+            .orElseThrow(() -> new CapsuleNotFound("Capsule with  id " + capsuleId + " was not found"));
 
         MemoryEntity memory = memoryService.getMemoryById(memoryId);
 
         if (memory.getCapsule() != null) {
-            throw new MemoryNotInBank("Memory is not in memory bank");
+            throw new MemoryNotInBank("Memory with id " + memoryId + " is not in your memory bank");
         }
 
         capsule.addMemory(memory);
 
         repository.save(capsule);
-        memoryService.saveMemory(memory);
     }
 
     @Override
@@ -179,12 +199,14 @@ public class CapsuleServiceImpl implements CapsuleService {
         }
 
         CapsuleEntity capsule = repository.findById(capsuleId)
-                .orElseThrow(() -> new CapsuleNotFound());
+            .orElseThrow(() -> new CapsuleNotFound("Capsule with  id " + capsuleId + " was not found"));
+
+        handleCapsuleNotOwnedByUser(capsule);
 
         MemoryEntity memory = memoryService.getMemoryById(memoryId);
 
         if (!memory.getCapsule().getId().equals(capsule.getId())) {
-            throw new MemoryNotInCapsule();
+            throw new MemoryNotInCapsule("Memory with id" + memoryId + " is not in your capsule");
         }
 
         return memory;
@@ -197,19 +219,23 @@ public class CapsuleServiceImpl implements CapsuleService {
         }
 
         CapsuleEntity capsule = repository.findById(capsuleId)
-            .orElseThrow(() -> new CapsuleNotFound());
+            .orElseThrow(() -> new CapsuleNotFound("Capsule with  id " + capsuleId + " was not found"));
+
+        handleCapsuleNotOwnedByUser(capsule);
 
         return capsule.getMemoryEntries();
     }
 
     @Override
-    public void addGoalToCapsule(Long capsuleId, GoalEntity goal) {
+    public void addGoalToCapsule(Long capsuleId, GoalEntity goal) { //TODO Check if goal is created by the current user
         if (capsuleId == null || goal == null) {
             throw new IllegalArgumentException("Null reference in CapsuleService::addGoalToCapsule()");
         }
 
         CapsuleEntity capsule = repository.findById(capsuleId)
-            .orElseThrow(() -> new CapsuleNotFound());
+            .orElseThrow(() -> new CapsuleNotFound("Capsule with  id " + capsuleId + " was not found"));
+
+        handleCapsuleNotOwnedByUser(capsule);
 
         capsule.setGoal(goal);
         repository.save(capsule);
@@ -222,7 +248,9 @@ public class CapsuleServiceImpl implements CapsuleService {
         }
 
         CapsuleEntity capsule = repository.findById(capsuleId)
-            .orElseThrow(() -> new CapsuleNotFound());
+            .orElseThrow(() -> new CapsuleNotFound("Capsule with  id " + capsuleId + " was not found"));
+
+        handleCapsuleNotOwnedByUser(capsule);
 
         return capsule.getGoal();
     }
@@ -234,10 +262,10 @@ public class CapsuleServiceImpl implements CapsuleService {
         }
 
         CapsuleEntity capsule = repository.findById(capsuleId)
-            .orElseThrow(() -> new CapsuleNotFound());
+            .orElseThrow(() -> new CapsuleNotFound("Capsule with  id " + capsuleId + " was not found"));
 
         if (capsule.getGoal() == null) {
-            throw new GoalNotFound("The capsule with this id has no goal");
+            throw new GoalNotFound("The capsule with id " + capsuleId + " has no goal");
         }
 
         goalService.deleteGoal(capsule.getGoal().getId());
@@ -247,13 +275,15 @@ public class CapsuleServiceImpl implements CapsuleService {
     }
 
     @Override
-    public void lockCapsuleById(Long id, String openDateInString) {
+    public void lockCapsuleById(Long id, String openDateInString) { //TODO better parsing of openDateInString
         if (id == null || openDateInString == null) {
             throw new IllegalArgumentException("Null reference in CapsuleServiceImpl::lockCapsuleById()");
         }
 
         CapsuleEntity capsule = repository.findById(id)
-            .orElseThrow(() -> new CapsuleNotFound("Capsule with this id was not found"));
+            .orElseThrow(() -> new CapsuleNotFound("Capsule with  id " + id + " was not found"));
+
+        handleCapsuleNotOwnedByUser(capsule);
 
         LocalDateTime openDate = LocalDateTime.parse(openDateInString, formatter);
 
@@ -267,6 +297,8 @@ public class CapsuleServiceImpl implements CapsuleService {
         if (capsule == null) {
             throw new IllegalArgumentException("Null reference in CapsuleServiceImpl::openCapsuleIfPossible()");
         }
+
+        handleCapsuleNotOwnedByUser(capsule);
 
         if (capsule.isTimeToOpen()) {
             capsule.open();
