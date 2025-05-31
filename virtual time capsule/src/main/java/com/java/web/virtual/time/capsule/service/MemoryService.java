@@ -2,6 +2,7 @@ package com.java.web.virtual.time.capsule.service;
 
 import com.java.web.virtual.time.capsule.dto.MemoryCreateDto;
 import com.java.web.virtual.time.capsule.exception.memory.MemoryNotFound;
+import com.java.web.virtual.time.capsule.exception.memory.MemoryNotOwnedByYou;
 import com.java.web.virtual.time.capsule.model.entity.MemoryEntity;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,7 @@ public interface MemoryService {
      *
      * @throws IllegalArgumentException if id is null.
      * @throws MemoryNotFound if a memory with this id does not exist.
+     * @throws MemoryNotOwnedByYou if a memory with this id is not owned by the current user.
      */
     MemoryEntity getMemoryById(Long id);
 
@@ -41,6 +43,7 @@ public interface MemoryService {
      * @param id unique identifier of the memory, must not be null.
      * @throws IllegalArgumentException if id is null.
      * @throws MemoryNotFound if a capsule with this id does not exist.
+     * @throws MemoryNotOwnedByYou if a memory with this id is not owned by the current user.
      */
     void deleteMemoryById(Long id);
 
