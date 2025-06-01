@@ -1,8 +1,10 @@
 package com.java.web.virtual.time.capsule.service;
 
+import com.java.web.virtual.time.capsule.dtos.GoalDto;
 import com.java.web.virtual.time.capsule.dtos.UpdateGoalDto;
 import com.java.web.virtual.time.capsule.exception.GoalNotFoundException;
 import com.java.web.virtual.time.capsule.exception.GoalNotVisibleException;
+import com.java.web.virtual.time.capsule.mapper.GoalMapper;
 import com.java.web.virtual.time.capsule.model.GoalEntity;
 import com.java.web.virtual.time.capsule.repository.GoalRepository;
 import com.java.web.virtual.time.capsule.repository.UserRepository;
@@ -11,9 +13,8 @@ import java.util.List;
 
 import lombok.AllArgsConstructor;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -40,13 +41,17 @@ public class GoalServiceImpl implements GoalService {
             throw new IllegalArgumentException(("No goal entity provided."));
         }
 
-        GoalEntity goalEntity = goalRepository.getReferenceById(updateGoalDto.getId());
+        GoalEntity goalEntity = getGoalEntity(updateGoalDto.getId());
 
+        goalRepository.save(goalEntity);
+    }
+
+    private @NotNull GoalEntity getGoalEntity(Integer updateGoalDto) {
+        GoalEntity goalEntity = goalRepository.getReferenceById(updateGoalDto);
         if (!goalEntity.isVisible()) {
             throw new GoalNotVisibleException("Goal not visible to user.");
         }
-
-        goalRepository.save(goalEntity);
+        return goalEntity;
     }
 
     @Override
@@ -59,15 +64,8 @@ public class GoalServiceImpl implements GoalService {
     }
 
     @Override
-    public List<GoalEntity> getUserGoals(UpdateGoalDto listGoalsDto) {
-        if (listGoalsDto == null) {
-            throw new IllegalArgumentException(("Invalid request."));
-        }
-
-        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext()
-            .getAuthentication()
-            .getPrincipal();
-        String username = userDetails.getUsername();
+    public List<GoalEntity> getUserGoals(Long userId) {
+        String username = userRepository.getReferenceById(userId).getUsername();
 
         List<GoalEntity> userGoals = goalRepository.findByCreator(userRepository.findByUsername(username));
 
@@ -83,13 +81,20 @@ public class GoalServiceImpl implements GoalService {
 
     @Override
     public void setGoalIsAchieved(Integer id) {
-        GoalEntity goal = goalRepository.getReferenceById(id);
-
-        if (!goal.isVisible()) {
-            throw new GoalNotVisibleException("Goal not visible to user.");
-        }
+        GoalEntity goal = getGoalEntity(id);
 
         goal.setAchieved(true);
         goalRepository.save(goal);
+    }
+
+    @Override
+    public GoalDto getGoal(Integer id) {
+        if (!goalRepository.existsById(id)) {
+            throw new GoalNotFoundException("Goal not found.");
+        }
+
+        GoalEntity goal = getGoalEntity(id);
+
+        return GoalMapper.INSTANCE.toDTO(goal);
     }
 }
