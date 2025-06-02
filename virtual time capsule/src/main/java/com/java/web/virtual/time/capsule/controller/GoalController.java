@@ -27,7 +27,7 @@ public class GoalController {
 
     @GetMapping("/{id}")
     public ResponseEntity<GoalDto> getGoal(@RequestParam Long id) {
-        return ResponseEntity.ok(goalService.getGoal(Math.toIntExact(id)));
+        return ResponseEntity.ok(goalService.getGoal(id));
     }
 
     @PutMapping("/update")
@@ -39,7 +39,7 @@ public class GoalController {
 
     @DeleteMapping("/remove/{id}")
     public ResponseEntity<HttpStatus> deleteGoal(@RequestParam Long id) {
-        goalService.deleteGoal(Math.toIntExact(id));
+        goalService.deleteGoal(id);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 }

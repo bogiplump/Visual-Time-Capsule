@@ -15,7 +15,6 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Id;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,7 +30,7 @@ import lombok.NoArgsConstructor;
 public class CapsuleEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(name = "capsule_name", nullable = false)
     private String capsuleName;

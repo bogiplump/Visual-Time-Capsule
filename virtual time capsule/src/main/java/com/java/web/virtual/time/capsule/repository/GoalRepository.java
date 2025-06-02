@@ -6,6 +6,6 @@ import com.java.web.virtual.time.capsule.model.GoalEntity;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface GoalRepository extends JpaRepository<GoalEntity, Integer> {
+public interface GoalRepository extends JpaRepository<GoalEntity, Long> {
     List<GoalEntity> findByCreator(CapsuleUser creator);
 }

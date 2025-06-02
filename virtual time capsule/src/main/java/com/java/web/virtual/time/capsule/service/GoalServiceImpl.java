@@ -46,8 +46,8 @@ public class GoalServiceImpl implements GoalService {
         goalRepository.save(goalEntity);
     }
 
-    private @NotNull GoalEntity getGoalEntity(Integer updateGoalDto) {
-        GoalEntity goalEntity = goalRepository.getReferenceById(updateGoalDto);
+    private @NotNull GoalEntity getGoalEntity(Long id) {
+        GoalEntity goalEntity = goalRepository.getReferenceById(id);
         if (!goalEntity.isVisible()) {
             throw new GoalNotVisibleException("Goal not visible to user.");
         }
@@ -55,7 +55,7 @@ public class GoalServiceImpl implements GoalService {
     }
 
     @Override
-    public void deleteGoal(Integer id) {
+    public void deleteGoal(Long id) {
         if (!goalRepository.existsById(id)) {
             throw new GoalNotFoundException("Goal not found.");
         }
@@ -75,12 +75,12 @@ public class GoalServiceImpl implements GoalService {
     }
 
     @Override
-    public void makeGoalVisible(Integer id) {
+    public void makeGoalVisible(Long id) {
         goalRepository.getReferenceById(id).setVisible(true);
     }
 
     @Override
-    public void setGoalIsAchieved(Integer id) {
+    public void setGoalIsAchieved(Long id) {
         GoalEntity goal = getGoalEntity(id);
 
         goal.setAchieved(true);
@@ -88,7 +88,7 @@ public class GoalServiceImpl implements GoalService {
     }
 
     @Override
-    public GoalDto getGoal(Integer id) {
+    public GoalDto getGoal(Long id) {
         if (!goalRepository.existsById(id)) {
             throw new GoalNotFoundException("Goal not found.");
         }

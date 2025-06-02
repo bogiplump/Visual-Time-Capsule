@@ -10,13 +10,13 @@ public interface GoalService {
 
     void updateGoal(UpdateGoalDto updateGoalDto);
 
-    void deleteGoal(Integer id);
+    void deleteGoal(Long id);
 
     List<GoalEntity> getUserGoals(Long userId);
 
-    void makeGoalVisible(Integer id);
+    void makeGoalVisible(Long id);
 
-    void setGoalIsAchieved(Integer id);
+    void setGoalIsAchieved(Long id);
 
-    GoalDto getGoal(Integer id);
+    GoalDto getGoal(Long id);
 }

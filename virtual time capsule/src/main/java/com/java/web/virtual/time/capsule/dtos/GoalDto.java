@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GoalDto {
-    private Integer id;
+    private Long id;
     private boolean isVisible;
     private boolean isAchieved;
     private LocalDate creationDate;
