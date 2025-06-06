@@ -55,4 +55,8 @@ public class CapsuleEntity {
     @OneToOne
     @JoinColumn(name = "goal_id")
     private GoalEntity goal;
+
+    @ManyToOne
+    @JoinColumn(name = "group_id")
+    private CapsuleGroupEntity group;
 }

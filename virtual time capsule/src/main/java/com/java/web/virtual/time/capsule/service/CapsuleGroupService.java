@@ -1,6 +1,5 @@
 package com.java.web.virtual.time.capsule.service;
 
-import com.java.web.virtual.time.capsule.dtos.CapsuleRequestDto;
 import com.java.web.virtual.time.capsule.dtos.CreateGroupDto;
 import com.java.web.virtual.time.capsule.dtos.GroupUpdateDto;
 import com.java.web.virtual.time.capsule.model.CapsuleEntity;
@@ -12,12 +11,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface CapsuleGroupService {
-    List<CapsuleGroupEntity> getAllCapsulesByUserId(Long userId);
+    List<CapsuleGroupEntity> getAllCapsuleGroupsByUserId(Long userId);
 
     // TODO: implement DTO's
     void createCapsuleGroup(CreateGroupDto createGroupDto);
 
-    CapsuleEntity getCapsule(CapsuleRequestDto capsuleRequestDto);  // TODO: implement dto
+    List<CapsuleEntity> getCapsulesInGroup(Long groupId);
 
     void updateGroup(GroupUpdateDto groupUpdateDto);
 

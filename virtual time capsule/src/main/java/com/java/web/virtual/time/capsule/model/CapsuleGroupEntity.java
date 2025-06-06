@@ -5,11 +5,12 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 import java.time.LocalDateTime;
+
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,7 +24,6 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "capsule_groups")
 public class CapsuleGroupEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -31,9 +31,8 @@ public class CapsuleGroupEntity {
     private String name;
     private String theme;
 
-    @OneToOne
-    @JoinColumn(name = "first_capsule_node_id")
-    private CapsuleNodeEntity firstCapsuleNode;
+    @OneToMany(mappedBy = "group")
+    private List<CapsuleEntity> capsules;
 
     @Column(name = "time_between_capsules")
     private LocalDateTime timeBetweenCapsules;
