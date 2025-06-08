@@ -1,10 +1,10 @@
-package com.java.web.virtual.time.capsule.dtos;
+package com.java.web.virtual.time.capsule.dto;
 
-import com.java.web.virtual.time.capsule.annotations.ValidEmail;
-import com.java.web.virtual.time.capsule.annotations.ValidName;
-import com.java.web.virtual.time.capsule.annotations.ValidPassword;
-import com.java.web.virtual.time.capsule.annotations.ValidUsername;
-import com.java.web.virtual.time.capsule.model.CapsuleUser;
+import com.java.web.virtual.time.capsule.annotation.ValidEmail;
+import com.java.web.virtual.time.capsule.annotation.ValidName;
+import com.java.web.virtual.time.capsule.annotation.ValidPassword;
+import com.java.web.virtual.time.capsule.annotation.ValidUsername;
+import com.java.web.virtual.time.capsule.model.User;
 import lombok.Data;
 
 @Data
@@ -27,7 +27,7 @@ public class UserResponseDto {
     @ValidEmail
     private String email;
 
-    public static UserResponseDto fromUser(final CapsuleUser user) {
+    public static UserResponseDto fromUser(final User user) {
         final UserResponseDto userResponseDto = new UserResponseDto();
         userResponseDto.setUsername(user.getUsername());
         userResponseDto.setPassword(user.getPassword());

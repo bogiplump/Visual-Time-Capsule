@@ -1,4 +1,4 @@
-package com.java.web.virtual.time.capsule.service;
+package com.java.web.virtual.time.capsule.service.impl;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;

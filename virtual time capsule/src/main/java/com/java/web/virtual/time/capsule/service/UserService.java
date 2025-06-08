@@ -1,15 +1,22 @@
 package com.java.web.virtual.time.capsule.service;
 
+import com.java.web.virtual.time.capsule.dto.FriendshipDto;
+import com.java.web.virtual.time.capsule.dto.UserCreateDto;
+import com.java.web.virtual.time.capsule.dto.UserLoginDto;
+import com.java.web.virtual.time.capsule.dto.UserResponseDto;
+import com.java.web.virtual.time.capsule.dto.UserUpdateDto;
 import com.java.web.virtual.time.capsule.exception.user.UserNotFound;
-import com.java.web.virtual.time.capsule.model.entity.UserEntity;
+import com.java.web.virtual.time.capsule.model.User;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public interface UserService {
 
     void registerUser(UserCreateDto user);
 
-    void updateUser(Long id);
+    void updateUser(Long id, UserUpdateDto user);
 
     void deleteUser(Long id);
 
@@ -17,17 +24,7 @@ public interface UserService {
 
     List<UserResponseDto> getUsers();
 
-    void sendInvitation(String sender, Long receiver);
+    void sendInvitation(Long sender, Long receiver);
 
-    void answerInvitation(String sender, FriendshipDto friendshipDto);
-    /**
-     * Retrieves a UserEntity from the database by its unique identifier.
-     *
-     * @param id unique identifier of the user, must not be null.
-     * @return the UserEntity object.
-     *
-     * @throws IllegalArgumentException if id is null.
-     * @throws UserNotFound if user with this id does not exist.
-     */
-    UserEntity getUserById(Long id);
+    void answerInvitation(Long sender, FriendshipDto friendshipDto);
 }

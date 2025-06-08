@@ -1,8 +1,7 @@
-package com.java.web.virtual.time.capsule.annotations;
+package com.java.web.virtual.time.capsule.annotation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -19,8 +18,11 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @NotNull(message = "{NotNull.message}")
 @NotBlank(message = "{NotBlank.message}")
-@Email
-public @interface ValidEmail {
+@Pattern(
+    regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d@$!%*?&]{8,}$",
+    message = "{InvalidPassword.message}"
+)
+public @interface ValidPassword {
     String message() default "Invalid name format";
 
     Class<?>[] groups() default {};

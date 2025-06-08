@@ -1,28 +1,30 @@
-package com.java.web.virtual.time.capsule.service;
+package com.java.web.virtual.time.capsule.service.impl;
 
-import com.java.web.virtual.time.capsule.dtos.FriendshipDto;
-import com.java.web.virtual.time.capsule.dtos.UserCreateDto;
-import com.java.web.virtual.time.capsule.dtos.UserLoginDto;
-import com.java.web.virtual.time.capsule.dtos.UserResponseDto;
+import com.java.web.virtual.time.capsule.dto.FriendshipDto;
+import com.java.web.virtual.time.capsule.dto.UserCreateDto;
+import com.java.web.virtual.time.capsule.dto.UserLoginDto;
+import com.java.web.virtual.time.capsule.dto.UserResponseDto;
+import com.java.web.virtual.time.capsule.dto.UserUpdateDto;
 import com.java.web.virtual.time.capsule.enums.FriendShipStatus;
-import com.java.web.virtual.time.capsule.exception.EmailAlreadyTakenException;
-import com.java.web.virtual.time.capsule.exception.InvitationAlreadySent;
-import com.java.web.virtual.time.capsule.exception.UserNotFoundException;
-import com.java.web.virtual.time.capsule.exception.UsernameAlreadyTakenException;
-import com.java.web.virtual.time.capsule.model.CapsuleUser;
+import com.java.web.virtual.time.capsule.exception.user.EmailAlreadyTakenException;
+import com.java.web.virtual.time.capsule.exception.user.InvitationAlreadySent;
+import com.java.web.virtual.time.capsule.exception.user.UserNotFoundException;
+import com.java.web.virtual.time.capsule.exception.user.UsernameAlreadyTakenException;
 import com.java.web.virtual.time.capsule.model.Friendship;
+import com.java.web.virtual.time.capsule.model.User;
 import com.java.web.virtual.time.capsule.repository.FriendshipRepository;
 import com.java.web.virtual.time.capsule.repository.UserRepository;
+import com.java.web.virtual.time.capsule.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
 
-@Component
+@Service
 @AllArgsConstructor
 public class UserServiceImpl implements UserService {
 
@@ -39,7 +41,7 @@ public class UserServiceImpl implements UserService {
             throw new EmailAlreadyTakenException("Email is already taken");
         }
 
-        CapsuleUser newUser = CapsuleUser.builder()
+        User newUser = User.builder()
             .username(user.getUsername())
             .password(encoder.encode(user.getPassword()))
             .firstName(user.getFirstName())
@@ -52,15 +54,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateUser(Long id) {
+    public void updateUser(Long id, UserUpdateDto updateDto) {
         if(!userRepository.existsById(id)) {
             throw new UserNotFoundException("User not found");
         }
-        CapsuleUser user = userRepository.findById(id).get();
-        user.setFirstName(user.getFirstName());
-        user.setLastName(user.getLastName());
-        user.setEmail(user.getEmail());
-        user.setPassword(user.getPassword());
+        User user = userRepository.findById(id).get();
+        user.setFirstName(updateDto.getFirstName());
+        user.setLastName(updateDto.getLastName());
+        user.setUsername(user.getUsername());
+        user.setPassword(updateDto.getPassword());
         userRepository.save(user);
     }
 
@@ -75,7 +77,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void loginUser(UserLoginDto userLoginDto) {
         String hashedPassword = encoder.encode(userLoginDto.getPassword());
-        CapsuleUser user = userRepository.findByUsername(userLoginDto.getUsername());
+        User user = userRepository.findByUsername(userLoginDto.getUsername());
         if (user == null) {
             throw new UsernameNotFoundException("User not found");
         }
@@ -91,9 +93,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void sendInvitation(String sender, Long receiver) {
-        CapsuleUser userRequester = userRepository.findByUsername(sender);
-        CapsuleUser userReceiver = userRepository.findById(receiver).get();
+    public void sendInvitation(Long sender, Long receiver) {
+        User userRequester = userRepository.findById(sender).orElseThrow(() -> new UserNotFoundException("User not found"));
+        User userReceiver = userRepository.findById(receiver).orElseThrow(() -> new UserNotFoundException("User not found"));
         if(!userRepository.existsById(receiver)) {
             throw new UserNotFoundException("User not found");
         }
@@ -121,9 +123,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void answerInvitation(String sender, FriendshipDto friendshipDto) {
-        CapsuleUser userRequester = userRepository.findByUsername(sender);
-        CapsuleUser userReceiver = userRepository.findById(friendshipDto.getReceiverId()).get();
+    public void answerInvitation(Long sender, FriendshipDto friendshipDto) {
+        User userRequester = userRepository.findById(sender).orElseThrow(() -> new UserNotFoundException("User not found"));
+        User userReceiver = userRepository.findById(friendshipDto.getReceiverId()).orElseThrow(() -> new UserNotFoundException("User not found"));
         if(userRequester.equals(userReceiver)) {
             throw new RuntimeException("You cannot send invitation to yourself");
         }

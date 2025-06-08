@@ -1,5 +1,6 @@
 package com.java.web.virtual.time.capsule.model;
 
+import com.java.web.virtual.time.capsule.dto.GoalDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,7 +12,6 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,10 +24,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity
 @Table(name = "goals")
-public class GoalEntity {
+public class Goal {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(name = "is_visible", nullable = false)
     private boolean isVisible;
@@ -42,8 +42,21 @@ public class GoalEntity {
 
     @ManyToOne
     @JoinColumn(name = "created_by_id")
-    private CapsuleUser creator;
+    private User creator;
 
     @OneToOne
-    private CapsuleEntity capsule;
+    private Capsule capsule;
+
+    public static Goal fromDTO(GoalDto goalDto, User creator) {
+
+        return Goal
+            .builder()
+            .creator(creator)
+            .isVisible(goalDto.isVisible())
+            .isAchieved(goalDto.isAchieved())
+            .content(goalDto.getContent())
+            .creationDate(LocalDate.now())
+            .content(goalDto.getContent())
+            .build();
+    }
 }

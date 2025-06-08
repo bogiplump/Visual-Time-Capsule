@@ -1,20 +1,23 @@
 package com.java.web.virtual.time.capsule.dto;
 
+import com.java.web.virtual.time.capsule.annotation.ValidName;
 import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
 @Data
 public class CapsuleUpdateDto {
-    @NotBlank(message = "Capsule name must not be blank")
-    @Size(max = 20, message = "Capsule name must not exceed 20 characters")
+
+
+    @ValidName
     private String capsuleName;
 
+    @NotNull
     @Future(message = "Open date must be in the future")
     private LocalDateTime openDate;
 
+    @NotNull
     private GoalDto goal;
 }

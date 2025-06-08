@@ -1,5 +1,7 @@
-package com.java.web.virtual.time.capsule.model.entity;
+package com.java.web.virtual.time.capsule.model;
 
+import com.java.web.virtual.time.capsule.dto.CapsuleCreateDto;
+import com.java.web.virtual.time.capsule.dto.GoalDto;
 import com.java.web.virtual.time.capsule.enums.CapsuleStatus;
 
 import com.java.web.virtual.time.capsule.exception.capsule.CapsuleHasBeenLocked;
@@ -20,11 +22,14 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -32,9 +37,11 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
+@Builder
 @Table(name = "capsules")
-public class CapsuleEntity {
+public class Capsule {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Setter(AccessLevel.NONE)
@@ -62,20 +69,20 @@ public class CapsuleEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by_id", nullable = false)
-    private UserEntity creator;
+    private User creator;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "goal_id")
     @Setter(AccessLevel.NONE)
-    private GoalEntity goal;
+    private Goal goal;
 
     @OneToMany(mappedBy = "capsule", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Setter(AccessLevel.NONE)
     @Getter(AccessLevel.NONE)
-    private Set<MemoryEntity> memoryEntries;
+    private Set<Memory> memoryEntries;
 
-    public CapsuleEntity(String capsuleName, UserEntity creator,
-                         GoalEntity goal) {
+    public Capsule(String capsuleName, User creator,
+                   Goal goal) {
         if (capsuleName == null || creator == null ||
             goal == null) {
             throw new IllegalArgumentException("Null reference in CapsuleEntity constructor. ");
@@ -92,7 +99,6 @@ public class CapsuleEntity {
 
     public void lock(LocalDateTime openDate) {
         lockDate = LocalDateTime.now();
-
         status = CapsuleStatus.CLOSED;
         this.openDate = openDate;
     }
@@ -106,7 +112,7 @@ public class CapsuleEntity {
         }
     }
 
-    public void setMemoryEntries(Set<MemoryEntity> memoryEntries) {
+    public void setMemoryEntries(Set<Memory> memoryEntries) {
         if (memoryEntries == null) {
             throw new IllegalArgumentException("Null reference in CapsuleEntity::setMemoryEntries(). ");
         }
@@ -116,18 +122,27 @@ public class CapsuleEntity {
         this.memoryEntries = memoryEntries;
     }
 
-    public void addMemory(MemoryEntity memory) {
+    public void addMemory(Memory memory) {
         if (memory == null) {
             throw new IllegalArgumentException("Null reference in CapsuleEntity::addMemory(). ");
         }
 
         checkIfCapsuleEditable();
 
-        memory.setCapsule(this);
         this.memoryEntries.add(memory);
     }
 
-    public void setGoal(GoalEntity goal) {
+    public void removeMemory(Memory memory) {
+        if (memory == null) {
+            throw new IllegalArgumentException("Null reference in CapsuleEntity::removeMemory(). ");
+        }
+
+        checkIfCapsuleEditable();
+
+        this.memoryEntries.remove(memory);
+    }
+
+    public void setGoal(Goal goal) {
         if (goal == null) {
             throw new IllegalArgumentException("Null reference in CapsuleEntity::setGoal");
         }
@@ -150,10 +165,10 @@ public class CapsuleEntity {
         }
     }
 
-    public Set<MemoryEntity> getMemoryEntries() {
+    public Set<Memory> getMemoryEntries() {
         checkIfCapsuleEditable();
 
-        return Set.copyOf(memoryEntries);
+        return memoryEntries;
     }
 
     public boolean isTimeToOpen() {
@@ -166,5 +181,21 @@ public class CapsuleEntity {
             case CapsuleStatus.OPEN -> throw new CapsuleIsOpened("Trying to open an opened capsule");
             case CapsuleStatus.CLOSED ->  status = CapsuleStatus.OPEN;
         }
+    }
+
+    public static Capsule fromDTOAndUser(CapsuleCreateDto capsuleCreateDto, User creator) {
+        GoalDto goalDto = capsuleCreateDto.getGoal();
+        Goal goal = Goal.builder()
+            .content(goalDto.getContent())
+            .creator(creator)
+            .isAchieved(goalDto.isAchieved())
+            .isVisible(goalDto.isVisible())
+            .creationDate(LocalDate.now())
+            .build();
+        return new Capsule(
+            capsuleCreateDto.getCapsuleName(),
+            creator,
+            goal
+        );
     }
 }

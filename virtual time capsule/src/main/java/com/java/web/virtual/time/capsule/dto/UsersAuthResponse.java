@@ -1,6 +1,5 @@
-package com.java.web.virtual.time.capsule.dtos;
+package com.java.web.virtual.time.capsule.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data

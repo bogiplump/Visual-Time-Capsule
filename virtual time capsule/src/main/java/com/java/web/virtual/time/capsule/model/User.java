@@ -1,4 +1,4 @@
-package com.java.web.virtual.time.capsule.model.entity;
+package com.java.web.virtual.time.capsule.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -7,10 +7,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Set;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -18,8 +20,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Builder
 @Table(name = "users")
-public class UserEntity {
+public class User {
     @Id
     @GeneratedValue
     private Long id;
@@ -31,18 +34,18 @@ public class UserEntity {
     private String lastName;
 
     @Column(name = "created_at")
-    private Date creationDate;
+    private LocalDate creationDate;
 
     private String username;
     private String password;
     private String email;
 
     @OneToMany(mappedBy = "creator")
-    private Set<GoalEntity> goals;
+    private Set<Goal> goals;
 
     @OneToMany(mappedBy = "creator")
-    private Set<MemoryEntity> memoryEntries;
+    private Set<Memory> memoryEntries;
 
     @OneToMany(mappedBy = "creator")
-    private Set<CapsuleEntity> capsules;
+    private Set<Capsule> capsules;
 }

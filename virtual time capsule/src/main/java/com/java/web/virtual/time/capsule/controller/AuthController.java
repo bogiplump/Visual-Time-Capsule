@@ -1,9 +1,9 @@
 package com.java.web.virtual.time.capsule.controller;
 
-import com.java.web.virtual.time.capsule.dtos.UserCreateDto;
-import com.java.web.virtual.time.capsule.dtos.UserLoginDto;
-import com.java.web.virtual.time.capsule.dtos.UsersAuthResponse;
-import com.java.web.virtual.time.capsule.service.JwtService;
+import com.java.web.virtual.time.capsule.dto.UserCreateDto;
+import com.java.web.virtual.time.capsule.dto.UserLoginDto;
+import com.java.web.virtual.time.capsule.dto.UsersAuthResponse;
+import com.java.web.virtual.time.capsule.service.impl.JwtService;
 import com.java.web.virtual.time.capsule.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;

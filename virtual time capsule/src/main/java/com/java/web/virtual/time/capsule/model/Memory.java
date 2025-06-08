@@ -1,4 +1,4 @@
-package com.java.web.virtual.time.capsule.model.entity;
+package com.java.web.virtual.time.capsule.model;
 
 import com.java.web.virtual.time.capsule.enums.MemoryType;
 
@@ -12,42 +12,45 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Builder
 @Table(name = "memory_entries")
-public class MemoryEntity {
+public class Memory {
     @Id
     @GeneratedValue
-    private Integer id;
+    private Long id;
 
     @Column(name = "type")
     @Enumerated(EnumType.STRING)
     private MemoryType memoryType;
 
     @Column(name = "content_path")
-    private String memoryLocation;
-
-    @Column(name = "content_if_text")
-    private String textContent;
+    private String path;
 
     @Column(name = "created_at")
-    private Date creationDate;
+    private LocalDate creationDate;
 
     private String description;
 
     @ManyToOne
     @JoinColumn(name = "capsules_id")
-    private CapsuleEntity capsule;
+    private Capsule capsule;
 
     @ManyToOne
     @JoinColumn(name = "created_by_id")
-    private UserEntity creator;
+    private User creator;
+
+    public Memory() {
+
+    }
+
 }

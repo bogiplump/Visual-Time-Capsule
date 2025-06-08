@@ -1,10 +1,10 @@
 package com.java.web.virtual.time.capsule.handler;
 
 import com.java.web.virtual.time.capsule.exception.BadRequestException;
-import com.java.web.virtual.time.capsule.exception.EmailAlreadyTakenException;
-import com.java.web.virtual.time.capsule.exception.InvitationAlreadySent;
-import com.java.web.virtual.time.capsule.exception.UserNotFoundException;
-import com.java.web.virtual.time.capsule.exception.UsernameAlreadyTakenException;
+import com.java.web.virtual.time.capsule.exception.user.EmailAlreadyTakenException;
+import com.java.web.virtual.time.capsule.exception.user.InvitationAlreadySent;
+import com.java.web.virtual.time.capsule.exception.user.UserNotFoundException;
+import com.java.web.virtual.time.capsule.exception.user.UsernameAlreadyTakenException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {

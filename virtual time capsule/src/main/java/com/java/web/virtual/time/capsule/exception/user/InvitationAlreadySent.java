@@ -1,4 +1,4 @@
-package com.java.web.virtual.time.capsule.exception;
+package com.java.web.virtual.time.capsule.exception.user;
 
 public class InvitationAlreadySent extends RuntimeException {
     public InvitationAlreadySent() {
