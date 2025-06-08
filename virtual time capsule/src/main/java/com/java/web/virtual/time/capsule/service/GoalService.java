@@ -1,27 +1,23 @@
 package com.java.web.virtual.time.capsule.service;
 
-import com.java.web.virtual.time.capsule.dto.GoalDto;
-import com.java.web.virtual.time.capsule.exception.goal.GoalNotFound;
-import com.java.web.virtual.time.capsule.model.entity.GoalEntity;
-import org.springframework.stereotype.Service;
+import com.java.web.virtual.time.capsule.dtos.GoalDto;
+import com.java.web.virtual.time.capsule.dtos.UpdateGoalDto;
+import com.java.web.virtual.time.capsule.model.GoalEntity;
+import java.util.List;
 
 @Service
 public interface GoalService {
-    /**
-     * Parses goal data transfer object to GoalEntity.
-     *
-     * @param goalDto must not be null
-     * @return the GoalEntity object.
-     */
-    GoalEntity parseGoalDto(GoalDto goalDto);
+    void createGoal(GoalEntity goalEntity);
 
-    /**
-     * Deletes the goal entity associated with this id from the database.
-     *
-     * @param goalId unique identifier of the goal entity, must not be null.
-     *
-     * @throws IllegalArgumentException if goalId is null.
-     * @throws GoalNotFound if goal with this id does not exist.
-     */
-    void deleteGoal(Long goalId);
+    void updateGoal(UpdateGoalDto updateGoalDto);
+
+    void deleteGoal(Integer id);
+
+    List<GoalEntity> getUserGoals(Long userId);
+
+    void makeGoalVisible(Integer id);
+
+    void setGoalIsAchieved(Integer id);
+
+    GoalDto getGoal(Integer id);
 }
