@@ -1,5 +1,6 @@
 package com.java.web.virtual.time.capsule.model;
 
+import com.java.web.virtual.time.capsule.dto.memory.MemoryResponseDto;
 import com.java.web.virtual.time.capsule.enums.MemoryType;
 
 import jakarta.persistence.Column;
@@ -53,4 +54,7 @@ public class Memory {
 
     }
 
+    public MemoryResponseDto toMemoryResponseDto() {
+        return null; //TODO implement
+    }
 }

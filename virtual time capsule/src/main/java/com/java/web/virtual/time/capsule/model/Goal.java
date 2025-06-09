@@ -1,6 +1,7 @@
 package com.java.web.virtual.time.capsule.model;
 
 import com.java.web.virtual.time.capsule.dto.goal.GoalDto;
+import com.java.web.virtual.time.capsule.dto.goal.GoalResponseDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -46,6 +47,10 @@ public class Goal {
 
     @OneToOne
     private Capsule capsule;
+
+    public GoalResponseDto toGoalResponseDto() {
+        return null; //TODO implement
+    }
 
     public static Goal fromDTO(GoalDto goalDto, User creator) {
 

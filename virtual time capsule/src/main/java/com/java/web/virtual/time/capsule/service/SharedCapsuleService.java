@@ -8,11 +8,11 @@ public interface SharedCapsuleService {
      * Creates and saves to the database the shared capsule. It's creator and only member is the current user.
      * Returns the id with which the capsule was saved in the database.
      *
-     * @param sharedCapsuleCreateDto
-     * @param currentUser
+     * @param sharedCapsuleDto the data transfer object for creation, not null.
+     * @param currentUser the username of the current user, must not be null.
      * @return the id of the capsule.
      */
-    Long createSharedCapsule(SharedCapsuleCreateDto sharedCapsuleCreateDto, String currentUser);
+    Long createSharedCapsule(SharedCapsuleCreateDto sharedCapsuleDto, String currentUser);
 
     /**
      * Retrieves the shared capsule from the database and the returns it as a response data transfer object.

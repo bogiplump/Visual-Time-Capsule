@@ -3,6 +3,7 @@ package com.java.web.virtual.time.capsule.model;
 import com.java.web.virtual.time.capsule.dto.capsule.CapsuleCreateDto;
 import com.java.web.virtual.time.capsule.dto.capsule.CapsuleResponseDto;
 import com.java.web.virtual.time.capsule.dto.goal.GoalDto;
+import com.java.web.virtual.time.capsule.dto.memory.MemoryResponseDto;
 import com.java.web.virtual.time.capsule.enums.CapsuleStatus;
 
 import com.java.web.virtual.time.capsule.exception.capsule.CapsuleHasBeenLocked;
@@ -26,6 +27,7 @@ import jakarta.persistence.Id;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import lombok.AccessLevel;
@@ -185,7 +187,31 @@ public class Capsule {
     }
 
     public CapsuleResponseDto toCapsuleResponseDto() {
-        return null; //TODO implement
+        var resultBuilder = CapsuleResponseDto.builder();
+
+        resultBuilder.capsuleName(capsuleName)
+            .creationDate(creationDate)
+            .lockDate(lockDate)
+            .openDate(openDate);
+
+        if (status != CapsuleStatus.CLOSED) {
+            if (goal != null) {
+                resultBuilder.goal(goal.toGoalResponseDto());
+            }
+
+            Set<MemoryResponseDto> memoriesDtoSet = new LinkedHashSet<>();
+            for (Memory currMemory : memoryEntries) {
+                memoriesDtoSet.add(currMemory.toMemoryResponseDto());
+            }
+            resultBuilder.memories(memoriesDtoSet);
+        }
+        else {
+            if (goal != null && goal.isVisible()) {
+                resultBuilder.goal(goal.toGoalResponseDto());
+            }
+        }
+
+        return resultBuilder.build();
     }
 
     public static Capsule fromDTOAndUser(CapsuleCreateDto capsuleCreateDto, User creator) {
