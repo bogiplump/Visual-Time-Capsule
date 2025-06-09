@@ -1,6 +1,7 @@
 package com.java.web.virtual.time.capsule.controller;
 
 import com.java.web.virtual.time.capsule.dto.capsule.CapsuleCreateDto;
+import com.java.web.virtual.time.capsule.dto.capsule.CapsuleResponseDto;
 import com.java.web.virtual.time.capsule.dto.capsule.CapsuleUpdateDto;
 import com.java.web.virtual.time.capsule.model.Capsule;
 import com.java.web.virtual.time.capsule.model.Goal;
@@ -38,12 +39,12 @@ public class CapsuleController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Capsule> getCapsuleById(@NotNull @PathVariable Long id,Principal principal) {
+    public ResponseEntity<CapsuleResponseDto> getCapsuleById(@NotNull @PathVariable Long id, Principal principal) {
         return ResponseEntity.ok(capsuleService.getCapsule(id,principal.getName()));
     }
 
     @GetMapping("/all")
-    public ResponseEntity<Set<Capsule>> getAllCapsules(Principal principal) {
+    public ResponseEntity<Set<CapsuleResponseDto>> getAllCapsules(Principal principal) {
         return ResponseEntity.ok(capsuleService.getAllCapsulesOfUser(principal.getName()));
     }
 

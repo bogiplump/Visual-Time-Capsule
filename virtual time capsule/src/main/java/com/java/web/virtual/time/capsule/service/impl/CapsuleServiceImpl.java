@@ -1,6 +1,7 @@
 package com.java.web.virtual.time.capsule.service.impl;
 
 import com.java.web.virtual.time.capsule.dto.capsule.CapsuleCreateDto;
+import com.java.web.virtual.time.capsule.dto.capsule.CapsuleResponseDto;
 import com.java.web.virtual.time.capsule.dto.capsule.CapsuleUpdateDto;
 import com.java.web.virtual.time.capsule.exception.capsule.CapsuleNotFound;
 import com.java.web.virtual.time.capsule.exception.capsule.CapsuleNotOwnedByYou;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -50,20 +52,29 @@ public class CapsuleServiceImpl implements CapsuleService {
     }
 
     @Override
-    public Capsule getCapsule(Long id, String currentUser) { //TODO: How a locked capsule is send to client
+    public CapsuleResponseDto getCapsule(Long id, String currentUser) { //TODO: How a locked capsule is send to client
         User user = userRepository.findByUsername(currentUser);
         Capsule capsule = capsuleRepository.findById(id)
             .orElseThrow(() -> new CapsuleNotFound("Capsule with  id " + id + " was not found. "));
 
         handleCapsuleNotOwnedByUser(capsule,user.getId());
 
-        return capsule;
+        return capsule.toCapsuleResponseDto();
     }
 
     @Override
-    public Set<Capsule> getAllCapsulesOfUser(String currentUser) {
+    public Set<CapsuleResponseDto> getAllCapsulesOfUser(String currentUser) {
         User user = userRepository.findByUsername(currentUser);
-       return capsuleRepository.findByCreator_Id(user.getId());
+
+       Set<Capsule> capsules =  capsuleRepository.findByCreator_Id(user.getId());
+
+       Set<CapsuleResponseDto> result = new LinkedHashSet<>();
+
+       for (Capsule currCapsule : capsules) {
+           result.add(currCapsule.toCapsuleResponseDto());
+       }
+
+       return result;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.java.web.virtual.time.capsule.model;
 
 import com.java.web.virtual.time.capsule.dto.capsule.CapsuleCreateDto;
+import com.java.web.virtual.time.capsule.dto.capsule.CapsuleResponseDto;
 import com.java.web.virtual.time.capsule.dto.goal.GoalDto;
 import com.java.web.virtual.time.capsule.enums.CapsuleStatus;
 
@@ -181,6 +182,10 @@ public class Capsule {
             case CapsuleStatus.OPEN -> throw new CapsuleIsOpened("Trying to open an opened capsule");
             case CapsuleStatus.CLOSED ->  status = CapsuleStatus.OPEN;
         }
+    }
+
+    public CapsuleResponseDto toCapsuleResponseDto() {
+        return null; //TODO implement
     }
 
     public static Capsule fromDTOAndUser(CapsuleCreateDto capsuleCreateDto, User creator) {

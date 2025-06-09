@@ -1,10 +1,10 @@
 package com.java.web.virtual.time.capsule.service;
 
 import com.java.web.virtual.time.capsule.dto.capsule.CapsuleCreateDto;
+import com.java.web.virtual.time.capsule.dto.capsule.CapsuleResponseDto;
 import com.java.web.virtual.time.capsule.dto.capsule.CapsuleUpdateDto;
 import com.java.web.virtual.time.capsule.exception.capsule.CapsuleHasBeenLocked;
 import com.java.web.virtual.time.capsule.exception.capsule.CapsuleNotFound;
-import com.java.web.virtual.time.capsule.model.Capsule;
 import com.java.web.virtual.time.capsule.model.Goal;
 import com.java.web.virtual.time.capsule.model.Memory;
 
@@ -23,18 +23,18 @@ public interface CapsuleService {
      * Retrieves a CapsuleEntity from the database by its unique identifier.
      *
      * @param id the unique identifier of the capsule, must not be null.
-     * @return the CapsuleEntity with the specified ID, or null if not found.
+     * @return the Capsule with the specified ID, as response data transport objects, or null if not found. TODO Check this here
      * @throws IllegalArgumentException if id is null.
      * @throws CapsuleNotFound if a capsule with this id does not exist.
      */
-    Capsule getCapsule(Long id, String currentUser);
+    CapsuleResponseDto getCapsule(Long id, String currentUser);
 
     /**
      * Retrieves of all the capsules of the current user.
      *
-     * @return unmodifiable set of all the capsules of the user.
+     * @return unmodifiable set of all the capsules of the user, as response data transport objects.
      */
-    Set<Capsule> getAllCapsulesOfUser(String currentUser);
+    Set<CapsuleResponseDto> getAllCapsulesOfUser(String currentUser);
 
     /**
      * Locks the capsule and its contents become unavailable until the date of the opening.
