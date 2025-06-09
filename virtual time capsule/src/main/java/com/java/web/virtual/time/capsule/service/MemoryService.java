@@ -1,9 +1,6 @@
 package com.java.web.virtual.time.capsule.service;
 
-import com.java.web.virtual.time.capsule.dto.MemoryCreateDto;
-import com.java.web.virtual.time.capsule.exception.memory.MemoryNotFound;
-import com.java.web.virtual.time.capsule.exception.memory.MemoryNotOwnedByYou;
-import com.java.web.virtual.time.capsule.model.Capsule;
+import com.java.web.virtual.time.capsule.dto.memory.MemoryCreateDto;
 import com.java.web.virtual.time.capsule.model.Memory;
 import org.springframework.stereotype.Service;
 

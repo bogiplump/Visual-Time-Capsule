@@ -1,4 +1,4 @@
-package com.java.web.virtual.time.capsule.dto;
+package com.java.web.virtual.time.capsule.dto.user;
 
 import com.java.web.virtual.time.capsule.annotation.ValidPassword;
 import com.java.web.virtual.time.capsule.annotation.ValidUsername;

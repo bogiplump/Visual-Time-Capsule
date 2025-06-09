@@ -1,10 +1,9 @@
 package com.java.web.virtual.time.capsule.service.impl;
 
-import com.java.web.virtual.time.capsule.dto.GoalDto;
-import com.java.web.virtual.time.capsule.dto.UpdateGoalDto;
+import com.java.web.virtual.time.capsule.dto.goal.GoalDto;
+import com.java.web.virtual.time.capsule.dto.user.UpdateGoalDto;
 import com.java.web.virtual.time.capsule.exception.goal.GoalNotFoundException;
 import com.java.web.virtual.time.capsule.exception.goal.GoalNotVisibleException;
-import com.java.web.virtual.time.capsule.mapper.GoalMapper;
 import com.java.web.virtual.time.capsule.model.Capsule;
 import com.java.web.virtual.time.capsule.model.Goal;
 import com.java.web.virtual.time.capsule.model.User;
@@ -17,7 +16,6 @@ import java.util.List;
 import com.java.web.virtual.time.capsule.service.GoalService;
 import lombok.AllArgsConstructor;
 
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 @Service

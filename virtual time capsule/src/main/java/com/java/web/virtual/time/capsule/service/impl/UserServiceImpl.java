@@ -1,10 +1,10 @@
 package com.java.web.virtual.time.capsule.service.impl;
 
-import com.java.web.virtual.time.capsule.dto.FriendshipDto;
-import com.java.web.virtual.time.capsule.dto.UserCreateDto;
-import com.java.web.virtual.time.capsule.dto.UserLoginDto;
-import com.java.web.virtual.time.capsule.dto.UserResponseDto;
-import com.java.web.virtual.time.capsule.dto.UserUpdateDto;
+import com.java.web.virtual.time.capsule.dto.user.FriendshipDto;
+import com.java.web.virtual.time.capsule.dto.user.UserCreateDto;
+import com.java.web.virtual.time.capsule.dto.user.UserLoginDto;
+import com.java.web.virtual.time.capsule.dto.user.UserResponseDto;
+import com.java.web.virtual.time.capsule.dto.user.UserUpdateDto;
 import com.java.web.virtual.time.capsule.enums.FriendShipStatus;
 import com.java.web.virtual.time.capsule.exception.user.EmailAlreadyTakenException;
 import com.java.web.virtual.time.capsule.exception.user.InvitationAlreadySent;

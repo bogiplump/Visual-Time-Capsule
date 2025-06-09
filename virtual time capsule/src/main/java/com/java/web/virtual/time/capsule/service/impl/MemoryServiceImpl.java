@@ -1,6 +1,6 @@
 package com.java.web.virtual.time.capsule.service.impl;
 
-import com.java.web.virtual.time.capsule.dto.MemoryCreateDto;
+import com.java.web.virtual.time.capsule.dto.memory.MemoryCreateDto;
 import com.java.web.virtual.time.capsule.exception.capsule.CapsuleNotFound;
 import com.java.web.virtual.time.capsule.exception.memory.MemoryNotFound;
 import com.java.web.virtual.time.capsule.model.Capsule;

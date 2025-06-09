@@ -1,7 +1,7 @@
 package com.java.web.virtual.time.capsule.model;
 
-import com.java.web.virtual.time.capsule.dto.CapsuleCreateDto;
-import com.java.web.virtual.time.capsule.dto.GoalDto;
+import com.java.web.virtual.time.capsule.dto.capsule.CapsuleCreateDto;
+import com.java.web.virtual.time.capsule.dto.goal.GoalDto;
 import com.java.web.virtual.time.capsule.enums.CapsuleStatus;
 
 import com.java.web.virtual.time.capsule.exception.capsule.CapsuleHasBeenLocked;

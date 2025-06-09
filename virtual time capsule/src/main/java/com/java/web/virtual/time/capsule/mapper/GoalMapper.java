@@ -1,6 +1,6 @@
 package com.java.web.virtual.time.capsule.mapper;
 
-import com.java.web.virtual.time.capsule.dto.GoalDto;
+import com.java.web.virtual.time.capsule.dto.goal.GoalDto;
 import com.java.web.virtual.time.capsule.model.Goal;
 
 import org.mapstruct.factory.Mappers;

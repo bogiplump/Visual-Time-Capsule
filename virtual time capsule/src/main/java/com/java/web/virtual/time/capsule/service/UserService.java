@@ -1,12 +1,10 @@
 package com.java.web.virtual.time.capsule.service;
 
-import com.java.web.virtual.time.capsule.dto.FriendshipDto;
-import com.java.web.virtual.time.capsule.dto.UserCreateDto;
-import com.java.web.virtual.time.capsule.dto.UserLoginDto;
-import com.java.web.virtual.time.capsule.dto.UserResponseDto;
-import com.java.web.virtual.time.capsule.dto.UserUpdateDto;
-import com.java.web.virtual.time.capsule.exception.user.UserNotFound;
-import com.java.web.virtual.time.capsule.model.User;
+import com.java.web.virtual.time.capsule.dto.user.FriendshipDto;
+import com.java.web.virtual.time.capsule.dto.user.UserCreateDto;
+import com.java.web.virtual.time.capsule.dto.user.UserLoginDto;
+import com.java.web.virtual.time.capsule.dto.user.UserResponseDto;
+import com.java.web.virtual.time.capsule.dto.user.UserUpdateDto;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

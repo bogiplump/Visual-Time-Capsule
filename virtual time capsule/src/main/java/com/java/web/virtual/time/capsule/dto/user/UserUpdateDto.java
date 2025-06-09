@@ -1,9 +1,6 @@
-package com.java.web.virtual.time.capsule.dto;
+package com.java.web.virtual.time.capsule.dto.user;
 
-import jakarta.persistence.Column;
 import lombok.Data;
-
-import java.time.LocalDate;
 
 @Data
 public class UserUpdateDto {

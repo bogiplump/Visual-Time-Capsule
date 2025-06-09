@@ -1,7 +1,7 @@
 package com.java.web.virtual.time.capsule.controller;
 
-import com.java.web.virtual.time.capsule.dto.GoalDto;
-import com.java.web.virtual.time.capsule.dto.UpdateGoalDto;
+import com.java.web.virtual.time.capsule.dto.goal.GoalDto;
+import com.java.web.virtual.time.capsule.dto.user.UpdateGoalDto;
 import com.java.web.virtual.time.capsule.model.Goal;
 import com.java.web.virtual.time.capsule.service.GoalService;
 
@@ -12,7 +12,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

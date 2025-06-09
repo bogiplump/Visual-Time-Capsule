@@ -1,11 +1,9 @@
-package com.java.web.virtual.time.capsule.dto;
+package com.java.web.virtual.time.capsule.dto.goal;
 
 import lombok.Data;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDate;
 
 @Data
 @Builder

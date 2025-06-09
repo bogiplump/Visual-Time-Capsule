@@ -1,12 +1,11 @@
 package com.java.web.virtual.time.capsule.controller;
 
-import com.java.web.virtual.time.capsule.dto.FriendshipDto;
-import com.java.web.virtual.time.capsule.dto.GoalDto;
-import com.java.web.virtual.time.capsule.dto.UserResponseDto;
-import com.java.web.virtual.time.capsule.dto.UserUpdateDto;
+import com.java.web.virtual.time.capsule.dto.user.FriendshipDto;
+import com.java.web.virtual.time.capsule.dto.goal.GoalDto;
+import com.java.web.virtual.time.capsule.dto.user.UserResponseDto;
+import com.java.web.virtual.time.capsule.dto.user.UserUpdateDto;
 import com.java.web.virtual.time.capsule.mapper.GoalMapper;
 import com.java.web.virtual.time.capsule.service.GoalService;
-import com.java.web.virtual.time.capsule.service.impl.JwtService;
 import com.java.web.virtual.time.capsule.service.UserService;
 import jakarta.validation.constraints.Positive;
 import org.springframework.http.HttpStatus;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;

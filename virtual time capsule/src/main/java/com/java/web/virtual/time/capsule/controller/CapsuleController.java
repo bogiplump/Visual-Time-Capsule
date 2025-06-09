@@ -1,7 +1,7 @@
 package com.java.web.virtual.time.capsule.controller;
 
-import com.java.web.virtual.time.capsule.dto.CapsuleCreateDto;
-import com.java.web.virtual.time.capsule.dto.CapsuleUpdateDto;
+import com.java.web.virtual.time.capsule.dto.capsule.CapsuleCreateDto;
+import com.java.web.virtual.time.capsule.dto.capsule.CapsuleUpdateDto;
 import com.java.web.virtual.time.capsule.model.Capsule;
 import com.java.web.virtual.time.capsule.model.Goal;
 import com.java.web.virtual.time.capsule.model.Memory;

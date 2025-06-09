@@ -1,4 +1,4 @@
-package com.java.web.virtual.time.capsule.dto;
+package com.java.web.virtual.time.capsule.dto.user;
 
 import lombok.Data;
 

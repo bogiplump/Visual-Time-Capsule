@@ -1,7 +1,7 @@
 package com.java.web.virtual.time.capsule.service;
 
-import com.java.web.virtual.time.capsule.dto.GoalDto;
-import com.java.web.virtual.time.capsule.dto.UpdateGoalDto;
+import com.java.web.virtual.time.capsule.dto.goal.GoalDto;
+import com.java.web.virtual.time.capsule.dto.user.UpdateGoalDto;
 import com.java.web.virtual.time.capsule.model.Goal;
 import java.util.List;
 

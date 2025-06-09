@@ -1,4 +1,4 @@
-package com.java.web.virtual.time.capsule.dto;
+package com.java.web.virtual.time.capsule.dto.memory;
 
 
 import com.java.web.virtual.time.capsule.enums.MemoryType;

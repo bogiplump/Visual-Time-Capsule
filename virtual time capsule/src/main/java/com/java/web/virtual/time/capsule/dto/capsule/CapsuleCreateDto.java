@@ -1,5 +1,6 @@
-package com.java.web.virtual.time.capsule.dto;
+package com.java.web.virtual.time.capsule.dto.capsule;
 
+import com.java.web.virtual.time.capsule.dto.goal.GoalDto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;

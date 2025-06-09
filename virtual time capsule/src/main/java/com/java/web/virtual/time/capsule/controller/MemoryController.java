@@ -1,6 +1,6 @@
 package com.java.web.virtual.time.capsule.controller;
 
-import com.java.web.virtual.time.capsule.dto.MemoryCreateDto;
+import com.java.web.virtual.time.capsule.dto.memory.MemoryCreateDto;
 import com.java.web.virtual.time.capsule.service.MemoryService;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

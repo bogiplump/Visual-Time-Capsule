@@ -1,7 +1,7 @@
 package com.java.web.virtual.time.capsule.controller;
 
-import com.java.web.virtual.time.capsule.dto.SharedCapsuleCreateDto;
-import com.java.web.virtual.time.capsule.dto.SharedCapsuleResponseDto;
+import com.java.web.virtual.time.capsule.dto.sharedcapsule.SharedCapsuleCreateDto;
+import com.java.web.virtual.time.capsule.dto.sharedcapsule.SharedCapsuleResponseDto;
 import com.java.web.virtual.time.capsule.service.SharedCapsuleService;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.ResponseEntity;

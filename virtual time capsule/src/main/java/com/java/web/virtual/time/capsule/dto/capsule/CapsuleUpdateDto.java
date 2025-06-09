@@ -1,6 +1,7 @@
-package com.java.web.virtual.time.capsule.dto;
+package com.java.web.virtual.time.capsule.dto.capsule;
 
 import com.java.web.virtual.time.capsule.annotation.ValidName;
+import com.java.web.virtual.time.capsule.dto.goal.GoalDto;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

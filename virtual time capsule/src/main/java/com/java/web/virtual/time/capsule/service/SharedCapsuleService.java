@@ -1,7 +1,7 @@
 package com.java.web.virtual.time.capsule.service;
 
-import com.java.web.virtual.time.capsule.dto.SharedCapsuleCreateDto;
-import com.java.web.virtual.time.capsule.dto.SharedCapsuleResponseDto;
+import com.java.web.virtual.time.capsule.dto.sharedcapsule.SharedCapsuleCreateDto;
+import com.java.web.virtual.time.capsule.dto.sharedcapsule.SharedCapsuleResponseDto;
 
 public interface SharedCapsuleService {
     /**

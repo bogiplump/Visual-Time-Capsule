@@ -1,6 +1,6 @@
 package com.java.web.virtual.time.capsule.model;
 
-import com.java.web.virtual.time.capsule.dto.GoalDto;
+import com.java.web.virtual.time.capsule.dto.goal.GoalDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
