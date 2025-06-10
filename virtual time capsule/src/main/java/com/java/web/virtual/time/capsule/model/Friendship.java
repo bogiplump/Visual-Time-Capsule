@@ -9,12 +9,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 @Entity
 @Builder
@@ -26,9 +24,9 @@ public class Friendship {
     private Long id;
 
     @ManyToOne(optional = false)
-    private CapsuleUser requester;
+    private User requester;
     @ManyToOne(optional = false)
-    private CapsuleUser responder;
+    private User responder;
 
     @Setter
     @Getter

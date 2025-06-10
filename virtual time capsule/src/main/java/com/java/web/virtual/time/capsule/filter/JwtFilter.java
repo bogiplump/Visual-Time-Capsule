@@ -1,7 +1,7 @@
 package com.java.web.virtual.time.capsule.filter;
 
 
-import com.java.web.virtual.time.capsule.service.JwtService;
+import com.java.web.virtual.time.capsule.service.impl.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

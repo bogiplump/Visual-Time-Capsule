@@ -1,11 +1,12 @@
 package com.java.web.virtual.time.capsule.repository;
 
-import com.java.web.virtual.time.capsule.model.CapsuleUser;
-import com.java.web.virtual.time.capsule.model.GoalEntity;
+import com.java.web.virtual.time.capsule.model.Goal;
 
 import java.util.List;
+
+import com.java.web.virtual.time.capsule.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface GoalRepository extends JpaRepository<GoalEntity, Long> {
-    List<GoalEntity> findByCreator(CapsuleUser creator);
+public interface GoalRepository extends JpaRepository<Goal, Long> {
+    List<Goal> findByCreator(User creator);
 }

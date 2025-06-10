@@ -1,22 +1,22 @@
 package com.java.web.virtual.time.capsule.service;
 
-import com.java.web.virtual.time.capsule.dtos.GoalDto;
-import com.java.web.virtual.time.capsule.dtos.UpdateGoalDto;
-import com.java.web.virtual.time.capsule.model.GoalEntity;
+import com.java.web.virtual.time.capsule.dto.GoalDto;
+import com.java.web.virtual.time.capsule.dto.UpdateGoalDto;
+import com.java.web.virtual.time.capsule.model.Goal;
 import java.util.List;
 
 public interface GoalService {
-    void createGoal(GoalEntity goalEntity);
+    Goal createGoal(Long capsuleId,GoalDto goalEntity,String creator);
 
-    void updateGoal(UpdateGoalDto updateGoalDto);
+    void updateGoal(Long id, UpdateGoalDto updateGoalDto);
 
     void deleteGoal(Long id);
 
-    List<GoalEntity> getUserGoals(Long userId);
+    List<Goal> getUserGoals(Long userId);
 
     void makeGoalVisible(Long id);
 
     void setGoalIsAchieved(Long id);
 
-    GoalDto getGoal(Long id);
+    Goal getGoal(Long id);
 }
