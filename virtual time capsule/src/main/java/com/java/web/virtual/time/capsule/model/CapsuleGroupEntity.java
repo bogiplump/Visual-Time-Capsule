@@ -32,7 +32,7 @@ public class CapsuleGroupEntity {
     private String theme;
 
     @OneToMany(mappedBy = "group")
-    private List<CapsuleEntity> capsules;
+    private List<Capsule> capsules;
 
     @Column(name = "time_between_capsules")
     private LocalDateTime timeBetweenCapsules;

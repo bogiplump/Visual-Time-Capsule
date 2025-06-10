@@ -1,4 +1,4 @@
-package com.java.web.virtual.time.capsule.service;
+package com.java.web.virtual.time.capsule.service.impl;
 
 import com.java.web.virtual.time.capsule.dto.CreateGroupDto;
 import com.java.web.virtual.time.capsule.dto.GroupUpdateDto;
@@ -9,6 +9,7 @@ import com.java.web.virtual.time.capsule.model.CapsuleGroupEntity;
 import com.java.web.virtual.time.capsule.repository.CapsuleGroupRepository;
 import com.java.web.virtual.time.capsule.repository.CapsuleNodeRepository;
 
+import com.java.web.virtual.time.capsule.service.CapsuleGroupService;
 import java.util.ArrayList;
 import java.util.List;
 
