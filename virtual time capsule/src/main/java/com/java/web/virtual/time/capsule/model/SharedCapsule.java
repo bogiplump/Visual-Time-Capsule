@@ -13,7 +13,15 @@ import java.util.Set;
 public class SharedCapsule {
     private Capsule capsule;
 
-    private Set<String> usernames;
+    private Set<CapsuleParticipant> users;
+
+    public void addUserToCapsule(Long userId) {
+        //TODO implement
+    }
+
+    public void removeUserFromCapsule(Long userId) {
+        //TODO implement
+    }
 
     public SharedCapsuleResponseDto toResponseDto() {
         return null; //TODO implement
