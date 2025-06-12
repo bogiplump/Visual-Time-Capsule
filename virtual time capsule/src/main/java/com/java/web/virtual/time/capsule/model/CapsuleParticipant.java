@@ -7,9 +7,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -29,11 +27,11 @@ public class CapsuleParticipant {
     @Setter(AccessLevel.NONE)
     private Long id;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "capsule_id", nullable = false)
     private Capsule capsule;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "participant_id", nullable = false)
     private User participant;
 
@@ -43,4 +41,21 @@ public class CapsuleParticipant {
     @Column(name = "added_at", nullable = false)
     @Setter(AccessLevel.NONE)
     private LocalDateTime addedAt;
+
+    public CapsuleParticipant(Capsule capsule, User participant, Boolean isReadyToClose) {
+        this.capsule = capsule;
+        this.participant = participant;
+        this.isReadyToClose = isReadyToClose;
+        this.addedAt = LocalDateTime.now();
+    }
+
+    public static CapsuleParticipant ofCapsuleAndParticipantId(Long capsuleId, Long participantId, Boolean isReadyToClose) {
+        Capsule capsule = new Capsule();
+        capsule.setId(capsuleId);
+
+        User participant = new User();
+        participant.setId(participantId);
+
+        return new CapsuleParticipant(capsule, participant, isReadyToClose);
+    }
 }

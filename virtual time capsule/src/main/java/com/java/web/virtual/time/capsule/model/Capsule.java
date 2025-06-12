@@ -47,7 +47,7 @@ import lombok.Setter;
 public class Capsule {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Setter(AccessLevel.NONE)
+    @Setter(AccessLevel.PACKAGE)
     private Long id;
 
     @Column(name = "capsule_name", nullable = false)
@@ -69,6 +69,9 @@ public class Capsule {
     @Column(name = "open_date")
     @Setter(AccessLevel.NONE)
     private LocalDateTime openDate;
+
+    @Column(name = "is_shared", nullable = false)
+    private Boolean isShared;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by_id", nullable = false)
