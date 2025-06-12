@@ -32,8 +32,6 @@ public class SharedCapsuleServiceImpl implements SharedCapsuleService {
         return repository.save(sharedCapsule).getCapsule().getId();
     }
 
-
-
     @Override
     public SharedCapsuleResponseDto getSharedCapsuleById(Long id, String currentUser) {
         SharedCapsule sharedCapsule = repository.findById(id)

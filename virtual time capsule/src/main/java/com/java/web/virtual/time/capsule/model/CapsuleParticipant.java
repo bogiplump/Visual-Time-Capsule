@@ -6,6 +6,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -27,13 +29,13 @@ public class CapsuleParticipant {
     @Setter(AccessLevel.NONE)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @Column(name = "capsule_id", nullable = false)
-    private Long capsuleId;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "capsule_id", nullable = false)
+    private Capsule capsule;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @Column(name = "participant_id", nullable = false)
-    private Long participantId;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "participant_id", nullable = false)
+    private User participant;
 
     @Column(name = "ready_to_close", nullable = false)
     private Boolean isReadyToClose;
