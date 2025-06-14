@@ -5,6 +5,7 @@ import com.java.web.virtual.time.capsule.dto.sharedcapsule.SharedCapsuleResponse
 import com.java.web.virtual.time.capsule.service.SharedCapsuleService;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -48,9 +49,31 @@ public class SharedCapsuleController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> removeUserFromCapsule(@NotNull @PathVariable Long capsuleId, @NotNull @RequestParam Long userId,
+    public ResponseEntity<?> removeUserFromCapsule(@NotNull @PathVariable Long id, @NotNull @RequestParam Long userId,
                                                         Principal principal) {
-        sharedCapsuleService.addUserToCapsule(capsuleId, userId, principal.getName());
+        sharedCapsuleService.addUserToCapsule(id, userId, principal.getName());
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("{id}/ready-to-lock")
+    public ResponseEntity<?> setReadyToClose(@NotNull @PathVariable Long id, Principal principal) {
+        sharedCapsuleService.setReadyToClose(id, principal.getName());
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("{id}/creator-ready-to-lock")
+    public ResponseEntity<?> creatorReadToClose(@NotNull @PathVariable Long id, @NotNull @RequestParam String openDate,
+                                                Principal principal) {
+        sharedCapsuleService.creatorLock(id, openDate, principal.getName());
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("{id}/force-lock")
+    public ResponseEntity<?> forceLock(@NotNull @PathVariable Long id, Principal principal) {
+        sharedCapsuleService.forceLock(id, principal.getName());
 
         return ResponseEntity.noContent().build();
     }

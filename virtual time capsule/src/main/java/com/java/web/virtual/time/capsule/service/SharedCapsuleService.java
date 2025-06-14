@@ -73,4 +73,44 @@ public interface SharedCapsuleService {
      * @throws CapsuleNotOwnedByYou  if capsule is not created by you.
      */
     void deleteSharedCapsuleById(Long id, String currentUser);
+
+    /**
+     * Saves the in the database that the user is ready to close the capsule.
+     * If all participants are ready to close the capsule is locked.
+     *
+     * @param id the unique identifier of the shared capsule, must not be null.
+     * @param currentUser the username of the current user, must not be null.
+     *
+     * @throws CapsuleNotFound if capsule with this id is not found in the database.
+     * @throws IsNotSharedCapsule if capsule is not a shared capsule.
+     */
+    void setReadyToClose(Long id, String currentUser);
+
+    /**
+     * Saves the in the database that the creator is ready to close the capsule and sets the open date.
+     * If all participants are ready to close the capsule is locked.
+     *
+     * @param id the unique identifier of the shared capsule, must not be null.
+     * @param openDateInString the date and time of the opening of the capsule
+     *                         in string format, must not be null.
+     * @param currentUser the username of the current user, must not be null.
+     *
+     * @throws CapsuleNotFound if capsule with this id is not found in the database.
+     * @throws IsNotSharedCapsule if capsule is not a shared capsule.
+     * @throws CapsuleNotOwnedByYou  if capsule is not created by you.
+     */
+    void creatorLock(Long id, String openDateInString, String currentUser);
+
+    /**
+     * Locks the capsule regardless of how many of the participants are ready to close the capsule.
+     * The creator needs to be ready to close the capsule before calling the method.
+     *
+     * @param id the unique identifier of the shared capsule, must not be null.
+     * @param currentUser the username of the current user, must not be null.
+     *
+     * @throws CapsuleNotFound if capsule with this id is not found in the database.
+     * @throws IsNotSharedCapsule if capsule is not a shared capsule.
+     * @throws CapsuleNotOwnedByYou if capsule is not created by you.
+     */
+    void forceLock(Long id, String currentUser);
 }
