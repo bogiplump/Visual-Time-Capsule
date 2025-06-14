@@ -14,5 +14,11 @@ public interface CapsuleParticipantRepository extends JpaRepository<CapsuleParti
 
     Set<CapsuleParticipant> findByCapsuleId(Long capsuleId);
 
+    CapsuleParticipant findByCapsuleIdAndParticipantId(Long capsuleId, Long participantId);
+
     boolean existsByCapsuleIdAndParticipantId(Long capsuleId, Long participantId);
+
+    int countByCapsuleIdAndIsReadyToClose(Long capsuleId, Boolean isReadyToClose);
+
+    int countByCapsuleId(Long capsuleId);
 }

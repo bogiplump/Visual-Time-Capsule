@@ -6,6 +6,7 @@ import com.java.web.virtual.time.capsule.enums.CapsuleStatus;
 import com.java.web.virtual.time.capsule.exception.capsule.CapsuleHasBeenLocked;
 import com.java.web.virtual.time.capsule.exception.capsule.CapsuleNotFound;
 import com.java.web.virtual.time.capsule.exception.capsule.CapsuleNotOwnedByYou;
+import com.java.web.virtual.time.capsule.exception.capsule.LockingCapsuleWithoutOpenDate;
 import com.java.web.virtual.time.capsule.exception.sharedcapsuele.IsNotSharedCapsule;
 import com.java.web.virtual.time.capsule.exception.sharedcapsuele.UserAlreadyInCapsule;
 import com.java.web.virtual.time.capsule.exception.sharedcapsuele.UserNotInCapsule;
@@ -20,7 +21,10 @@ import com.java.web.virtual.time.capsule.service.SharedCapsuleService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Set;
+
+import static com.java.web.virtual.time.capsule.service.impl.SystemDateFormatter.formatter;
 
 @AllArgsConstructor
 @Service
@@ -121,6 +125,83 @@ public class SharedCapsuleServiceImpl implements SharedCapsuleService {
         }
 
         participantRepository.deleteByCapsuleIdAndParticipantId(capsuleId, userId);
+    }
+
+    private void lockCapsuleIfPossible(Long capsuleId) {
+        int readyToCloseCount = participantRepository.countByCapsuleIdAndIsReadyToClose(capsuleId, true);
+        int allCount = participantRepository.countByCapsuleId(capsuleId);
+
+        if (readyToCloseCount == allCount) {
+            Capsule capsule = capsuleRepository.findById(capsuleId).get();
+
+            capsule.lock();
+            capsuleRepository.save(capsule);
+        }
+    }
+
+    @Override
+    public void setReadyToClose(Long id, String currentUser) {
+        handleIsIdToValidCapsule(id);
+
+        User currUser = userRepository.findByUsername(currentUser);
+        if (!participantRepository.existsByCapsuleIdAndParticipantId(id, currUser.getId())) {
+            throw new UserNotInCapsule("You are not in the capsule with id " + id + " so you can not close it. ");
+        }
+
+        Long creatorId = capsuleRepository.findCreatedByIdById(id);
+        if (currUser.getId().equals(creatorId)) {
+            throw new LockingCapsuleWithoutOpenDate("You the creator of the capsule with id " + id +
+                ". You must use creator-lock and give the open date for the capsule. After that you can use force-lock. ");
+        }
+
+        CapsuleParticipant participant =
+            participantRepository.findByCapsuleIdAndParticipantId(id, currUser.getId());
+
+        participant.setIsReadyToClose(true);
+
+        participantRepository.save(participant);
+
+        lockCapsuleIfPossible(id);
+    }
+
+    @Override
+    public void creatorLock(Long id, String openDateInString, String currentUser) {
+        handleIsIdToValidCapsule(id);
+
+        User currUser = userRepository.findByUsername(currentUser);
+        handleUserNotCapsuleOwner(id, currUser.getId());
+
+        CapsuleParticipant participant =
+            participantRepository.findByCapsuleIdAndParticipantId(id, currUser.getId());
+
+        participant.setIsReadyToClose(true);
+
+        participantRepository.save(participant);
+
+        LocalDateTime openDate = LocalDateTime.parse(openDateInString, formatter);
+
+        Capsule capsule = capsuleRepository.findById(id).get();
+        capsule.setOpenDate(openDate);
+        capsuleRepository.save(capsule);
+
+        lockCapsuleIfPossible(id);
+    }
+
+    @Override
+    public void forceLock(Long id, String currentUser) {
+        handleIsIdToValidCapsule(id);
+
+        User currUser = userRepository.findByUsername(currentUser);
+        handleUserNotCapsuleOwner(id, currUser.getId());
+
+        Capsule capsule = capsuleRepository.findById(id).get();
+        if (capsule.getOpenDate() == null) {
+            throw new LockingCapsuleWithoutOpenDate("You need to perform creator-lock before force-lock. " +
+                "There is no open date set.");
+        }
+
+        capsule.lock();
+        capsuleRepository.save(capsule);
     }
 
     @Override

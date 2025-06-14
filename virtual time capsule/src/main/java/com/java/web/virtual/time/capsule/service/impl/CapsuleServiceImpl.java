@@ -17,17 +17,15 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 
+import static com.java.web.virtual.time.capsule.service.impl.SystemDateFormatter.formatter;
+
 @Service
 @AllArgsConstructor
 public class CapsuleServiceImpl implements CapsuleService {
-    private final static String dateTimePattern = "HH-mm-ss_dd-MM-yyyy";
-    private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateTimePattern);
-
     private final CapsuleRepository capsuleRepository;
     private final UserRepository userRepository;
     private final GoalService goalService;
