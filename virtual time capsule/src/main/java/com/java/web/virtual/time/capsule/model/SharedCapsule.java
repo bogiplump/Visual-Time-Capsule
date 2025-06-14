@@ -15,14 +15,6 @@ public class SharedCapsule {
 
     private Set<CapsuleParticipant> users;
 
-    public void addUserToCapsule(Long userId) {
-        //TODO implement
-    }
-
-    public void removeUserFromCapsule(Long userId) {
-        //TODO implement
-    }
-
     public SharedCapsuleResponseDto toResponseDto() {
         return null; //TODO implement
     }

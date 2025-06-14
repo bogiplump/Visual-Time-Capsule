@@ -10,5 +10,9 @@ import java.util.Set;
 public interface CapsuleParticipantRepository extends JpaRepository<CapsuleParticipant, Long> {
     void deleteByCapsuleIdAndParticipantId(Long capsuleId, Long participantId);
 
-    Set<CapsuleParticipant> findByCapsule_Id(Long capsuleId);
+    void deleteByCapsuleId(Long capsuleId);
+
+    Set<CapsuleParticipant> findByCapsuleId(Long capsuleId);
+
+    boolean existsByCapsuleIdAndParticipantId(Long capsuleId, Long participantId);
 }

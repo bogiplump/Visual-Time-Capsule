@@ -115,7 +115,7 @@ public class CapsuleServiceImpl implements CapsuleService {
     public void deleteCapsule(Long id, String currentUser) {
         User user = userRepository.findByUsername(currentUser);
 
-        if (capsuleRepository.existsByIdAndCreator_Id(id,user.getId())) {
+        if (capsuleRepository.existsByIdAndCreatorId(id,user.getId())) {
            throw new CapsuleNotFound("Capsule with  id " + id + " was not found or is not owned by you. ");
         }
 

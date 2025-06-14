@@ -2,6 +2,7 @@ package com.java.web.virtual.time.capsule.service;
 
 import com.java.web.virtual.time.capsule.dto.sharedcapsule.SharedCapsuleCreateDto;
 import com.java.web.virtual.time.capsule.dto.sharedcapsule.SharedCapsuleResponseDto;
+import com.java.web.virtual.time.capsule.exception.capsule.CapsuleNotFound;
 import com.java.web.virtual.time.capsule.exception.capsule.CapsuleNotOwnedByYou;
 import com.java.web.virtual.time.capsule.exception.sharedcapsuele.IsNotSharedCapsule;
 import com.java.web.virtual.time.capsule.exception.sharedcapsuele.UserAlreadyInCapsule;
@@ -25,6 +26,7 @@ public interface SharedCapsuleService {
      * @param currentUser the username of the current user, must not be null.
      * @return a shared capsule response data transfer object.
      *
+     * @throws CapsuleNotFound if capsule with this id is not found in the database.
      * @throws IsNotSharedCapsule if capsule is not a shared capsule.
      * @throws UserNotInCapsule  if the current user is not in the capsule.
      */
@@ -38,6 +40,7 @@ public interface SharedCapsuleService {
      * @param userId the unique identifier of the user who needs to be added, must not be null.
      * @param currentUser the username of the current user, must not be null.
      *
+     * @throws CapsuleNotFound if capsule with this id is not found in the database.
      * @throws IsNotSharedCapsule if capsule is not a shared capsule.
      * @throws CapsuleNotOwnedByYou  if capsule is not created by you.
      * @throws UserAlreadyInCapsule if user is already in the capsule.
@@ -52,6 +55,7 @@ public interface SharedCapsuleService {
      * @param userId the unique identifier of the user who needs to be removed, must not be null.
      * @param currentUser the username of the current user, must not be null.
      *
+     * @throws CapsuleNotFound if capsule with this id is not found in the database.
      * @throws IsNotSharedCapsule if capsule is not a shared capsule.
      * @throws CapsuleNotOwnedByYou  if capsule is not created by you.
      * @throws UserNotInCapsule if user is not in the capsule.
@@ -64,6 +68,7 @@ public interface SharedCapsuleService {
      * @param id the unique identifier of the shared capsule, must not be null.
      * @param currentUser the username of the current user, must not be null.
      *
+     * @throws CapsuleNotFound if capsule with this id is not found in the database.
      * @throws IsNotSharedCapsule if capsule is not a shared capsule.
      * @throws CapsuleNotOwnedByYou  if capsule is not created by you.
      */
