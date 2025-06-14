@@ -81,6 +81,9 @@ public class Capsule {
     @Getter(AccessLevel.NONE)
     private Set<Memory> memoryEntries;
 
+    @OneToMany()
+    private CapsuleGroup capsuleGroup;
+
     public Capsule(String capsuleName, User creator,
                    Goal goal) {
         if (capsuleName == null || creator == null ||

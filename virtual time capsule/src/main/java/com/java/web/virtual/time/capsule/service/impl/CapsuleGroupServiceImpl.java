@@ -4,10 +4,9 @@ import com.java.web.virtual.time.capsule.dto.CreateGroupDto;
 import com.java.web.virtual.time.capsule.dto.GroupUpdateDto;
 import com.java.web.virtual.time.capsule.exception.GroupNotFoundException;
 import com.java.web.virtual.time.capsule.model.Capsule;
-import com.java.web.virtual.time.capsule.model.CapsuleGroupEntity;
+import com.java.web.virtual.time.capsule.model.CapsuleGroup;
 
 import com.java.web.virtual.time.capsule.repository.CapsuleGroupRepository;
-import com.java.web.virtual.time.capsule.repository.CapsuleNodeRepository;
 
 import com.java.web.virtual.time.capsule.service.CapsuleGroupService;
 import java.util.ArrayList;
@@ -24,17 +23,14 @@ public class CapsuleGroupServiceImpl implements CapsuleGroupService {
     @Autowired
     private CapsuleGroupRepository capsuleGroupRepository;
 
-    @Autowired
-    private CapsuleNodeRepository capsuleNodeRepository;
-
     @Override
-    public List<CapsuleGroupEntity> getAllCapsuleGroupsByUserId(Long userId) {
+    public List<CapsuleGroup> getAllCapsuleGroupsByUserId(Long userId) {
         return capsuleGroupRepository.findDistinctByCapsulesCreatorId(userId);
     }
 
     @Override
     public void createCapsuleGroup(CreateGroupDto createGroupDto) {
-        CapsuleGroupEntity groupEntity = new CapsuleGroupEntity();
+        CapsuleGroup groupEntity = new CapsuleGroup();
 
         groupEntity.setName(createGroupDto.getName());
         groupEntity.setTheme(createGroupDto.getTheme());
@@ -46,14 +42,14 @@ public class CapsuleGroupServiceImpl implements CapsuleGroupService {
 
     @Override
     public List<Capsule> getCapsulesInGroup(Long groupId) {
-        CapsuleGroupEntity group = capsuleGroupRepository.findById(groupId)
+        CapsuleGroup group = capsuleGroupRepository.findById(groupId)
             .orElseThrow(() -> new GroupNotFoundException("Could not find capsule group by id."));
         return group.getCapsules() != null ? group.getCapsules() : new ArrayList<>();
     }
 
     @Override
     public void updateGroup(GroupUpdateDto groupUpdateDto) {
-        CapsuleGroupEntity group = capsuleGroupRepository.findById(groupUpdateDto.getId())
+        CapsuleGroup group = capsuleGroupRepository.findById(groupUpdateDto.getId())
             .orElseThrow(() -> new GroupNotFoundException("Could not find capsule group by id."));
 
         if (groupUpdateDto.getName() != null) {

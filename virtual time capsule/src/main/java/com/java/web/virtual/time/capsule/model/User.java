@@ -48,4 +48,7 @@ public class User {
 
     @OneToMany(mappedBy = "creator")
     private Set<Capsule> capsules;
+
+    @OneToMany(mappedBy = "createdById")
+    private Set<CapsuleGroup> groups;
 }

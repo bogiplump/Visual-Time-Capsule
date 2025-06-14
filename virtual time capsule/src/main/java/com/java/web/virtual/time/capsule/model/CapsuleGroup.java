@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
@@ -23,7 +24,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity
 @Table(name = "capsule_groups")
-public class CapsuleGroupEntity {
+public class CapsuleGroup {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -39,4 +40,11 @@ public class CapsuleGroupEntity {
 
     @Column(name = "open_time")
     private LocalDateTime openTime;
+
+    @Column(name = "created_at")
+    private LocalDateTime timeOfCreation;
+
+    @Column(name = "created_by")
+    @ManyToOne
+    private User createdById;
 }
