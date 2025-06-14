@@ -103,10 +103,9 @@ public class Capsule {
         this.creationDate = LocalDateTime.now();
     }
 
-    public void lock(LocalDateTime openDate) {
+    public void lock() {
         lockDate = LocalDateTime.now();
         status = CapsuleStatus.CLOSED;
-        this.openDate = openDate;
     }
 
     private void checkIfCapsuleEditable() {
@@ -165,9 +164,8 @@ public class Capsule {
         }
 
         switch (status) {
-            case CapsuleStatus.CREATED ->  throw new CapsuleIsNotClosedYet("Trying to change the openDate of a capsule which is not locked");
             case CapsuleStatus.OPEN -> throw new CapsuleIsOpened("Trying to change the openDate of opened capsule");
-            case CapsuleStatus.CLOSED ->  this.openDate = openDate;
+            default -> this.openDate = openDate;
         }
     }
 

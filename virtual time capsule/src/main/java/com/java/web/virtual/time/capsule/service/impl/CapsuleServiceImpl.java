@@ -87,7 +87,8 @@ public class CapsuleServiceImpl implements CapsuleService {
 
         LocalDateTime openDate = LocalDateTime.parse(openDateInString, formatter);
 
-        capsule.lock(openDate);
+        capsule.lock();
+        capsule.setOpenDate(openDate);
 
         capsuleRepository.save(capsule);
     }
