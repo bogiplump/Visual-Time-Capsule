@@ -1,11 +1,12 @@
 package com.java.web.virtual.time.capsule.model;
 
-import com.java.web.virtual.time.capsule.dto.sharedcapsule.SharedCapsuleCreateDto;
+import com.java.web.virtual.time.capsule.dto.capsule.CapsuleResponseDto;
+import com.java.web.virtual.time.capsule.dto.sharedcapsule.CapsuleParticipantResponseDto;
 import com.java.web.virtual.time.capsule.dto.sharedcapsule.SharedCapsuleResponseDto;
-import com.java.web.virtual.time.capsule.service.SharedCapsuleService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Data
@@ -13,14 +14,16 @@ import java.util.Set;
 public class SharedCapsule {
     private Capsule capsule;
 
-    private Set<CapsuleParticipant> users;
+    private Set<CapsuleParticipant> participants;
 
     public SharedCapsuleResponseDto toResponseDto() {
-        return null; //TODO implement
-    }
+        CapsuleResponseDto capsuleDto = capsule.toCapsuleResponseDto();
 
-    public static SharedCapsule fromDtoAndUser(SharedCapsuleCreateDto sharedCapsuleDto,
-                                               User currentUser) {
-        return null; //TODO implement
+        Set<CapsuleParticipantResponseDto> participantDtos = new LinkedHashSet<>();
+        for (CapsuleParticipant curr : participants) {
+            participantDtos.add(curr.toResponseDto());
+        }
+
+        return new SharedCapsuleResponseDto(capsuleDto, participantDtos);
     }
 }

@@ -1,6 +1,6 @@
 package com.java.web.virtual.time.capsule.service;
 
-import com.java.web.virtual.time.capsule.dto.sharedcapsule.SharedCapsuleCreateDto;
+import com.java.web.virtual.time.capsule.dto.capsule.CapsuleCreateDto;
 import com.java.web.virtual.time.capsule.dto.sharedcapsule.SharedCapsuleResponseDto;
 import com.java.web.virtual.time.capsule.exception.capsule.CapsuleNotFound;
 import com.java.web.virtual.time.capsule.exception.capsule.CapsuleNotOwnedByYou;
@@ -17,7 +17,7 @@ public interface SharedCapsuleService {
      * @param currentUser the username of the current user, must not be null.
      * @return the id of the capsule.
      */
-    Long createSharedCapsule(SharedCapsuleCreateDto sharedCapsuleDto, String currentUser);
+    Long createSharedCapsule(CapsuleCreateDto sharedCapsuleDto, String currentUser);
 
     /**
      * Retrieves the shared capsule from the database and the returns it as a response data transfer object.

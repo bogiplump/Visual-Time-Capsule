@@ -1,6 +1,6 @@
 package com.java.web.virtual.time.capsule.service.impl;
 
-import com.java.web.virtual.time.capsule.dto.sharedcapsule.SharedCapsuleCreateDto;
+import com.java.web.virtual.time.capsule.dto.capsule.CapsuleCreateDto;
 import com.java.web.virtual.time.capsule.dto.sharedcapsule.SharedCapsuleResponseDto;
 import com.java.web.virtual.time.capsule.enums.CapsuleStatus;
 import com.java.web.virtual.time.capsule.exception.capsule.CapsuleHasBeenLocked;
@@ -9,16 +9,18 @@ import com.java.web.virtual.time.capsule.exception.capsule.CapsuleNotOwnedByYou;
 import com.java.web.virtual.time.capsule.exception.sharedcapsuele.IsNotSharedCapsule;
 import com.java.web.virtual.time.capsule.exception.sharedcapsuele.UserAlreadyInCapsule;
 import com.java.web.virtual.time.capsule.exception.sharedcapsuele.UserNotInCapsule;
+import com.java.web.virtual.time.capsule.model.Capsule;
 import com.java.web.virtual.time.capsule.model.CapsuleParticipant;
 import com.java.web.virtual.time.capsule.model.SharedCapsule;
 import com.java.web.virtual.time.capsule.model.User;
 import com.java.web.virtual.time.capsule.repository.CapsuleParticipantRepository;
 import com.java.web.virtual.time.capsule.repository.CapsuleRepository;
-import com.java.web.virtual.time.capsule.repository.SharedCapsuleRepository;
 import com.java.web.virtual.time.capsule.repository.UserRepository;
 import com.java.web.virtual.time.capsule.service.SharedCapsuleService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.Set;
 
 @AllArgsConstructor
 @Service
@@ -26,7 +28,6 @@ public class SharedCapsuleServiceImpl implements SharedCapsuleService {
     private UserRepository userRepository;
     private CapsuleRepository capsuleRepository;
     private CapsuleParticipantRepository participantRepository;
-    private SharedCapsuleRepository repository;
 
     private void handleIsIdToValidCapsule(Long capsuleId) {
         if (!capsuleRepository.existsById(capsuleId)) {
@@ -45,27 +46,33 @@ public class SharedCapsuleServiceImpl implements SharedCapsuleService {
     }
 
     @Override
-    public Long createSharedCapsule(SharedCapsuleCreateDto sharedCapsuleDto, String currentUser) {
+    public Long createSharedCapsule(CapsuleCreateDto sharedCapsuleDto, String currentUser) {
         User user = userRepository.findByUsername(currentUser);
 
-        SharedCapsule sharedCapsule = SharedCapsule.fromDtoAndUser(sharedCapsuleDto, user);
+        Capsule capsule = Capsule.fromDTOAndUser(sharedCapsuleDto, user);
+        capsule.setIsShared(true);
 
-        return repository.save(sharedCapsule).getCapsule().getId();
+        Long capsuleId = capsuleRepository.save(capsule).getId();
+        CapsuleParticipant participantToAdd =
+            CapsuleParticipant.ofCapsuleAndParticipantId(capsuleId, user.getId(), false);
+
+        participantRepository.save(participantToAdd);
+
+        return capsuleId;
     }
 
     @Override
     public SharedCapsuleResponseDto getSharedCapsuleById(Long id, String currentUser) {
-        SharedCapsule sharedCapsule = repository.findById(id)
-            .orElseThrow(() -> new CapsuleNotFound("Shared capsule with id " + id + " was not found. "));
-
-        if (!sharedCapsule.getCapsule().getIsShared()) {
-            throw new IsNotSharedCapsule("Capsule with id " + id + " is not a shared capsule. ");
-        }
+        handleIsIdToValidCapsule(id);
+        Capsule capsule = capsuleRepository.findById(id).get();
 
         User user = userRepository.findByUsername(currentUser);
         if (!participantRepository.existsByCapsuleIdAndParticipantId(id, user.getId())) {
-            throw new UserNotInCapsule("You are not in capsule with id " + id + ". ");
+            throw new UserNotInCapsule("You are not in capsule with id " + id + " so you do not have access to it. ");
         }
+
+        Set<CapsuleParticipant> participants = participantRepository.findByCapsuleId(id);
+        SharedCapsule sharedCapsule = new SharedCapsule(capsule, participants);
 
         return sharedCapsule.toResponseDto();
     }
@@ -86,7 +93,7 @@ public class SharedCapsuleServiceImpl implements SharedCapsuleService {
 
         if (participantRepository.existsByCapsuleIdAndParticipantId(capsuleId, userId)) {
             throw new UserAlreadyInCapsule("The user with id " + userId + " is in the shared capsule with id "
-                + capsuleId + ". You can only remove a user from the shared capsule if he is a participant. ");
+                + capsuleId + ". You can only add a user to the shared capsule if he is not a participant. ");
         }
 
         CapsuleParticipant participantToAdd = CapsuleParticipant.ofCapsuleAndParticipantId(capsuleId, userId, false);
@@ -110,7 +117,7 @@ public class SharedCapsuleServiceImpl implements SharedCapsuleService {
 
         if (!participantRepository.existsByCapsuleIdAndParticipantId(capsuleId, userId)) {
             throw new UserNotInCapsule("The user with id " + userId + " is not in the shared capsule with id "
-                + capsuleId + ". You can only add a user in the shared capsule if he is not a participant. ");
+                + capsuleId + ". You can only remove a user from the shared capsule if he is a participant. ");
         }
 
         participantRepository.deleteByCapsuleIdAndParticipantId(capsuleId, userId);

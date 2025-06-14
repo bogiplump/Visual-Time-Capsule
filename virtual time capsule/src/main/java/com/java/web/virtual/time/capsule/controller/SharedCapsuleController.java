@@ -1,6 +1,6 @@
 package com.java.web.virtual.time.capsule.controller;
 
-import com.java.web.virtual.time.capsule.dto.sharedcapsule.SharedCapsuleCreateDto;
+import com.java.web.virtual.time.capsule.dto.capsule.CapsuleCreateDto;
 import com.java.web.virtual.time.capsule.dto.sharedcapsule.SharedCapsuleResponseDto;
 import com.java.web.virtual.time.capsule.service.SharedCapsuleService;
 import jakarta.validation.constraints.NotNull;
@@ -24,7 +24,7 @@ public class SharedCapsuleController {
     private SharedCapsuleService sharedCapsuleService;
 
     @PostMapping
-    public ResponseEntity<?> createSharedCapsule(@NotNull @RequestBody SharedCapsuleCreateDto sharedCapsuleDto,
+    public ResponseEntity<?> createSharedCapsule(@NotNull @RequestBody CapsuleCreateDto sharedCapsuleDto,
                                                  Principal principal) {
         Long capsuleId = sharedCapsuleService.createSharedCapsule(sharedCapsuleDto, principal.getName());
 

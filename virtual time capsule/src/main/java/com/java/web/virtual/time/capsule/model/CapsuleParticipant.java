@@ -1,5 +1,7 @@
 package com.java.web.virtual.time.capsule.model;
 
+import com.java.web.virtual.time.capsule.dto.sharedcapsule.CapsuleParticipantResponseDto;
+import com.java.web.virtual.time.capsule.repository.CapsuleParticipantRepository;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -57,5 +59,9 @@ public class CapsuleParticipant {
         participant.setId(participantId);
 
         return new CapsuleParticipant(capsule, participant, isReadyToClose);
+    }
+
+    public CapsuleParticipantResponseDto toResponseDto() {
+        return new CapsuleParticipantResponseDto(participant.getId(), participant.getUsername(), isReadyToClose);
     }
 }
