@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class GoalDto {
+public class GoalCreateDto {
     private boolean isVisible;
     private boolean isAchieved;
     private String content;

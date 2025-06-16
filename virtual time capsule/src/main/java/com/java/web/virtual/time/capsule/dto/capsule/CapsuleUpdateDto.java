@@ -1,7 +1,7 @@
 package com.java.web.virtual.time.capsule.dto.capsule;
 
 import com.java.web.virtual.time.capsule.annotation.ValidName;
-import com.java.web.virtual.time.capsule.dto.goal.GoalDto;
+import com.java.web.virtual.time.capsule.dto.goal.GoalCreateDto;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -20,5 +20,5 @@ public class CapsuleUpdateDto {
     private LocalDateTime openDate;
 
     @NotNull
-    private GoalDto goal;
+    private GoalCreateDto goal;
 }

@@ -1,7 +1,7 @@
 package com.java.web.virtual.time.capsule.controller;
 
 import com.java.web.virtual.time.capsule.dto.user.FriendshipDto;
-import com.java.web.virtual.time.capsule.dto.goal.GoalDto;
+import com.java.web.virtual.time.capsule.dto.goal.GoalCreateDto;
 import com.java.web.virtual.time.capsule.dto.user.UserResponseDto;
 import com.java.web.virtual.time.capsule.dto.user.UserUpdateDto;
 import com.java.web.virtual.time.capsule.mapper.GoalMapper;
@@ -69,8 +69,8 @@ public class UserController {
     }
 
     @GetMapping("/{id}/goals")
-    public ResponseEntity<List<GoalDto>> getUserGoals(@PathVariable Long id) {
-        List<GoalDto> userGoals = goalService.getUserGoals(id).stream()
+    public ResponseEntity<List<GoalCreateDto>> getUserGoals(@PathVariable Long id) {
+        List<GoalCreateDto> userGoals = goalService.getUserGoals(id).stream()
             .map(GoalMapper.INSTANCE::toDTO)
             .toList();
 

@@ -1,7 +1,7 @@
 package com.java.web.virtual.time.capsule.service.impl;
 
-import com.java.web.virtual.time.capsule.dto.goal.GoalDto;
-import com.java.web.virtual.time.capsule.dto.user.UpdateGoalDto;
+import com.java.web.virtual.time.capsule.dto.goal.GoalCreateDto;
+import com.java.web.virtual.time.capsule.dto.goal.GoalUpdateDto;
 import com.java.web.virtual.time.capsule.exception.goal.GoalNotFoundException;
 import com.java.web.virtual.time.capsule.exception.goal.GoalNotVisibleException;
 import com.java.web.virtual.time.capsule.model.Capsule;
@@ -27,7 +27,7 @@ public class GoalServiceImpl implements GoalService {
     private CapsuleRepository capsuleRepository;
 
     @Override
-    public Goal createGoal(Long capsuleId, GoalDto goalEntity, String creator) {
+    public Goal createGoal(Long capsuleId, GoalCreateDto goalEntity, String creator) {
         Capsule capsule = capsuleRepository.findById(capsuleId).orElseThrow(GoalNotFoundException::new);
         User user = userRepository.findByUsername(creator);
         Goal goal = Goal.fromDTO(goalEntity,user);
@@ -36,7 +36,7 @@ public class GoalServiceImpl implements GoalService {
     }
 
     @Override
-    public void updateGoal(Long id, UpdateGoalDto updateGoalDto) {
+    public void updateGoal(Long id, GoalUpdateDto updateGoalDto) {
         if (updateGoalDto == null) {
             throw new IllegalArgumentException(("No goal entity provided."));
         }

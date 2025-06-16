@@ -2,7 +2,7 @@ package com.java.web.virtual.time.capsule.model;
 
 import com.java.web.virtual.time.capsule.dto.capsule.CapsuleCreateDto;
 import com.java.web.virtual.time.capsule.dto.capsule.CapsuleResponseDto;
-import com.java.web.virtual.time.capsule.dto.goal.GoalDto;
+import com.java.web.virtual.time.capsule.dto.goal.GoalCreateDto;
 import com.java.web.virtual.time.capsule.dto.memory.MemoryResponseDto;
 import com.java.web.virtual.time.capsule.enums.CapsuleStatus;
 
@@ -216,7 +216,7 @@ public class Capsule {
     }
 
     public static Capsule fromDTOAndUser(CapsuleCreateDto capsuleCreateDto, User creator) {
-        GoalDto goalDto = capsuleCreateDto.getGoal();
+        GoalCreateDto goalDto = capsuleCreateDto.getGoal();
         Goal goal = Goal.builder()
             .content(goalDto.getContent())
             .creator(creator)

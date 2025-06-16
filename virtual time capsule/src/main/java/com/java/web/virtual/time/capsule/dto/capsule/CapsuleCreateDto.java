@@ -1,6 +1,6 @@
 package com.java.web.virtual.time.capsule.dto.capsule;
 
-import com.java.web.virtual.time.capsule.dto.goal.GoalDto;
+import com.java.web.virtual.time.capsule.dto.goal.GoalCreateDto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -11,5 +11,5 @@ public class CapsuleCreateDto {
     @Size(max = 20, message = "Capsule name must not exceed 20 characters")
     private String capsuleName;
 
-    private GoalDto goal;
+    private GoalCreateDto goal;
 }
