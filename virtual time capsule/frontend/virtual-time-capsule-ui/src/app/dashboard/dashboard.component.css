@@ -1,0 +1,522 @@
+/* ... (existing CSS for .register-container, .register-card, etc.) ... */
+
+/* Form Elements - Enhanced for better aesthetics */
+.form-group {
+  margin-bottom: 1.5rem; /* Consistent spacing between groups */
+  text-align: left; /* Ensure labels and inputs align left within their group */
+}
+
+.form-label {
+  display: block;
+  color: #374151; /* gray-700 */
+  font-size: 0.9rem; /* Slightly larger text for labels */
+  font-weight: 600; /* Semi-bold for emphasis */
+  margin-bottom: 0.6rem; /* More space below label */
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.75rem 1rem; /* Generous padding for better touch targets and readability */
+  border: 1px solid #d1d5db; /* Light gray border */
+  border-radius: 0.5rem; /* Rounded corners */
+  font-size: 1rem; /* Standard readable font size */
+  color: #1f2937; /* Darker text color */
+  background-color: #ffffff; /* White background */
+  outline: none; /* Remove default outline */
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Smooth transitions */
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
+
+/* Enhanced Focus State */
+.form-input:focus {
+  border-color: #3b82f6; /* A clear, pleasant blue for focus */
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3); /* A subtle, expanding shadow on focus */
+}
+
+/* Placeholder Styling */
+.form-input::placeholder {
+  color: #9ca3af; /* Lighter gray for placeholder text */
+  opacity: 1; /* Ensure full opacity across browsers */
+}
+
+/* Textarea Specific Styles */
+.textarea-input {
+  min-height: 100px; /* Make textarea taller by default */
+  resize: vertical; /* Allow vertical resizing only */
+  line-height: 1.5; /* Improve readability for multi-line text */
+}
+
+/* Checkbox specific styles (from previous modal update, ensuring consistency) */
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  margin-top: 1rem; /* Space above checkbox group */
+  margin-bottom: 1rem;
+}
+
+.form-checkbox {
+  margin-right: 0.75rem; /* Space between checkbox and label */
+  width: 1.1rem; /* Slightly larger checkbox */
+  height: 1.1rem; /* Slightly larger checkbox */
+  accent-color: #3b82f6; /* Accent color for the checkbox fill when checked */
+  cursor: pointer;
+}
+
+.form-label-checkbox {
+  font-size: 0.95rem; /* Slightly larger text for checkbox labels */
+  color: #374151;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* Dialog-specific messages */
+.dialog-messages {
+  margin-top: 1rem;
+  text-align: left; /* Ensure messages in dialog are left-aligned */
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem; /* Space between multiple messages */
+}
+
+/* Make sure message-box styles are still defined and consistent */
+.message-box {
+  padding: 0.8rem 1rem; /* Slightly adjusted padding for messages */
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.message-box.success {
+  background-color: #d1fae5;
+  color: #047857;
+}
+
+.message-box.error {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+/* ... (rest of your CSS, including modal actions and animations) ... */
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  /* Removed align-items: center; justify-content: center; from here
+     to allow the card to span full width instead of being centered as a block. */
+  min-height: 100vh;
+  background-color: #f3f4f6; /* gray-100 */
+  padding: 1rem; /* Still keep some padding for the overall container */
+}
+
+.dashboard-card {
+  background-color: #ffffff; /* white */
+  padding: 2rem; /* Keep existing padding, or adjust as needed for content */
+  border-radius: 0.75rem; /* rounded-xl */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+  width: 100%; /* Take full width available */
+  max-width: 1200px; /* NEW: Set a larger max-width or remove it entirely based on preference */
+  /* Replaced max-w-md (28rem) with a larger value or removed.
+     Setting a large max-width like 1200px (approx 75rem) or 1400px is common
+     to prevent content from becoming too stretched on very large screens.
+     If you truly want it to fill 100% of *any* screen, remove max-width completely. */
+  margin: 1rem auto; /* Center the card horizontally with auto margins */
+  text-align: center;
+  box-sizing: border-box;
+}
+
+/* --- Rest of your CSS remains the same --- */
+
+.dashboard-heading {
+  font-size: 2.5rem; /* text-4xl */
+  font-weight: 800; /* font-extrabold */
+  color: #2563eb; /* blue-700 */
+  margin-bottom: 1.5rem; /* mb-6 */
+}
+
+.dashboard-welcome {
+  font-size: 1.125rem; /* text-lg */
+  color: #374151; /* gray-700 */
+  margin-bottom: 2rem; /* mb-8 */
+}
+
+/* Original dashboard-actions (now removed from HTML, but keeping styles if they are brought back) */
+.dashboard-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem; /* space-y-4 */
+  margin-bottom: 2rem;
+}
+
+/* Button styles */
+.refresh-button,
+.logout-button,
+.create-capsule-button {
+  background-color: #10b981; /* Green-600 */
+  color: #ffffff;
+  padding: 0.4rem 0.8rem; /* REDUCED PADDING for a smaller button */
+  border-radius: 0.375rem; /* Slightly smaller border-radius */
+  border: none;
+  font-weight: 600;
+  font-size: 0.9rem; /* Smaller font size */
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  white-space: nowrap; /* Prevent button text from wrapping */
+  /* REMOVED width: 100%; or any fixed width, it will now size to content */
+  flex-shrink: 0; /* Prevent button from shrinking */
+}
+
+.refresh-button { background-color: #7c3aed; }
+.refresh-button:hover { background-color: #6d28d9; transform: scale(1.02); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+.refresh-button:disabled { background-color: #9ca3af; cursor: not-allowed; transform: scale(1); box-shadow: none; }
+
+.logout-button { background-color: #dc2626; }
+.logout-button:hover { background-color: #b91c1c; transform: scale(1.02); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+
+.create-capsule-button:hover {
+  background-color: #059669; /* Green-700 darker */
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+
+/* Spinner styles */
+.loading-spinner-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.spinner { animation: spin 1s linear infinite; width: 1.25rem; height: 1.25rem; margin-right: 0.75rem; color: #ffffff; }
+.spinner.opacity-25 { opacity: 0.25; }
+.spinner.opacity-75 { opacity: 0.75; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+/* Message box styles */
+.message-box { padding: 1rem; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 500; }
+.message-box.success { background-color: #d1fae5; color: #047857; }
+.message-box.error { background-color: #fee2e2; color: #b91c1c; }
+
+
+/* Structured Layout specific styles */
+.section-divider {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  border: 0;
+  border-top: 1px solid #eee;
+}
+
+.dashboard-main-content {
+  display: flex;
+  justify-content: space-between;
+  gap: 2rem;
+  width: 100%;
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+}
+
+.capsules-feed {
+  flex: 3;
+  min-width: 300px;
+}
+
+.capsules-header {
+  display: flex;
+  justify-content: space-between; /* Puts items at opposite ends */
+  align-items: center; /* Vertically aligns them in the middle */
+  margin-bottom: 1.5rem; /* Space below the header area */
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+  gap: 1rem; /* Gap between heading and button if they wrap or are too close */
+}
+
+.section-heading {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0; /* Reset margin as it's part of flex container */
+  text-align: left;
+  flex-shrink: 0; /* Prevent heading from shrinking too much */
+}
+
+.loading-message,
+.no-data-message {
+  color: #6b7280;
+  font-style: italic;
+  padding: 1rem 0;
+  text-align: center;
+}
+
+.capsule-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.capsule-card {
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  text-align: left;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.capsule-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.capsule-card h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 0.75rem;
+}
+
+.capsule-card p {
+  font-size: 0.95rem;
+  color: #4b5563;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+.friends-sidebar {
+  flex: 1;
+  min-width: 100px;
+  max-width: 100px;
+  background-color: #e0f2fe;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  overflow: hidden;
+  transition: all 0.4s ease-in-out;
+  flex-shrink: 0;
+  text-align: left;
+}
+
+.friends-sidebar:hover {
+  min-width: 280px;
+  max-width: 300px;
+  padding: 1.5rem;
+}
+
+.friends-sidebar h2 {
+  white-space: nowrap;
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+  color: #1e40af;
+  text-align: center;
+}
+
+.friend-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.friend-item {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0.75rem 0;
+  border-bottom: 1px dashed #bfdbfe;
+  color: #374151;
+  font-size: 0.9rem;
+  text-align: left;
+}
+
+.friend-item:last-child {
+  border-bottom: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .capsules-header {
+    flex-direction: column; /* Stack heading and button on small screens */
+    align-items: flex-start; /* Align stacked items to the left */
+  }
+
+  .create-capsule-button {
+    width: auto; /* Allow button to size to content even when stacked */
+    margin-top: 0.5rem; /* Add some space when stacked */
+  }
+  .dashboard-main-content {
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .capsules-feed,
+  .friends-sidebar {
+    flex: none;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .friends-sidebar {
+    min-width: unset;
+    max-width: unset;
+    height: auto;
+    overflow: visible;
+    transition: none;
+  }
+
+  .friends-sidebar:hover {
+    min-width: unset;
+    max-width: unset;
+    padding: 1rem;
+  }
+
+  .friends-sidebar h2 {
+    text-align: left;
+    white-space: normal;
+  }
+
+  .friend-item {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent black background */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000; /* Ensure it's on top of other content */
+  animation: fadeIn 0.3s ease-out; /* Simple fade-in animation */
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: #ffffff;
+  padding: 2.5rem; /* Increased padding */
+  border-radius: 0.75rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); /* Stronger shadow */
+  width: 90%; /* Responsive width */
+  max-width: 500px; /* Max width for larger screens */
+  position: relative; /* For potential close button positioning */
+  animation: slideIn 0.3s ease-out; /* Simple slide-in animation */
+  text-align: left; /* Align text within modal to left */
+}
+
+.modal-heading {
+  font-size: 1.75rem; /* text-2xl */
+  font-weight: 700; /* font-bold */
+  color: #1f2937;
+  margin-bottom: 1.5rem;
+  text-align: center; /* Center the modal heading */
+}
+
+.modal-form .form-group {
+  margin-bottom: 1rem;
+}
+
+.textarea-input {
+  resize: vertical; /* Allow vertical resizing of textarea */
+  min-height: 80px;
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.form-checkbox {
+  margin-right: 0.75rem; /* Space between checkbox and label */
+  width: 1rem;
+  height: 1rem;
+  accent-color: #10b981; /* Highlight color for checkbox */
+}
+
+.form-label-checkbox {
+  font-size: 0.9rem;
+  color: #374151;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end; /* Align buttons to the right */
+  margin-top: 2rem;
+}
+
+.modal-submit-button,
+.modal-cancel-button {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-submit-button {
+  background-color: #10b981; /* Green */
+  color: #ffffff;
+}
+
+.modal-submit-button:hover {
+  background-color: #059669;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.modal-submit-button:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.modal-cancel-button {
+  background-color: #ef4444; /* Red */
+  color: #ffffff;
+}
+
+.modal-cancel-button:hover {
+  background-color: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dialog-messages {
+  margin-top: 1rem;
+  text-align: left; /* Ensure messages in dialog are left-aligned */
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { transform: translateY(-50px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Responsive adjustments for modal */
+@media (max-width: 600px) {
+  .modal-content {
+    padding: 1.5rem;
+  }
+  .modal-heading {
+    font-size: 1.5rem;
+  }
+  .modal-actions {
+    flex-direction: column; /* Stack buttons on small screens */
+  }
+  .modal-submit-button,
+  .modal-cancel-button {
+    width: 100%;
+  }
+}

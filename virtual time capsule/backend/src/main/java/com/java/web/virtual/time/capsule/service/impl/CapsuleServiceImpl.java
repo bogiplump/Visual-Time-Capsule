@@ -7,7 +7,7 @@ import com.java.web.virtual.time.capsule.exception.capsule.CapsuleNotOwnedByYou;
 import com.java.web.virtual.time.capsule.model.Capsule;
 import com.java.web.virtual.time.capsule.model.Goal;
 import com.java.web.virtual.time.capsule.model.Memory;
-import com.java.web.virtual.time.capsule.model.User;
+import com.java.web.virtual.time.capsule.model.UserModel;
 import com.java.web.virtual.time.capsule.repository.CapsuleRepository;
 import com.java.web.virtual.time.capsule.repository.UserRepository;
 import com.java.web.virtual.time.capsule.service.CapsuleService;
@@ -42,7 +42,7 @@ public class CapsuleServiceImpl implements CapsuleService {
 
     @Override
     public Long createCapsule(CapsuleCreateDto capsuleDto,String currentUser) {
-        User user = userRepository.findByUsername(currentUser);
+        UserModel user = userRepository.findByUsername(currentUser);
         Capsule capsule = Capsule.fromDTOAndUser(capsuleDto,user);
         capsule.getGoal().setCapsule(capsule);
 
@@ -51,7 +51,7 @@ public class CapsuleServiceImpl implements CapsuleService {
 
     @Override
     public Capsule getCapsule(Long id, String currentUser) { //TODO: How a locked capsule is send to client
-        User user = userRepository.findByUsername(currentUser);
+        UserModel user = userRepository.findByUsername(currentUser);
         Capsule capsule = capsuleRepository.findById(id)
             .orElseThrow(() -> new CapsuleNotFound("Capsule with  id " + id + " was not found. "));
 
@@ -62,7 +62,7 @@ public class CapsuleServiceImpl implements CapsuleService {
 
     @Override
     public Set<Capsule> getAllCapsulesOfUser(String currentUser) {
-        User user = userRepository.findByUsername(currentUser);
+        UserModel user = userRepository.findByUsername(currentUser);
        return capsuleRepository.findByCreator_Id(user.getId());
     }
 
@@ -70,7 +70,7 @@ public class CapsuleServiceImpl implements CapsuleService {
     public void lockCapsule(Long id, String openDateInString, String lockingUsername) {//TODO better parsing of openDateInString
         Capsule capsule = capsuleRepository.findById(id)
             .orElseThrow(() -> new CapsuleNotFound("Capsule with  id " + id + " was not found"));
-        User lockingUser = userRepository.findByUsername(lockingUsername);
+        UserModel lockingUser = userRepository.findByUsername(lockingUsername);
 
         handleCapsuleNotOwnedByUser(capsule,lockingUser.getId());
 
@@ -86,7 +86,7 @@ public class CapsuleServiceImpl implements CapsuleService {
         Capsule capsule = capsuleRepository.findById(id)
             .orElseThrow(() -> new CapsuleNotFound("Capsule with  id " + id + " was not found. "));
 
-        User user = userRepository.findByUsername(currentUser);
+        UserModel user = userRepository.findByUsername(currentUser);
         handleCapsuleNotOwnedByUser(capsule,user.getId());
 
         capsule.setCapsuleName(capsuleDto.getCapsuleName());
@@ -102,7 +102,7 @@ public class CapsuleServiceImpl implements CapsuleService {
 
     @Override
     public void deleteCapsule(Long id, String currentUser) {
-        User user = userRepository.findByUsername(currentUser);
+        UserModel user = userRepository.findByUsername(currentUser);
 
         if (capsuleRepository.existsByIdAndCreator_Id(id,user.getId())) {
            throw new CapsuleNotFound("Capsule with  id " + id + " was not found or is not owned by you. ");
@@ -113,7 +113,7 @@ public class CapsuleServiceImpl implements CapsuleService {
 
     @Override
     public Set<Memory> getMemoriesFromCapsule(Long id, String currentUser) {
-        User user = userRepository.findByUsername(currentUser);
+        UserModel user = userRepository.findByUsername(currentUser);
         Capsule capsule = capsuleRepository.findById(id)
             .orElseThrow(() -> new CapsuleNotFound("Capsule with  id " + id + " was not found"));
 
@@ -124,7 +124,7 @@ public class CapsuleServiceImpl implements CapsuleService {
 
     @Override
     public Goal getGoalForCapsule(Long id, String currentUser) {
-        User user = userRepository.findByUsername(currentUser);
+        UserModel user = userRepository.findByUsername(currentUser);
         Capsule capsule = capsuleRepository.findById(id)
             .orElseThrow(() -> new CapsuleNotFound("Capsule with  id " + id + " was not found"));
 

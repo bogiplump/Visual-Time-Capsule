@@ -4,10 +4,9 @@ import com.java.web.virtual.time.capsule.dto.GoalDto;
 import com.java.web.virtual.time.capsule.dto.UpdateGoalDto;
 import com.java.web.virtual.time.capsule.exception.goal.GoalNotFoundException;
 import com.java.web.virtual.time.capsule.exception.goal.GoalNotVisibleException;
-import com.java.web.virtual.time.capsule.mapper.GoalMapper;
 import com.java.web.virtual.time.capsule.model.Capsule;
 import com.java.web.virtual.time.capsule.model.Goal;
-import com.java.web.virtual.time.capsule.model.User;
+import com.java.web.virtual.time.capsule.model.UserModel;
 import com.java.web.virtual.time.capsule.repository.CapsuleRepository;
 import com.java.web.virtual.time.capsule.repository.GoalRepository;
 import com.java.web.virtual.time.capsule.repository.UserRepository;
@@ -31,7 +30,7 @@ public class GoalServiceImpl implements GoalService {
     @Override
     public Goal createGoal(Long capsuleId, GoalDto goalEntity, String creator) {
         Capsule capsule = capsuleRepository.findById(capsuleId).orElseThrow(GoalNotFoundException::new);
-        User user = userRepository.findByUsername(creator);
+        UserModel user = userRepository.findByUsername(creator);
         Goal goal = Goal.fromDTO(goalEntity,user);
         goal.setCapsule(capsule);
         return goalRepository.save(goal);

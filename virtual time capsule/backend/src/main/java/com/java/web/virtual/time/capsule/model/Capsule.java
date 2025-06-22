@@ -69,7 +69,7 @@ public class Capsule {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by_id", nullable = false)
-    private User creator;
+    private UserModel creator;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "goal_id")
@@ -81,7 +81,7 @@ public class Capsule {
     @Getter(AccessLevel.NONE)
     private Set<Memory> memoryEntries;
 
-    public Capsule(String capsuleName, User creator,
+    public Capsule(String capsuleName, UserModel creator,
                    Goal goal) {
         if (capsuleName == null || creator == null ||
             goal == null) {
@@ -183,12 +183,12 @@ public class Capsule {
         }
     }
 
-    public static Capsule fromDTOAndUser(CapsuleCreateDto capsuleCreateDto, User creator) {
+    public static Capsule fromDTOAndUser(CapsuleCreateDto capsuleCreateDto, UserModel creator) {
         GoalDto goalDto = capsuleCreateDto.getGoal();
         Goal goal = Goal.builder()
             .content(goalDto.getContent())
             .creator(creator)
-            .isAchieved(goalDto.isAchieved())
+            .isAchieved(false)
             .isVisible(goalDto.isVisible())
             .creationDate(LocalDate.now())
             .build();

@@ -5,6 +5,8 @@ import com.java.web.virtual.time.capsule.dto.GoalDto;
 import com.java.web.virtual.time.capsule.dto.UserResponseDto;
 import com.java.web.virtual.time.capsule.dto.UserUpdateDto;
 import com.java.web.virtual.time.capsule.mapper.GoalMapper;
+import com.java.web.virtual.time.capsule.model.Friendship;
+import com.java.web.virtual.time.capsule.model.UserModel;
 import com.java.web.virtual.time.capsule.service.GoalService;
 import com.java.web.virtual.time.capsule.service.impl.JwtService;
 import com.java.web.virtual.time.capsule.service.UserService;
@@ -19,7 +21,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
@@ -29,10 +30,13 @@ import java.util.List;
 @RequestMapping("/api/v1/users")
 @Validated
 public class UserController {
+
+    private final JwtService jwtService;
     private final UserService userService;
     private final GoalService goalService;
 
-    public UserController(UserService userService, GoalService goalService) {
+    public UserController(JwtService jwtService, UserService userService, GoalService goalService) {
+        this.jwtService = jwtService;
         this.userService = userService;
         this.goalService = goalService;
     }
@@ -40,6 +44,13 @@ public class UserController {
     @GetMapping()
     public ResponseEntity<List<UserResponseDto>> getAllUsers() {
         return ResponseEntity.ok(userService.getUsers());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserResponseDto> getUserById(@PathVariable @Positive long id) {
+        UserModel userModel = userService.getUserById(id);
+        List<Friendship> friendships = userService.getFriendships(id);
+        return ResponseEntity.ok(UserResponseDto.fromUserAndHisFriends(userModel,friendships));
     }
 
     @DeleteMapping("/{id}")
@@ -60,7 +71,8 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         String user = principal.getName();
-        userService.sendInvitation(id,id);
+        UserModel currentUser = userService.getUser(user);
+        userService.sendInvitation(currentUser.getId(),id);
         return ResponseEntity.ok("Friendship invitation created");
     }
 

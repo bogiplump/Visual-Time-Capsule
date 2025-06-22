@@ -16,7 +16,6 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = {})
 @Target({ ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
-@NotNull(message = "{NotNull.message}")
 @NotBlank(message = "{NotBlank.message}")
 @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "{InvalidUsername.message}")
 public @interface ValidUsername {

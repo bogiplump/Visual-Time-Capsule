@@ -1,0 +1,61 @@
+<div class="login-container">
+  <div class="login-card">
+    <h2 class="login-heading">Secure Login</h2>
+    <form (ngSubmit)="onSubmit()" class="login-form">
+      <div class="form-group">
+        <label for="username" class="form-label">Username</label>
+        <input
+          type="text"
+          id="username"
+          name="username"
+          [(ngModel)]="credentials.username"
+          class="form-input"
+          placeholder="Enter your username"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="password" class="form-label">Password</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          [(ngModel)]="credentials.password"
+          class="form-input"
+          placeholder="Enter your password"
+          required
+        />
+      </div>
+      <button
+        type="submit"
+        [disabled]="loading"
+        class="login-button"
+      >
+        <span *ngIf="!loading">Login</span>
+        <span *ngIf="loading" class="loading-spinner-container">
+          <svg class="spinner" xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Logging In...
+        </span>
+      </button>
+    </form>
+
+    <div *ngIf="message.text"
+         class="message-box"
+         [ngClass]="{'success': message.type === 'success', 'error': message.type === 'error'}">
+      {{ message.text }}
+    </div>
+
+    <p class="alt-action-text">
+      Don't have an account?
+      <button
+        (click)="navigateToRegister()"
+        class="alt-action-button"
+      >
+        Register here
+      </button>
+    </p>
+  </div>
+</div>

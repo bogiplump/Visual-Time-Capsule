@@ -4,6 +4,10 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+./frontend/virtual-time-capsule-ui/node_module/**
+./frontend/virtual-time-capsule-ui/.angular/**
+./frontend/virtual-time-capsule-ui/dist/**
+
 ### STS ###
 .apt_generated
 .classpath

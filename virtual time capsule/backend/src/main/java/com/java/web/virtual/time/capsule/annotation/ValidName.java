@@ -17,7 +17,6 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = {})
 @Target({ ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
-@NotNull(message = "{NotNull.message}")
 @NotBlank(message = "{NotBlank.message}")
 @Pattern(
     regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ '-]{1,50}$",

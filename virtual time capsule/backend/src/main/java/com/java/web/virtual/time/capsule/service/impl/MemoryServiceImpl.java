@@ -5,7 +5,7 @@ import com.java.web.virtual.time.capsule.exception.capsule.CapsuleNotFound;
 import com.java.web.virtual.time.capsule.exception.memory.MemoryNotFound;
 import com.java.web.virtual.time.capsule.model.Capsule;
 import com.java.web.virtual.time.capsule.model.Memory;
-import com.java.web.virtual.time.capsule.model.User;
+import com.java.web.virtual.time.capsule.model.UserModel;
 import com.java.web.virtual.time.capsule.repository.CapsuleRepository;
 import com.java.web.virtual.time.capsule.repository.MemoryRepository;
 import com.java.web.virtual.time.capsule.repository.UserRepository;
@@ -35,7 +35,7 @@ public class MemoryServiceImpl implements MemoryService {
 
     @Override
     public  Long saveMemory(Long capsuleId, MemoryCreateDto memoryDto, String currentUser)  throws IOException {
-        User creator = userRepository.findByUsername(currentUser);
+        UserModel creator = userRepository.findByUsername(currentUser);
 
         Capsule capsule = capsuleRepository.findById(capsuleId)
             .orElseThrow(() -> new CapsuleNotFound("Capsule with  id " + capsuleId + " was not found"));
@@ -70,7 +70,7 @@ public class MemoryServiceImpl implements MemoryService {
         Memory memory = memoryRepository.findById(capsuleId).orElseThrow(() -> new MemoryNotFound("Memory Not Found"));
         Capsule capsule = capsuleRepository.findById(capsuleId).orElseThrow(() -> new CapsuleNotFound("Capsule with  id " + id + " was not found"));
 
-        User user = userRepository.findByUsername(currentUser);
+        UserModel user = userRepository.findByUsername(currentUser);
 
         handleCapsuleNotOwnedByUser(capsule,user.getId());
 
@@ -84,7 +84,7 @@ public class MemoryServiceImpl implements MemoryService {
         Memory memory = memoryRepository.findById(capsuleId).orElseThrow(() -> new MemoryNotFound("Memory Not Found"));
         Capsule capsule = capsuleRepository.findById(capsuleId).orElseThrow(() -> new CapsuleNotFound("Capsule with  id " + id + " was not found"));
 
-        User user = userRepository.findByUsername(currentUser);
+        UserModel user = userRepository.findByUsername(currentUser);
 
         handleCapsuleNotOwnedByUser(capsule,user.getId());
 

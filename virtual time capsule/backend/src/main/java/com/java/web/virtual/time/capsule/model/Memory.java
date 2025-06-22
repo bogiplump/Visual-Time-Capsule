@@ -47,7 +47,7 @@ public class Memory {
 
     @ManyToOne
     @JoinColumn(name = "created_by_id")
-    private User creator;
+    private UserModel creator;
 
     public Memory() {
 

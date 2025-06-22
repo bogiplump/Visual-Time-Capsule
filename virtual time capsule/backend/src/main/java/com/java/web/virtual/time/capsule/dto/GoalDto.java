@@ -13,6 +13,5 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class GoalDto {
     private boolean isVisible;
-    private boolean isAchieved;
     private String content;
 }

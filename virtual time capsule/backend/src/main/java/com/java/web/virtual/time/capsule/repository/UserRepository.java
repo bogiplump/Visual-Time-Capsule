@@ -1,20 +1,23 @@
 package com.java.web.virtual.time.capsule.repository;
 
-import com.java.web.virtual.time.capsule.model.User;
+import com.java.web.virtual.time.capsule.model.UserModel;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface UserRepository extends JpaRepository<User, Long> {
+import java.util.List;
 
-    User findUserByUsernameAndPassword(String username, String password);
+public interface UserRepository extends JpaRepository<UserModel, Long> {
 
-    User findByUsername(String username);
+    UserModel findUserByUsernameAndPassword(String username, String password);
 
-    User findByEmail(String email);
+    UserModel findByUsername(String username);
+
+    UserModel findByEmail(String email);
 
     boolean existsByUsername(String username);
 
     boolean existsByEmail(String email);
 
-    @NotNull User save(User user);
+    @NotNull UserModel save(UserModel user);
+
 }

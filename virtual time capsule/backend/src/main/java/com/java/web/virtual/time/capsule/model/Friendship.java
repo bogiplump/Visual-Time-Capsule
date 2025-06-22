@@ -21,12 +21,13 @@ public class Friendship {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Getter
     private Long id;
 
     @ManyToOne(optional = false)
-    private User requester;
+    private UserModel requester;
     @ManyToOne(optional = false)
-    private User responder;
+    private UserModel responder;
 
     @Setter
     @Getter

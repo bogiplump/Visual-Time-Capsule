@@ -42,18 +42,18 @@ public class Goal {
 
     @ManyToOne
     @JoinColumn(name = "created_by_id")
-    private User creator;
+    private UserModel creator;
 
     @OneToOne
     private Capsule capsule;
 
-    public static Goal fromDTO(GoalDto goalDto, User creator) {
+    public static Goal fromDTO(GoalDto goalDto, UserModel creator) {
 
         return Goal
             .builder()
             .creator(creator)
             .isVisible(goalDto.isVisible())
-            .isAchieved(goalDto.isAchieved())
+            .isAchieved(false)
             .content(goalDto.getContent())
             .creationDate(LocalDate.now())
             .content(goalDto.getContent())

@@ -14,6 +14,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -30,19 +31,6 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .cors(cors -> {})
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                    "/",
-                    "/index.html",
-                    "/assets/**",
-                    "/*.js",
-                    "/*.ts",
-                    "/*.css",
-                    "/*.map",
-                    "/*.ico",
-                    "/*.png",
-                    "/*.jpg",
-                    "/*.svg"
-                ).permitAll()
                 .requestMatchers("/auth/**").permitAll()
                 .anyRequest().authenticated()
             )
@@ -71,7 +59,7 @@ public class SecurityConfig {
         ));
         config.setAllowedHeaders(Arrays.asList("Origin", "Content-Type", "Accept", "Authorization"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));
-        config.setExposedHeaders(Arrays.asList("Authorization"));
+        config.setExposedHeaders(List.of("Authorization"));
 
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);

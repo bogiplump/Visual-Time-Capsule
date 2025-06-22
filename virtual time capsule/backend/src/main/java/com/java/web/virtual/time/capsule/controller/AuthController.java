@@ -2,7 +2,9 @@ package com.java.web.virtual.time.capsule.controller;
 
 import com.java.web.virtual.time.capsule.dto.UserCreateDto;
 import com.java.web.virtual.time.capsule.dto.UserLoginDto;
+import com.java.web.virtual.time.capsule.dto.UserResponseDto;
 import com.java.web.virtual.time.capsule.dto.UsersAuthResponse;
+import com.java.web.virtual.time.capsule.model.UserModel;
 import com.java.web.virtual.time.capsule.service.impl.JwtService;
 import com.java.web.virtual.time.capsule.service.UserService;
 import jakarta.validation.Valid;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -29,10 +32,10 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<UsersAuthResponse> login(@Valid @RequestBody UserLoginDto request) {
-        userService.loginUser(request);
+        UserModel userModel = userService.loginUser(request);
         String accessToken = jwtService.generateAccessToken(request.getUsername());
         String refreshToken = jwtService.generateRefreshToken(request.getUsername());
-        return ResponseEntity.ok(new UsersAuthResponse(accessToken, refreshToken));
+        return ResponseEntity.ok(new UsersAuthResponse(accessToken, refreshToken, UserResponseDto.fromUser(userModel)));
     }
 
     @PostMapping("/refresh")
@@ -41,7 +44,8 @@ public class AuthController {
         if (jwtService.isTokenValid(refreshToken)) {
             String username = jwtService.extractUsername(refreshToken);
             String newAccessToken = jwtService.generateAccessToken(username);
-            return ResponseEntity.ok(new UsersAuthResponse(newAccessToken, refreshToken));
+            UserModel userModel = userService.getUser(username);
+            return ResponseEntity.ok(new UsersAuthResponse(newAccessToken, refreshToken,UserResponseDto.fromUser(userModel)));
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }

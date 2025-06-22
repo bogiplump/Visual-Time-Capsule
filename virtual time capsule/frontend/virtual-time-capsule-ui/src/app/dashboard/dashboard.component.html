@@ -1,0 +1,118 @@
+<div class="dashboard-container">
+  <div class="dashboard-card">
+    <h1 class="dashboard-heading">Welcome to Your Dashboard!</h1>
+    <p class="dashboard-welcome">Manage your capsules and connect with friends.</p>
+
+    <!-- Message Display (for general dashboard messages) -->
+    <div *ngIf="messages.length > 0" style="margin-bottom: 1rem;">
+      <div *ngFor="let message of messages" [ngClass]="{'message-box': true, 'success': message.type === 'success', 'error': message.type === 'error'}">
+        {{ message.text }}
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="dashboard-main-content">
+      <!-- Left Column: Capsules Feed -->
+      <div class="capsules-feed">
+        <div class="capsules-header">
+          <h2 class="section-heading">My Capsules</h2>
+          <button class="create-capsule-button" (click)="openCreateCapsuleDialog()">
+            Create New Capsule
+          </button>
+        </div>
+
+        <div *ngIf="loadingCapsules" class="loading-message">Loading capsules...</div>
+        <div *ngIf="!loadingCapsules && myCapsules.length === 0" class="no-data-message">No capsules found.</div>
+        <div *ngIf="!loadingCapsules && myCapsules.length > 0" class="capsule-grid">
+          <div *ngFor="let capsule of myCapsules" class="capsule-card">
+            <h3>{{ capsule.capsuleName }}</h3>
+            <p>Status: **{{ capsule.status }}**</p>
+            <p>Open Date: {{ capsule.openDate | date:'shortDate' }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Friends Sidebar -->
+      <div class="friends-sidebar">
+        <h2 class="section-heading">My Friends</h2>
+        <div *ngIf="loadingFriendships" class="loading-message">Loading friendships...</div>
+        <div *ngIf="!loadingFriendships && myFriendships.length === 0" class="no-data-message">No friends found.</div>
+        <ul *ngIf="!loadingFriendships && myFriendships.length > 0" class="friend-list">
+          <li *ngFor="let friendship of myFriendships" class="friend-item">
+            Friendship with **{{ friendship.responder.username }}** (Status: {{ friendship.status }})
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Capsule Dialog (Modal) -->
+  <div class="modal-overlay" *ngIf="showCreateCapsuleDialog">
+    <div class="modal-content">
+      <h3 class="modal-heading">Create New Time Capsule</h3>
+      <form (ngSubmit)="submitCreateCapsule()" class="modal-form">
+        <div class="form-group">
+          <label for="capsuleName" class="form-label">Capsule Name</label>
+          <input
+            type="text"
+            id="capsuleName"
+            name="capsuleName"
+            [(ngModel)]="newCapsuleData.capsuleName"
+            class="form-input"
+            placeholder="e.g., My 2025 Vision, Memories of Summer"
+            required
+            maxlength="20"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="goalContent" class="form-label">Your Goal Content</label>
+          <textarea
+            id="goalContent"
+            name="goalContent"
+            [(ngModel)]="newCapsuleData.goal.content"
+            class="form-input textarea-input"
+            placeholder="What is a significant goal you want to achieve or remember?"
+            required
+            rows="3"
+          ></textarea>
+        </div>
+
+        <div class="form-group checkbox-group">
+          <input
+            type="checkbox"
+            id="goalVisible"
+            name="goalVisible"
+            [(ngModel)]="newCapsuleData.goal.isVisible"
+            class="form-checkbox"
+          />
+          <label for="goalVisible" class="form-label-checkbox">Goal Visible (to friends)</label>
+        </div>
+
+        <!-- Dialog-specific messages -->
+        <div *ngIf="dialogMessages.length > 0" class="dialog-messages">
+          <div *ngFor="let msg of dialogMessages" [ngClass]="{'message-box': true, 'success': msg.type === 'success', 'error': msg.type === 'error'}">
+            {{ msg.text }}
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="submit" class="modal-submit-button" [disabled]="loadingCreateCapsule">
+            <span *ngIf="!loadingCreateCapsule">Create Capsule</span>
+            <span *ngIf="loadingCreateCapsule" class="loading-spinner-container">
+              <svg class="spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Creating...
+            </span>
+          </button>
+          <button type="button" class="modal-cancel-button" (click)="closeCreateCapsuleDialog()">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
