@@ -57,4 +57,32 @@ public class GoalController {
 
         return ResponseEntity.ok(HttpStatus.OK);
     }
+
+    @PostMapping("/shared-capsule")
+    public ResponseEntity<Goal> createSharedGoal(@RequestParam Long capsuleId, @RequestBody @Valid GoalCreateDto goalDto,
+                                           Principal principal) {
+        goalService.createSharedGoal(capsuleId, goalDto, principal.getName());
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @GetMapping("/shared-capsule/{id}")
+    public ResponseEntity<Goal> getSharedGoal(@NotNull @PathVariable Long id, Principal principal) {
+        return ResponseEntity.ok(goalService.getGoal(id));
+    }
+
+    @PatchMapping("/shared-capsule/{id}")
+    public ResponseEntity<HttpStatus> updateSharedGoalContent(@NotNull @PathVariable Long id, @NotNull  @RequestBody GoalUpdateDto goalDto,
+                                                        Principal principal) {
+        goalService.updateGoal(id, goalDto);
+
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+
+    @DeleteMapping("/shared-capsule/{id}")
+    public ResponseEntity<?> deleteSharedGoal(@PathVariable Long id, Principal principal) {
+        goalService.deleteGoal(id);
+
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
 }

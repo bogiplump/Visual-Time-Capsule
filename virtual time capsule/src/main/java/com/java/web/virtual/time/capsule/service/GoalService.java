@@ -19,4 +19,12 @@ public interface GoalService {
     void setGoalIsAchieved(Long id);
 
     Goal getGoal(Long id);
+
+    Long createSharedGoal(Long capsuleId, GoalCreateDto goalEntity, String currentUser);
+
+    Goal getSharedGoal(Long id);
+
+    void updateSharedGoal(Long id, GoalUpdateDto updateGoalDto, String currentUser);
+
+    void deleteSharedGoal(Long id, String currentUser);
 }
