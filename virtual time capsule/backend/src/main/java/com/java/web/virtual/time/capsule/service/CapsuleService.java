@@ -1,6 +1,7 @@
 package com.java.web.virtual.time.capsule.service;
 
 import com.java.web.virtual.time.capsule.dto.capsule.CapsuleCreateDto;
+import com.java.web.virtual.time.capsule.dto.capsule.CapsulePreviewDto;
 import com.java.web.virtual.time.capsule.dto.capsule.CapsuleResponseDto;
 import com.java.web.virtual.time.capsule.dto.capsule.CapsuleUpdateDto;
 import com.java.web.virtual.time.capsule.exception.capsule.CapsuleHasBeenLocked;
@@ -20,7 +21,17 @@ public interface CapsuleService {
     Long createCapsule(CapsuleCreateDto capsuleDto, String currentUser);
 
     /**
-     * Retrieves a CapsuleEntity from the database by its unique identifier.
+     * Retrieves a capsule from the database by its unique identifier and returns a preview data transfer object.
+     *
+     * @param id the unique identifier of the capsule, must not be null.
+     * @return the Capsule with the specified ID, as a preview data transfer object, or null if not found. TODO Check this here
+     * @throws IllegalArgumentException if id is null.
+     * @throws CapsuleNotFound if a capsule with this id does not exist.
+     */
+    CapsulePreviewDto getCapsulePreview(Long id, String currentUser);
+
+    /**
+     * Retrieves a Capsule from the database by its unique identifier and returns a response data transfer object.
      *
      * @param id the unique identifier of the capsule, must not be null.
      * @return the Capsule with the specified ID, as response data transport objects, or null if not found. TODO Check this here

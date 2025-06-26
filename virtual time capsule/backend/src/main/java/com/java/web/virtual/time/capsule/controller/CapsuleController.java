@@ -1,6 +1,7 @@
 package com.java.web.virtual.time.capsule.controller;
 
 import com.java.web.virtual.time.capsule.dto.capsule.CapsuleCreateDto;
+import com.java.web.virtual.time.capsule.dto.capsule.CapsulePreviewDto;
 import com.java.web.virtual.time.capsule.dto.capsule.CapsuleResponseDto;
 import com.java.web.virtual.time.capsule.dto.capsule.CapsuleUpdateDto;
 import com.java.web.virtual.time.capsule.model.Capsule;
@@ -28,7 +29,6 @@ import java.util.Set;
 @AllArgsConstructor
 @RequestMapping("/api/v1/capsules")
 public class CapsuleController {
-
     private final CapsuleService capsuleService;
 
     @PostMapping
@@ -36,6 +36,11 @@ public class CapsuleController {
         Long capsuleId = capsuleService.createCapsule(capsuleDto, principal.getName());
         URI location = URI.create("/api/v1/capsules/" + capsuleId);
         return ResponseEntity.created(location).build();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CapsulePreviewDto> getCapsulePreviewById(@NotNull @PathVariable Long id, Principal principal) {
+        return ResponseEntity.ok(capsuleService.getCapsulePreview(id,principal.getName()));
     }
 
     @GetMapping("/{id}")

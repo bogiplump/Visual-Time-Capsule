@@ -1,6 +1,7 @@
 package com.java.web.virtual.time.capsule.service.impl;
 
 import com.java.web.virtual.time.capsule.dto.capsule.CapsuleCreateDto;
+import com.java.web.virtual.time.capsule.dto.capsule.CapsulePreviewDto;
 import com.java.web.virtual.time.capsule.dto.capsule.CapsuleResponseDto;
 import com.java.web.virtual.time.capsule.dto.capsule.CapsuleUpdateDto;
 import com.java.web.virtual.time.capsule.exception.capsule.CapsuleNotFound;
@@ -47,6 +48,17 @@ public class CapsuleServiceImpl implements CapsuleService {
         capsule.getGoal().setCapsule(capsule);
 
         return capsuleRepository.save(capsule).getId();
+    }
+
+    @Override
+    public CapsulePreviewDto getCapsulePreview(Long id, String currentUser) {
+        User user = userRepository.findByUsername(currentUser);
+        Capsule capsule = capsuleRepository.findById(id)
+            .orElseThrow(() -> new CapsuleNotFound("Capsule with  id " + id + " was not found. "));
+
+        handleCapsuleNotOwnedByUser(capsule,user.getId());
+
+        return capsule.toCapsulePreviewDto();
     }
 
     @Override

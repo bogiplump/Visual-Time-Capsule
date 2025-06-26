@@ -1,6 +1,7 @@
 package com.java.web.virtual.time.capsule.model;
 
 import com.java.web.virtual.time.capsule.dto.capsule.CapsuleCreateDto;
+import com.java.web.virtual.time.capsule.dto.capsule.CapsulePreviewDto;
 import com.java.web.virtual.time.capsule.dto.capsule.CapsuleResponseDto;
 import com.java.web.virtual.time.capsule.dto.goal.GoalCreateDto;
 import com.java.web.virtual.time.capsule.dto.memory.MemoryResponseDto;
@@ -210,6 +211,23 @@ public class Capsule {
             if (goal != null && goal.isVisible()) {
                 resultBuilder.goal(goal.toGoalResponseDto());
             }
+        }
+
+        return resultBuilder.build();
+    }
+
+    public CapsulePreviewDto toCapsulePreviewDto() {
+        var resultBuilder = CapsulePreviewDto.builder();
+
+        resultBuilder.capsuleName(capsuleName)
+            .status(status)
+            .creationDate(creationDate)
+            .lockDate(lockDate)
+            .openDate(openDate);
+
+
+        if (goal != null) {
+            resultBuilder.goalContent(goal.getContent());
         }
 
         return resultBuilder.build();
