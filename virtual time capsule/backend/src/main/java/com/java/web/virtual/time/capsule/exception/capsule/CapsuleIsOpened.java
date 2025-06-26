@@ -1,6 +1,6 @@
 package com.java.web.virtual.time.capsule.exception.capsule;
 
-public class CapsuleIsOpened extends RuntimeException {
+public class CapsuleIsOpened extends CapsuleException {
     public CapsuleIsOpened(String message) {
         super(message);
     }

@@ -1,6 +1,7 @@
 package com.java.web.virtual.time.capsule.handler;
 
 import com.java.web.virtual.time.capsule.exception.BadRequestException;
+import com.java.web.virtual.time.capsule.exception.capsule.CapsuleException;
 import com.java.web.virtual.time.capsule.exception.user.EmailAlreadyTakenException;
 import com.java.web.virtual.time.capsule.exception.user.InvitationAlreadySent;
 import com.java.web.virtual.time.capsule.exception.user.UserNotFoundException;
@@ -17,6 +18,10 @@ import java.util.List;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+    @ExceptionHandler(CapsuleException.class)
+    public ResponseEntity<String> handlerCapsuleException(CapsuleException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
 
     @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<String> handleUserNotFound(UsernameNotFoundException ex) {

@@ -1,6 +1,6 @@
 package com.java.web.virtual.time.capsule.exception.capsule;
 
-public class CapsuleNotOwnedByYou extends RuntimeException {
+public class CapsuleNotOwnedByYou extends CapsuleException {
     public CapsuleNotOwnedByYou(String message) {
         super(message);
     }
