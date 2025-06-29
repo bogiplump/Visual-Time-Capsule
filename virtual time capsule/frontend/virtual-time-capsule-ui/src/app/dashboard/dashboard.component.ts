@@ -4,17 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router, RouterLink } from '@angular/router';
 import { Subscription, interval } from 'rxjs';
-
-// Services
 import { CapsuleService } from '../services/capsule.service';
 import { GoalService } from '../services/goal.service';
 import { MemoryService } from '../services/memory.service';
 import { AuthService } from '../services/auth.service';
 import { UserService } from '../services/user.service';
-
-// DTOs & Enums
 import { CapsuleResponseDto } from '../dtos/capsule-response.dto';
-import { CapsuleCreateDto, GoalCreateDto } from '../dtos/capsule-create.dto';
+import { CapsuleCreateDto, } from '../dtos/capsule-create.dto';
 import { MemoryCreateDto } from '../dtos/memory-create.dto';
 import { CapsuleStatus } from '../enums/capsule-status.enum';
 import { MemoryType } from '../enums/memory-type.enum';
@@ -132,6 +128,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
       next: (capsulesData: CapsuleResponseDto[]) => {
         this.myCapsules = capsulesData;
         console.log('My Capsules:', capsulesData);
+        for (let capsule of capsulesData) {
+          console.log(capsule.sharedWithUsers);
+          capsule.sharedWithUsers = capsule.sharedWithUsers?.filter(
+            u => u.username !== this.authService.getCurrentUsername()
+          );
+          console.log(capsule.sharedWithUsers);
+        }
         this.addMessage('Capsules loaded successfully!', 'success');
       },
       error: (error: HttpErrorResponse) => {
@@ -201,6 +204,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       },
       error: (error: HttpErrorResponse) => {
         console.error('Failed to load all users:', error);
+        this.loadingAllUsers = false;
       },
       complete: () => {
         this.loadingAllUsers = false;
@@ -358,10 +362,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
       next: (response: CapsuleResponseDto) => {
         this.addDialogMessage('Capsule created successfully! You can now add a memory.', 'success');
         this.createdCapsuleId = response.id;
+        this.goalService.createGoal(response.id,capsuleToCreate.goal).subscribe({});
         this.switchToMemoryTab();
       },
       error: (error: HttpErrorResponse) => {
         this.addDialogMessage(`Failed to create capsule: ${error.message || 'Unknown error'}`, 'error');
+        this.loadingCreateCapsule = false;
       },
       complete: () => {
         this.loadingCreateCapsule = false;
@@ -435,6 +441,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         } else {
           this.addDialogMessage(errorMessage, 'error');
         }
+        this.loadingCreateMemory = false;
       },
       complete: () => {
         this.loadingCreateMemory = false;

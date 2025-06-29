@@ -3,10 +3,10 @@ import {Capsule} from '../models/capsule.model';
 
 export interface GoalDto {
   id: number | null;
-  isVisible: boolean;
-  isAchieved: boolean;
-  creationDate: string;
+  visible: boolean;
+  achieved: boolean;
   content: string;
   creator: number | null;
+  creationDate: string | null;
   capsuleId: number | null;
 }

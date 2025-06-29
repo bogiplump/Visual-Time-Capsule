@@ -87,24 +87,24 @@
         <div class="capsule-section goal-section">
           <h2 class="section-title">Your Goal</h2>
           <!-- Display goal content ONLY if currentGoal exists AND isVisible is true -->
-          <ng-container *ngIf="currentGoal?.isVisible">
+          <ng-container *ngIf="displayingGoal?.visible">
             <div class="info-grid">
               <div class="info-item">
                 <span class="info-label">Content:</span>
-                <span *ngIf="!editingGoal" class="info-value">{{ currentGoal?.content }}</span>
+                <span *ngIf="!editingGoal" class="info-value">{{ displayingGoal?.content }}</span>
                 <textarea *ngIf="editingGoal" [(ngModel)]="updatedGoalContent" class="edit-input textarea-input"></textarea>
               </div>
               <div class="info-item">
                 <span class="info-label">Achieved:</span>
-                <span class="info-value">{{ currentGoal?.isAchieved ? 'Yes' : 'No' }}</span>
+                <span class="info-value">{{ displayingGoal?.achieved ? 'Yes' : 'No' }}</span>
               </div>
-              <div class="info-item">
-                <span class="info-label">Visible:</span>
-                <span class="info-value">{{ currentGoal?.isVisible ? 'Yes' : 'No' }}</span>
+              <div *ngIf="goalAchievementMessage" class="info-item goal-message">
+                <span class="info-label">Message:</span>
+                <span class="info-value">{{ goalAchievementMessage }}</span>
               </div>
               <div class="info-item">
                 <span class="info-label">Created:</span>
-                <span class="info-value">{{ currentGoal?.creationDate | date:'shortDate' }}</span>
+                <span class="info-value">{{ displayingGoal?.creationDate | date:'shortDate' }}</span>
               </div>
             </div>
             <div class="section-actions">
@@ -125,7 +125,7 @@
             </div>
           </ng-container>
           <!-- Message when goal is not visible or doesn't exist, with an edit option for the owner -->
-          <ng-container *ngIf="!currentGoal?.isVisible">
+          <ng-container *ngIf="!displayingGoal?.visible">
             <p class="no-data-message">Goal is currently hidden or not set.</p>
             <!-- Edit Goal button if capsule is editable (implies current user is owner & status is CREATED) -->
             <div class="section-actions" *ngIf="isEditable">
@@ -252,6 +252,49 @@
         </p>
       </div>
       <div *ngIf="loadingMemoryContent" class="loading-message">Loading content...</div>
+    </div>
+  </div>
+
+  <!-- NEW: Goal Achievement Dialog -->
+  <div class="modal-overlay" *ngIf="showGoalAchievedDialog && !hasAchievementBeenSet">
+    <div class="modal-content goal-achieved-modal">
+      <h3 class="modal-heading">Your Goal Unveiled!</h3>
+      <p class="modal-subheading">Upon opening this capsule, reflect on your past goal:</p>
+
+      <div *ngIf="displayingGoal" class="goal-content-display">
+        <p class="goal-text">"{{ displayingGoal.content }}"</p>
+        <p class="goal-created-date">Set on: {{ displayingGoal.creationDate | date:'shortDate' }}</p>
+
+        <p class="goal-question">Did you achieve this goal?</p>
+        <div class="radio-group">
+          <label>
+            <input type="radio" name="goalAchieved" value="achieved" [(ngModel)]="goalAchievedStatus" />
+            Yes, I achieved it!
+          </label>
+          <label>
+            <input type="radio" name="goalAchieved" value="notAchieved" [(ngModel)]="goalAchievedStatus" />
+            No, I did not achieve it.
+          </label>
+        </div>
+      </div>
+      <div *ngIf="!displayingGoal" class="loading-message">Loading goal details...</div>
+
+      <div class="modal-actions">
+        <button
+          class="modal-submit-button"
+          (click)="submitGoalAchievedStatus()"
+          [disabled]="goalAchievedStatus === null || submittingGoalAchievedStatus || !displayingGoal"
+        >
+          <span *ngIf="!submittingGoalAchievedStatus">Confirm</span>
+          <span *ngIf="submittingGoalAchievedStatus" class="loading-spinner-container-small">
+            <svg class="spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Saving...
+          </span>
+        </button>
+      </div>
     </div>
   </div>
 </div>

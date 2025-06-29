@@ -1,9 +1,9 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { UserResponseDto } from '../dtos/user-response.dto';
-import { GoalDto } from '../dtos/goal.dto';
-import { FriendshipDto } from '../dtos/friendship.dto';
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {Observable} from 'rxjs';
+import {UserResponseDto} from '../dtos/user-response.dto';
+import {GoalDto} from '../dtos/goal.dto';
+import {FriendshipDto} from '../dtos/friendship.dto';
 import {CapsuleResponseDto} from '../dtos/capsule-response.dto';
 import {environment} from '../../environments/environment';
 import {map} from 'rxjs/operators';
@@ -95,24 +95,9 @@ export class UserService {
     console.log('UserService: Making HTTP GET request to:', this.apiUrl);
     return this.http.get<any[]>(this.apiUrl).pipe(
       map(rawUsersData => {
-        console.log('UserService: Raw data received from HTTP client (before manual mapping):', rawUsersData);
-
-        const mappedUsers: UserProfileDto[] = rawUsersData.map(rawUser => {
-          // Perform a deep clone of the rawUser object
-          // This creates a plain JavaScript object from the JSON string,
-          // stripping away any potential hidden properties or getter/setter issues
-          // that might be present on the object returned by HttpClient.
+        return rawUsersData.map(rawUser => {
           const clonedRawUser = JSON.parse(JSON.stringify(rawUser));
 
-          console.log('  Inside map callback - clonedRawUser:', clonedRawUser);
-          console.log('    clonedRawUser.id:', clonedRawUser.id);
-          console.log('    clonedRawUser.username:', clonedRawUser.username);
-          console.log('    clonedRawUser.friendshipStatus:', clonedRawUser.friendshipStatus);
-          console.log('    clonedRawUser.associatedFriendshipId:', clonedRawUser.associatedFriendshipId);
-          console.log('    clonedRawUser.isRequestFromCurrentUser:', clonedRawUser.isRequestFromCurrentUser);
-          console.log('    clonedRawUser.isRequestToCurrentUser:', clonedRawUser.isRequestToCurrentUser);
-
-          // Now, map from the cloned object
           const userProfile: UserProfileDto = {
             id: clonedRawUser.id,
             username: clonedRawUser.username,
@@ -121,13 +106,8 @@ export class UserService {
             isRequestFromCurrentUser: clonedRawUser.isRequestFromCurrentUser,
             isRequestToCurrentUser: clonedRawUser.isRequestToCurrentUser
           };
-
-          console.log('  Inside map callback - created userProfile:', userProfile);
           return userProfile;
         });
-
-        console.log('UserService: Data after manual mapping to UserProfileDto (final service output):', mappedUsers);
-        return mappedUsers;
       })
     );
   }

@@ -5,6 +5,7 @@ import { Goal } from '../models/goal.model';
 import { GoalDto } from '../dtos/goal.dto';
 import { UpdateGoalDto } from '../dtos/update-goal.dto';
 import {environment} from '../../environments/environment';
+import {GoalCreateDto} from '../dtos/capsule-create.dto';
 
 @Injectable({
   providedIn: 'root'
@@ -18,15 +19,15 @@ export class GoalService {
    * Retrieves a specific goal by ID.
    * GET /api/v1/goals/{id}
    */
-  getGoal(id: number): Observable<Goal> {
-    return this.http.get<Goal>(`${this.apiUrl}/${id}`);
+  getGoal(id: number | null | undefined): Observable<GoalDto> {
+    return this.http.get<GoalDto>(`${this.apiUrl}/${id}`);
   }
 
   /**
    * Creates a new goal and associates it with a capsule.
    * POST /api/v1/goals/
    */
-  createGoal(capsuleId: number, goalDto: GoalDto): Observable<Goal> {
+  createGoal(capsuleId: number, goalDto: GoalCreateDto): Observable<Goal> {
     let params = new HttpParams().set('capsuleId', capsuleId.toString());
     return this.http.post<Goal>(`${this.apiUrl}/`, goalDto, { params });
   }
@@ -45,5 +46,13 @@ export class GoalService {
    */
   updateGoal(id: number | null, updateGoalDto: UpdateGoalDto): Observable<void> {
     return this.http.put<void>(`${this.apiUrl}/${id}/update`, updateGoalDto);
+  }
+
+  setIsAchieved(id:number | null,isAchieved: boolean): Observable<void> {
+    console.log("Sending is Achieved request");
+    return this.http.put<void>(
+      `${this.apiUrl}/${id}/setIsAchieved?isAchieved=${isAchieved}`,
+      null // no request body
+    );
   }
 }

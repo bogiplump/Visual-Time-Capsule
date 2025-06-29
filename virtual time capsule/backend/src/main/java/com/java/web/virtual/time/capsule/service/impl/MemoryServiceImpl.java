@@ -7,6 +7,7 @@ import com.java.web.virtual.time.capsule.exception.capsule.CapsuleHasBeenLocked;
 import com.java.web.virtual.time.capsule.exception.capsule.CapsuleIsOpened;
 import com.java.web.virtual.time.capsule.exception.capsule.CapsuleNotFound;
 import com.java.web.virtual.time.capsule.exception.memory.MemoryNotFound;
+import com.java.web.virtual.time.capsule.exception.user.UserNotFoundException;
 import com.java.web.virtual.time.capsule.model.Capsule;
 import com.java.web.virtual.time.capsule.model.Memory;
 import com.java.web.virtual.time.capsule.model.UserModel;
@@ -58,24 +59,25 @@ public class MemoryServiceImpl implements MemoryService {
     }
 
     @Override
-    @Transactional // Keep this transactional!
+    @Transactional
     public Long saveMemory(Long capsuleId, MemoryCreateDto memoryDto, String username) throws IOException {
-        try { // ADD THIS TRY BLOCK
-            // Ensure the upload directory exists
+        try {
             Path uploadPath = Paths.get(uploadDirectory).toAbsolutePath().normalize();
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
                 log.info("Created upload directory: {}", uploadPath);
             }
 
-            // 1. Fetch the Capsule entity within the current transaction
             Capsule capsule = capsuleRepository.findById(capsuleId)
                 .orElseThrow(() -> new ResourceNotFoundException("Capsule not found with id: " + capsuleId));
 
             // 2. Verify ownership
             UserModel creator = userRepository.findByUsername(username);
-            if (creator == null || !Objects.equals(capsule.getCreator().getId(), creator.getId())) {
-                throw new IllegalArgumentException("User is not the owner of this capsule or user not found.");
+            if(creator == null) {
+                throw new UserNotFoundException("User not found with name: " + username);
+            }
+            if (creator.equals(capsule.getCreator()) && !capsule.getSharedWithUsers().contains(creator)) {
+                throw new IllegalArgumentException("User are not authorized to add memories");
             }
 
             // 3. Apply business rules based on capsule status BEFORE adding memory

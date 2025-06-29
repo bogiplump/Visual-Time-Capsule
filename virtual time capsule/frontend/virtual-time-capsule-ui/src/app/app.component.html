@@ -1,10 +1,14 @@
 <div class="app-container">
 <!-- Navigation/Header (Optional, shown if logged in) -->
-<header *ngIf="isAuthenticated$ | async" class="app-header">
+<header *ngIf="this.authService.isAuthenticated$ | async" class="app-header">
   <div class="header-title">Virtual Time Capsule</div>
   <nav>
     <ul class="nav-list">
-      <li><a routerLink="/dashboard" class="nav-link">Dashboard</a></li>
+      <li>
+        <a>{{this.authService.getCurrentUsername()}}</a>
+      </li>
+      <li><a routerLink="/dashboard" class="nav-link">Dashboard</a>
+      </li>
       <li>
         <button (click)="logout()" class="header-logout-button">
           Logout

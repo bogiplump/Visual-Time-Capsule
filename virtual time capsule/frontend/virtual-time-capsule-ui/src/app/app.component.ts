@@ -17,10 +17,8 @@ import { RouterModule } from '@angular/router'; // Import RouterModule for route
 })
 export class AppComponent implements OnInit {
   title = 'virtual-time-capsule-ui';
-  isAuthenticated$: Observable<boolean>;
 
-  constructor(private authService: AuthService) {
-    this.isAuthenticated$ = this.authService.isAuthenticated$;
+  constructor(protected authService: AuthService) {
   }
 
   ngOnInit(): void {

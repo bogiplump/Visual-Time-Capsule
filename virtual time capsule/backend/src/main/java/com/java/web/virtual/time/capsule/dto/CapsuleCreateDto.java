@@ -29,15 +29,4 @@ public class CapsuleCreateDto {
     // NEW: List of user IDs to share this capsule with
     private Set<Long> sharedWithUserIds;
 
-    // Nested DTO for Goal creation (moved here if not already static nested)
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class GoalCreateDto {
-        @NotBlank(message = "Goal content cannot be empty")
-        @Size(max = 500, message = "Goal content cannot exceed 500 characters")
-        private String content;
-        private boolean isVisible;
-    }
 }
