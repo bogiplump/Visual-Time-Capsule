@@ -37,6 +37,4 @@ public class Friendship {
     public Friendship() {
 
     }
-
-
 }
