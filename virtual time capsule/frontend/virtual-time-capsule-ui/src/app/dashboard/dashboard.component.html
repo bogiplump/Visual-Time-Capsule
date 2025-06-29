@@ -29,13 +29,38 @@
             <h3>{{ capsule.capsuleName }}</h3>
             <p>Status: **{{ capsule.status }}**</p>
             <p>Open Date: {{ capsule.openDateTime ? (capsule.openDateTime | date:'shortDate') : 'Not Set' }}</p>
+
+            <!-- NEW: Display for shared capsules -->
+            <p *ngIf="capsule.isShared" class="shared-capsule-info">
+              Shared with:
+              <span *ngFor="let user of capsule.sharedWithUsers; let last = last">
+                {{ user.username }}{{ !last ? ', ' : '' }}
+              </span>
+            </p>
+            <p *ngIf="capsule.isShared && capsule.status === capsuleStatus.CREATED" class="shared-capsule-info">
+              Participants ready to close: {{ capsule.readyParticipantsCount ?? 0 }}/{{ capsule.totalParticipantsCount ?? 0 }}
+            </p>
+            <!-- NEW: Button for participant to mark ready -->
+            <button
+              *ngIf="capsule.isShared && capsule.status === capsuleStatus.CREATED && !capsule.isCurrentUserReadyToClose"
+              class="action-button mark-ready-button"
+              (click)="$event.stopPropagation(); markCapsuleReady(capsule.id)"
+            >
+              I'm Ready to Close
+            </button>
+            <button
+              *ngIf="capsule.isShared && capsule.status === capsuleStatus.CREATED && capsule.isCurrentUserReadyToClose"
+              class="action-button mark-ready-button"
+              [disabled]="true"
+            >
+              You're Ready!
+            </button>
           </div>
         </div>
       </div>
 
       <!-- Right Column: Friends Sidebar -->
       <div class="friends-sidebar">
-        <!-- New Button Position -->
         <div class="friends-sidebar-header">
           <h2 class="section-heading">My Friends</h2>
           <button class="connect-users-button" [routerLink]="['/users']">
@@ -48,18 +73,36 @@
 
         <ul *ngIf="!loadingFriendships && myFriendships.length > 0" class="friend-list">
           <li *ngFor="let friendship of myFriendships" class="friend-item">
-            <!-- Determine the friend's ID and link to their profile -->
             <a [routerLink]="['/users', friendship.requesterId === currentUserId ? friendship.responderId : friendship.requesterId, 'capsules']" class="friend-link">
               <span class="friend-name">
                 {{ friendship.requesterId === currentUserId ? friendship.responderUsername : friendship.requesterUsername }}
               </span>
             </a>
             <span class="friend-status status-{{ friendship.status?.toLowerCase() }}">
-              {{ friendship.status === FriendshipStatus.PENDING ? (friendship.responderId === currentUserId ? 'Invitation Received' : 'Invitation Sent') : friendship.status }}
+              <ng-container *ngIf="friendship.status === FriendshipStatus.PENDING">
+                <ng-container *ngIf="friendship.responderId === currentUserId">
+                  Invitation Received
+                </ng-container>
+                <ng-container *ngIf="friendship.requesterId === currentUserId">
+                  Invitation Sent
+                </ng-container>
+                <!-- This case should theoretically not happen if myFriendships is correctly filtered on backend -->
+                <ng-container *ngIf="friendship.requesterId !== currentUserId && friendship.responderId !== currentUserId">
+                  Pending (Unknown Party)
+                </ng-container>
+              </ng-container>
+              <ng-container *ngIf="friendship.status !== FriendshipStatus.PENDING">
+                {{ friendship.status }}
+              </ng-container>
             </span>
 
+            <!-- DEBUG INFO START -->
+            <span style="font-size: 0.7em; color: grey; margin-left: 10px;">
+              (ReqID: {{ friendship.requesterId }}, ResID: {{ friendship.responderId }}, CurrentUserID: {{ currentUserId }})
+            </span>
+            <!-- DEBUG INFO END -->
+
             <div class="friend-actions">
-              <!-- Accept/Decline buttons for received pending invitations -->
               <ng-container *ngIf="friendship.status === FriendshipStatus.PENDING && friendship.responderId === currentUserId">
                 <button class="action-button accept-button" (click)="acceptFriendRequest(friendship.id)">Accept</button>
                 <button class="action-button decline-button" (click)="declineFriendRequest(friendship.id)">Decline</button>
@@ -85,8 +128,8 @@
         <button
           class="modal-tab-button"
           [ngClass]="{'active': currentModalTab === 'memory'}"
-          (click)="switchToMemoryTab()"
           [disabled]="!createdCapsuleId"
+          (click)="switchToMemoryTab()"
         >
           Add Memory
         </button>
@@ -145,6 +188,26 @@
                 class="form-checkbox"
               />
               <label for="goalVisible" class="form-label-checkbox">Goal Visible (to friends)</label>
+            </div>
+
+            <!-- NEW: Share with Friends section -->
+            <div class="form-group">
+              <label for="sharedWithUsers" class="form-label">Share with Friends (Optional)</label>
+              <select
+                id="sharedWithUsers"
+                name="sharedWithUsers"
+                multiple
+                [(ngModel)]="newCapsuleData.sharedWithUserIds"
+                class="form-input select-input"
+                [disabled]="loadingAllUsers"
+              >
+                <option *ngIf="loadingAllUsers" value="" disabled>Loading friends...</option>
+                <option *ngIf="!loadingAllUsers && allUsers.length === 0" value="" disabled>No friends available to share with.</option>
+                <option *ngFor="let user of allUsers" [value]="user.id">
+                  {{ user.username }}
+                </option>
+              </select>
+              <small class="form-text-hint">Select friends to share this capsule with. Hold Ctrl/Cmd to select multiple.</small>
             </div>
 
             <div *ngIf="dialogMessages.length > 0" class="dialog-messages">

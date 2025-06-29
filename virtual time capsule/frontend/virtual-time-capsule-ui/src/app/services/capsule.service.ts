@@ -1,63 +1,52 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Capsule } from '../models/capsule.model';
-import { Memory } from '../models/memory.model';
-import { Goal } from '../models/goal.model';
+import { environment } from '../../environments/environment';
+import { CapsuleResponseDto } from '../dtos/capsule-response.dto';
+import { MemoryDto } from '../dtos/memory.dto';
 import { CapsuleCreateDto } from '../dtos/capsule-create.dto';
 import { CapsuleUpdateDto } from '../dtos/capsule-update.dto';
-import {CapsuleResponseDto} from '../dtos/capsule-response.dto';
-import {environment} from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CapsuleService {
-  private apiUrl = `${environment.backendUrl}/api/v1/capsules`; // Adjust to your backend URL
+  private apiUrl = `${environment.backendUrl}/api/v1/capsules`;
 
   constructor(private http: HttpClient) { }
 
   /**
    * Creates a new time capsule.
    * POST /api/v1/capsules/
+   * Now includes optional sharedWithUserIds.
    */
-  createCapsule(capsuleDto: CapsuleCreateDto): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}`, capsuleDto);
+  createCapsule(capsuleDto: CapsuleCreateDto): Observable<CapsuleResponseDto> {
+    return this.http.post<CapsuleResponseDto>(this.apiUrl, capsuleDto);
+  }
+
+  /**
+   * Retrieves all time capsules for the authenticated user (created by or shared with).
+   * GET /api/v1/capsules/all
+   */
+  getAllMyCapsules(): Observable<CapsuleResponseDto[]> {
+    return this.http.get<CapsuleResponseDto[]>(`${this.apiUrl}/all`);
   }
 
   /**
    * Retrieves a specific time capsule by ID.
    * GET /api/v1/capsules/{id}
    */
-  getCapsule(id: number): Observable<CapsuleResponseDto> {
-    const url = `${this.apiUrl}/${id}`;
-    console.log(url);
-    return this.http.get<CapsuleResponseDto>(`${this.apiUrl}/${id}`);
-  }
-
-  /**
-   * Retrieves all time capsules for the authenticated user.
-   * GET /api/v1/capsules/
-   */
-  getAllCapsules(): Observable<Capsule[]> {
-    return this.http.get<Capsule[]>(`${this.apiUrl}/all`);
-  }
-
-  /**
-   * Locks a specific time capsule, setting its open date.
-   * PUT /api/v1/capsules/{id}/lock
-   */
-  lockCapsule(id: number, openDate: string): Observable<void> {
-    let params = new HttpParams().set('openDate', openDate);
-    return this.http.put<void>(`${this.apiUrl}/${id}/lock`, null, { params });
+  getCapsule(capsuleId: number): Observable<CapsuleResponseDto> {
+    return this.http.get<CapsuleResponseDto>(`${this.apiUrl}/${capsuleId}`);
   }
 
   /**
    * Updates an existing time capsule.
    * PUT /api/v1/capsules/{id}
+   * Returns CapsuleResponseDto now.
    */
-  updateCapsule(id: number, capsuleDto: CapsuleUpdateDto): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/${id}`, capsuleDto);
+  updateCapsule(id: number, capsuleDto: CapsuleUpdateDto): Observable<CapsuleResponseDto> {
+    return this.http.put<CapsuleResponseDto>(`${this.apiUrl}/${id}`, capsuleDto);
   }
 
   /**
@@ -69,31 +58,46 @@ export class CapsuleService {
   }
 
   /**
-   * Retrieves all memories associated with a specific capsule.
-   * GET /api/v1/capsules/{id}/memories
+   * Locks a specific time capsule, setting its open date.
+   * PUT /api/v1/capsules/lock/{id}
+   * Now returns CapsuleResponseDto.
    */
-  getMemoriesForCapsule(capsuleId: number): Observable<Memory[]> {
-    return this.http.get<Memory[]>(`${this.apiUrl}/${capsuleId}/memories`);
+  lockCapsule(id: number, openDateTime: string): Observable<CapsuleResponseDto> {
+    // Note: This uses RequestParam, so send as query parameter
+    let params = new HttpParams().set('openDateTime', openDateTime); // Changed to openDateTime
+    return this.http.put<CapsuleResponseDto>(`${this.apiUrl}/lock/${id}`, {}, { params });
   }
 
   /**
-   * Retrieves the goal associated with a specific capsule.
-   * GET /api/v1/capsules/{id}/goal
+   * Opens a capsule.
+   * PUT /api/v1/capsules/{id}/open
+   * Returns CapsuleResponseDto now.
    */
-  getGoalForCapsule(capsuleId: number): Observable<Goal> {
-    return this.http.get<Goal>(`${this.apiUrl}/${capsuleId}/goal`);
+  openCapsule(id: number): Observable<CapsuleResponseDto> {
+    return this.http.put<CapsuleResponseDto>(`${this.apiUrl}/${id}/open`, {});
   }
 
-  openCapsule(id: number): Observable<any> {
-    return this.http.put<Capsule>(`${this.apiUrl}/${id}/open`,null,{});
+  /**
+   * Retrieves all memories associated with a specific capsule.
+   * GET /api/v1/capsules/{id}/memories
+   */
+  getMemoriesForCapsule(capsuleId: number): Observable<MemoryDto[]> {
+    return this.http.get<MemoryDto[]>(`${this.apiUrl}/${capsuleId}/memories`);
   }
 
-
-  getAllMyCapsules(): Observable<CapsuleResponseDto[]> {
-    return this.http.get<CapsuleResponseDto[]>(`${this.apiUrl}/all`);
+  /**
+   * Marks a user as "ready to close" for a specific shared capsule.
+   * PUT /api/v1/capsules/{id}/ready-to-close
+   */
+  markReadyToClose(capsuleId: number): Observable<CapsuleResponseDto> {
+    return this.http.put<CapsuleResponseDto>(`${this.apiUrl}/${capsuleId}/ready-to-close`, {});
   }
 
-  getCapsulesOfUser(id: number | null): Observable<CapsuleResponseDto[]> {
-    return this.http.get<CapsuleResponseDto[]>(`${this.apiUrl}/id`);
-  }
+  // This method seems like a duplicate of getCapsule(id) or was for a different purpose
+  // Depending on its actual use, it might be redundant or need adjustment.
+  // getCapsulesOfUser(id: number | null): Observable<CapsuleResponseDto[]> {
+  //   // Adjust this URL if it's meant to fetch public capsules for any user
+  //   // or if it's indeed meant to be for the current user's capsules (which getAllMyCapsules already does)
+  //   return this.http.get<CapsuleResponseDto[]>(`${this.apiUrl}/id`);
+  // }
 }

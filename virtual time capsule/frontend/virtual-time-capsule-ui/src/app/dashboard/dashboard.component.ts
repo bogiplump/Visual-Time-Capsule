@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
-import {Router, RouterLink} from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Subscription, interval } from 'rxjs';
 
 // Services
@@ -10,16 +10,17 @@ import { CapsuleService } from '../services/capsule.service';
 import { GoalService } from '../services/goal.service';
 import { MemoryService } from '../services/memory.service';
 import { AuthService } from '../services/auth.service';
-import {UserService} from '../services/user.service';
+import { UserService } from '../services/user.service';
 
 // DTOs & Enums
 import { CapsuleResponseDto } from '../dtos/capsule-response.dto';
-import { CapsuleCreateDto } from '../dtos/capsule-create.dto';
+import { CapsuleCreateDto, GoalCreateDto } from '../dtos/capsule-create.dto';
 import { MemoryCreateDto } from '../dtos/memory-create.dto';
 import { CapsuleStatus } from '../enums/capsule-status.enum';
 import { MemoryType } from '../enums/memory-type.enum';
-import {FriendshipDto} from '../dtos/friendship.dto';
-import {FriendshipStatus} from '../enums/friendship-status.enum';
+import { FriendshipDto } from '../dtos/friendship.dto';
+import { FriendshipStatus } from '../enums/friendship-status.enum';
+import { UserProfileDto } from '../dtos/user-profile.dto';
 
 interface Message {
   text: string;
@@ -38,28 +39,24 @@ export class DashboardComponent implements OnInit, OnDestroy {
   loadingCapsules = true;
   messages: Message[] = [];
 
-  // Friendships related properties
   myFriendships: FriendshipDto[] = [];
   loadingFriendships = true;
   currentUserId: number | null = null;
+  allUsers: UserProfileDto[] = [];
+  loadingAllUsers = true;
 
-  // Modals and Forms
   showCreateCapsuleDialog = false;
   currentModalTab: 'capsule' | 'memory' = 'capsule';
   createdCapsuleId: number | null = null;
 
   newCapsuleData: CapsuleCreateDto = {
     capsuleName: '',
-    openDateTime: '',
+    openDateTime: null,
     goal: {
-      id:  null,
-      isVisible: false,
-      isAchieved: false,
-      creationDate: '',
       content: '',
-      creator: null,
-      capsuleId: null,
-    }
+      isVisible: false,
+    },
+    sharedWithUserIds: []
   };
   loadingCreateCapsule = false;
   dialogMessages: Message[] = [];
@@ -73,7 +70,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   memoryTypes = Object.values(MemoryType);
   loadingCreateMemory = false;
 
-  // Date and Time related for canOpenCapsule in dashboard
   currentDate: Date = new Date();
   private dateUpdateSubscription: Subscription | undefined;
   capsuleStatus: typeof CapsuleStatus = CapsuleStatus;
@@ -93,7 +89,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
       if (user?.id) {
         this.currentUserId = user.id;
         this.loadMyCapsules();
-        this.loadMyFriendships();
+        this.loadMyFriendships().then(() => {
+          this.loadAllUsers();
+        });
       } else {
         this.addMessage('Authentication error. Please log in.', 'error');
         this.router.navigate(['/login']);
@@ -133,7 +131,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.capsuleService.getAllMyCapsules().subscribe({
       next: (capsulesData: CapsuleResponseDto[]) => {
         this.myCapsules = capsulesData;
-        console.log(capsulesData);
+        console.log('My Capsules:', capsulesData);
         this.addMessage('Capsules loaded successfully!', 'success');
       },
       error: (error: HttpErrorResponse) => {
@@ -145,30 +143,71 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  loadMyFriendships(): void {
-    if (this.currentUserId === null) {
-      this.addMessage('User not authenticated, cannot load friendships.', 'error');
-      this.loadingFriendships = false;
-      return;
-    }
+  loadMyFriendships(): Promise<void> {
+    return new Promise((resolve) => {
+      if (this.currentUserId === null) {
+        this.addMessage('User not authenticated, cannot load friendships.', 'error');
+        this.loadingFriendships = false;
+        resolve();
+        return;
+      }
 
-    this.loadingFriendships = true;
-    this.userService.getFriendships(this.currentUserId).subscribe({
-      next: (friendships: FriendshipDto[]) => {
-        this.myFriendships = friendships;
-        console.log('My Friendships:', this.myFriendships);
+      this.loadingFriendships = true;
+      this.userService.getFriendships(this.currentUserId).subscribe({
+        next: (friendships: FriendshipDto[]) => {
+          this.myFriendships = friendships;
+          console.log('My Friendships:', this.myFriendships);
+          // NEW: Debugging log to check pending invitations where current user is responder
+          this.myFriendships.forEach(f => {
+            if (f.status === FriendshipStatus.PENDING) {
+              console.log(`Friendship ID: ${f.id}, Status: ${f.status}, Requester: ${f.requesterUsername} (ID: ${f.requesterId}), Responder: ${f.responderUsername} (ID: ${f.responderId})`);
+              if (f.responderId === this.currentUserId) {
+                console.log(`>>> PENDING INVITATION TO CURRENT USER FOUND! Friendship ID: ${f.id}`);
+              }
+            }
+          });
+        },
+        error: (error: HttpErrorResponse) => {
+          console.error('Failed to load friendships:', error);
+          this.addMessage(`Failed to load friendships: ${error.message || 'Unknown error'}`, 'error');
+        },
+        complete: () => {
+          this.loadingFriendships = false;
+          resolve();
+        }
+      });
+    });
+  }
+
+  loadAllUsers(): void {
+    this.loadingAllUsers = true;
+    this.userService.getAllUsers().subscribe({
+      next: (users: UserProfileDto[]) => {
+        let filteredUsers = users.filter(user => user.id !== this.currentUserId);
+
+        const acceptedFriendIds = new Set<number>();
+        this.myFriendships.forEach(friendship => {
+          if (friendship.status === FriendshipStatus.ACCEPTED) {
+            if (friendship.requesterId === this.currentUserId) {
+              acceptedFriendIds.add(friendship.responderId);
+            } else if (friendship.responderId === this.currentUserId) {
+              acceptedFriendIds.add(friendship.requesterId);
+            }
+          }
+        });
+
+        this.allUsers = filteredUsers.filter(user => acceptedFriendIds.has(user.id));
+        console.log('Accepted Friends for Sharing:', this.allUsers);
       },
       error: (error: HttpErrorResponse) => {
-        console.error('Failed to load friendships:', error);
-        this.addMessage(`Failed to load friendships: ${error.message || 'Unknown error'}`, 'error');
+        console.error('Failed to load all users:', error);
       },
       complete: () => {
-        this.loadingFriendships = false;
+        this.loadingAllUsers = false;
       }
     });
   }
 
-  // NEW: Accept Friend Request
   acceptFriendRequest(friendshipId: number): void {
     if (this.currentUserId === null) {
       this.addMessage('Authentication error: Cannot accept request.', 'error');
@@ -176,7 +215,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
     this.addMessage('Accepting friend request...', 'success');
 
-    // Find the specific friendship from the list
     const friendshipToUpdate = this.myFriendships.find(f => f.id === friendshipId);
 
     if (!friendshipToUpdate) {
@@ -186,18 +224,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     const friendshipUpdateDto: FriendshipDto = {
       id: friendshipId,
-      requesterId: friendshipToUpdate.responderId, // Use the original requesterId
-      responderId: friendshipToUpdate.requesterId, // Use the original responderId (should be currentUserId)
-      requesterUsername: friendshipToUpdate.responderUsername, // Pass original username
-      responderUsername: friendshipToUpdate.requesterUsername, // Pass original username
-      status: FriendshipStatus.ACCEPTED, // Set status to ACCEPTED
+      requesterId: friendshipToUpdate.requesterId,
+      responderId: friendshipToUpdate.responderId,
+      requesterUsername: friendshipToUpdate.requesterUsername,
+      responderUsername: friendshipToUpdate.responderUsername,
+      status: FriendshipStatus.ACCEPTED,
       lastUpdate: new Date().toISOString()
     };
 
     this.userService.answerFriendshipInvitation(friendshipId, friendshipUpdateDto).subscribe({
       next: (response) => {
         this.addMessage(`Friend request accepted!`, 'success');
-        this.loadMyFriendships(); // Reload friendships to update status
+        this.loadMyFriendships().then(() => this.loadAllUsers());
       },
       error: (error: HttpErrorResponse) => {
         this.addMessage(`Failed to accept request: ${error.error?.message || 'Unknown error'}`, 'error');
@@ -205,7 +243,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  // NEW: Decline Friend Request
   declineFriendRequest(friendshipId: number): void {
     if (this.currentUserId === null) {
       this.addMessage('Authentication error: Cannot decline request.', 'error');
@@ -213,7 +250,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
     this.addMessage('Declining friend request...', 'success');
 
-    // Find the specific friendship from the list
     const friendshipToUpdate = this.myFriendships.find(f => f.id === friendshipId);
 
     if (!friendshipToUpdate) {
@@ -223,18 +259,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     const friendshipUpdateDto: FriendshipDto = {
       id: friendshipId,
-      requesterId: friendshipToUpdate.responderId, // Use the original requesterId
-      responderId: friendshipToUpdate.requesterId, // Use the original responderId (should be currentUserId)
-      requesterUsername: friendshipToUpdate.responderUsername, // Pass original username
-      responderUsername: friendshipToUpdate.requesterUsername, // Pass original username
-      status: FriendshipStatus.DECLINED, // Set status to DECLINED
+      requesterId: friendshipToUpdate.requesterId,
+      responderId: friendshipToUpdate.responderId,
+      requesterUsername: friendshipToUpdate.requesterUsername,
+      responderUsername: friendshipToUpdate.responderUsername,
+      status: FriendshipStatus.DECLINED,
       lastUpdate: new Date().toISOString()
     };
 
     this.userService.answerFriendshipInvitation(friendshipId, friendshipUpdateDto).subscribe({
       next: (response) => {
         this.addMessage(`Friend request declined!`, 'success');
-        this.loadMyFriendships(); // Reload friendships to update status
+        this.loadMyFriendships().then(() => this.loadAllUsers());
       },
       error: (error: HttpErrorResponse) => {
         this.addMessage(`Failed to decline request: ${error.error?.message || 'Unknown error'}`, 'error');
@@ -242,46 +278,55 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  // --- Capsule Creation Modal ---
+  markCapsuleReady(capsuleId: number): void {
+    this.addMessage('Marking capsule as ready...', 'success');
+    this.capsuleService.markReadyToClose(capsuleId).subscribe({
+      next: (updatedCapsule: CapsuleResponseDto) => {
+        this.addMessage('Capsule marked as ready to close!', 'success');
+        this.loadMyCapsules();
+      },
+      error: (error: HttpErrorResponse) => {
+        this.addMessage(`Failed to mark capsule ready: ${error.error?.message || 'Unknown error'}`, 'error');
+      }
+    });
+  }
+
   openCreateCapsuleDialog(): void {
     this.showCreateCapsuleDialog = true;
-    this.currentModalTab = 'capsule'; // Always start on capsule details tab
-    this.createdCapsuleId = null; // Reset for new creation
-    this.newCapsuleData = { // Reset form
+    this.currentModalTab = 'capsule';
+    this.createdCapsuleId = null;
+    this.newCapsuleData = {
       capsuleName: '',
-      openDateTime: '', // Initialize as null or empty string
+      openDateTime: null,
       goal: {
-        id:  null,
         content: '',
         isVisible: false,
-        isAchieved: false,
-        creationDate: '',
-        creator: null,
-        capsuleId: null,
-      }
+      },
+      sharedWithUserIds: []
     };
-    this.newMemoryData = { // Reset memory form
+    this.newMemoryData = {
       description: '',
       type: MemoryType.TEXT,
       content: null as any
     };
     this.selectedFile = null;
     this.dialogMessages = [];
+    this.loadAllUsers();
   }
 
   closeCreateCapsuleDialog(): void {
     this.showCreateCapsuleDialog = false;
-    this.loadMyCapsules(); // Refresh capsule list after creating/cancelling
+    this.loadMyCapsules();
   }
 
   switchToCapsuleTab(): void {
     this.currentModalTab = 'capsule';
-    this.dialogMessages = []; // Clear messages when switching tabs
+    this.dialogMessages = [];
   }
 
   switchToMemoryTab(): void {
     this.currentModalTab = 'memory';
-    this.dialogMessages = []; // Clear messages when switching tabs
+    this.dialogMessages = [];
   }
 
   submitCreateCapsule(): void {
@@ -293,18 +338,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.loadingCreateCapsule = true;
     this.dialogMessages = [];
 
+    const formattedOpenDateTime = this.newCapsuleData.openDateTime
+      ? new Date(this.newCapsuleData.openDateTime).toISOString()
+      : null;
+
     const capsuleToCreate: CapsuleCreateDto = {
       capsuleName: this.newCapsuleData.capsuleName,
-      openDateTime: this.newCapsuleData.openDateTime,
+      openDateTime: formattedOpenDateTime,
       goal: {
-        id: this.newCapsuleData.goal.id,
         content: this.newCapsuleData.goal.content,
-        isVisible: this.newCapsuleData.goal.isVisible,
-        isAchieved: this.newCapsuleData.goal.isAchieved,
-        creationDate: this.newCapsuleData.goal.creationDate,
-        creator: this.newCapsuleData.goal.creator,
-        capsuleId: this.newCapsuleData.goal.capsuleId,
-      }
+        isVisible: this.newCapsuleData.goal.isVisible
+      },
+      sharedWithUserIds: this.newCapsuleData.sharedWithUserIds
     };
 
     console.log("CapsuleCreateDto being sent:", capsuleToCreate);
@@ -324,7 +369,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  // --- Memory Addition to New Capsule ---
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
@@ -398,13 +442,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  // --- Utility for Capsule Card display ---
   canOpenCapsule(capsule: CapsuleResponseDto): boolean {
     if (!capsule || capsule.status !== CapsuleStatus.CLOSED || !capsule.openDateTime) {
       return false;
     }
     const capsuleOpenDate = new Date(capsule.openDateTime);
     return this.currentDate >= capsuleOpenDate;
+  }
+
+  canAddMemory(capsule: CapsuleResponseDto): boolean {
+    return capsule.status === CapsuleStatus.CREATED;
   }
 
   protected readonly FriendshipStatus = FriendshipStatus;
