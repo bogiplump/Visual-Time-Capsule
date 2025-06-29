@@ -1,0 +1,62 @@
+<div class="user-capsules-container">
+  <div class="user-capsules-card">
+    <button class="back-button" (click)="router.navigate(['/users'])">
+      &larr; Back to Users List
+    </button>
+
+    <h1 class="user-capsules-heading">Capsules by {{ username || 'User' }}</h1> <!-- Updated heading -->
+
+    <!-- Message Display -->
+    <div *ngIf="messages.length > 0" class="page-messages">
+      <div *ngFor="let msg of messages" [ngClass]="{'message-box': true, 'success': msg.type === 'success', 'error': msg.type === 'error'}">
+        {{ msg.text }}
+      </div>
+    </div>
+
+    <div *ngIf="loadingCapsules" class="loading-message">Loading capsules...</div>
+
+    <!-- Updated: No specific "public capsules" text, just "No capsules found" -->
+    <div *ngIf="!loadingCapsules && publicCapsules.length === 0" class="no-data-message">No capsules found for this user.</div>
+
+    <div *ngIf="!loadingCapsules && publicCapsules.length > 0" class="capsules-grid">
+      <div *ngFor="let capsule of publicCapsules" class="capsule-card" (click)="viewCapsuleDetails(capsule.id)">
+        <h3>{{ capsule.capsuleName }}</h3>
+        <p>Status: **{{ capsule.status }}**</p>
+        <p>Open Date: {{ capsule.openDateTime ? (capsule.openDateTime | date:'shortDate') : 'Not Set' }}</p>
+
+        <!-- Display goal content if visible (using isGoalContentVisible) -->
+        <div *ngIf="capsule.goal">
+          <p class="goal-label">Goal:</p>
+          <ng-container *ngIf="isGoalContentVisible(capsule); else hiddenGoalInPublic">
+            <p class="goal-preview">{{ capsule.goal.content }}</p>
+          </ng-container>
+          <ng-template #hiddenGoalInPublic>
+            <p class="goal-hidden">Goal is hidden</p>
+          </ng-template>
+        </div>
+        <p *ngIf="!capsule.goal" class="no-data-message-small">No goal set.</p>
+
+
+        <!-- Display Memories based on Capsule Status (using isMemoriesVisible) -->
+        <div class="memories-preview">
+          <p class="memories-label">Memories:</p>
+          <ng-container *ngIf="isMemoriesVisible(capsule); else lockedMemoriesInPublic">
+            <p *ngIf="capsule.memories && capsule.memories.length > 0">
+              ({{ capsule.memories.length }} memories available)
+            </p>
+            <p *ngIf="!capsule.memories || capsule.memories.length === 0" class="no-data-message-small">
+              No memories added yet.
+            </p>
+          </ng-container>
+          <ng-template #lockedMemoriesInPublic>
+            <p class="memories-locked">Memories are locked until capsule opens.</p>
+          </ng-template>
+        </div>
+
+        <div class="view-details-overlay">
+          <span class="view-details-text">View Details</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

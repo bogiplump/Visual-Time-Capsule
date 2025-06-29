@@ -1,0 +1,200 @@
+.users-list-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* Align to top */
+  min-height: 100vh; /* Full viewport height */
+  padding: 2rem;
+  background-color: #f0f2f5; /* Light background */
+}
+
+.users-list-card {
+  background-color: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 800px; /* Max width for readability */
+  text-align: center;
+  position: relative;
+}
+
+.back-button {
+  position: absolute;
+  top: 1.5rem;
+  left: 1.5rem;
+  background-color: #6b7280; /* Gray */
+  color: white;
+  padding: 0.6rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.back-button:hover {
+  background-color: #4b5563; /* Darker gray */
+}
+
+.users-heading {
+  font-size: 2.5rem;
+  color: #1e40af; /* Blue */
+  margin-bottom: 2rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.loading-message, .no-data-message, .page-messages {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+}
+
+.loading-message {
+  background-color: #e0f2fe; /* Light blue */
+  color: #0369a1;
+}
+
+.no-data-message {
+  background-color: #ffeccf; /* Light orange */
+  color: #92400e;
+}
+
+.page-messages .message-box {
+  text-align: left;
+  margin-bottom: 0.5rem;
+}
+
+.users-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Responsive grid */
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.user-card {
+  background-color: #f9fafb; /* Lighter background for cards */
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.user-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.user-card h3 {
+  font-size: 1.5rem;
+  color: #1f2937;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.user-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem; /* Space between buttons */
+  width: 100%; /* Ensure buttons take full width */
+  margin-top: 1rem;
+}
+
+.action-button {
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  width: 100%; /* Make them full width */
+}
+
+.action-button:disabled {
+  background-color: #e5e7eb;
+  color: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.view-profile-button {
+  background-color: #3b82f6; /* Blue */
+  color: white;
+}
+
+.view-profile-button:hover {
+  background-color: #2563eb; /* Darker blue */
+}
+
+/* NEW Friendship Button Styles */
+.friendship-button {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for all friendship buttons */
+}
+
+.friendship-button.send-request {
+  background-color: #10b981; /* Teal green for 'Send Friend Request' */
+  color: white;
+}
+.friendship-button.send-request:hover:not(:disabled) {
+  background-color: #059669; /* Darker teal on hover */
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.friendship-button.accept-request {
+  background-color: #22c55e; /* Bright green for 'Accept Request' */
+  color: white;
+}
+.friendship-button.accept-request:hover:not(:disabled) {
+  background-color: #16a34a; /* Darker green on hover */
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.friendship-button.pending {
+  background-color: #f59e0b; /* Amber for 'Request Sent' (pending) */
+  color: white;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.friendship-button.accepted {
+  background-color: #6b7280; /* Gray for 'Friends' */
+  color: white;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .users-list-card {
+    padding: 1.5rem;
+  }
+
+  .users-heading {
+    font-size: 2rem;
+  }
+
+  .user-card h3 {
+    font-size: 1.25rem;
+  }
+
+  .back-button {
+    top: 1rem;
+    left: 1rem;
+    padding: 0.5rem 0.8rem;
+    font-size: 0.9rem;
+  }
+}
+

@@ -1,0 +1,99 @@
+<div class="register-container">
+  <div class="register-card">
+    <h2 class="register-heading">Register Account</h2>
+    <form (ngSubmit)="onSubmit()" class="register-form">
+      <div class="form-group">
+        <label for="reg-username" class="form-label">Username</label>
+        <input
+          type="text"
+          id="reg-username"
+          name="username"
+          [(ngModel)]="userData.username"
+          class="form-input"
+          placeholder="Choose a username"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="reg-email" class="form-label">Email</label>
+        <input
+          type="email"
+          id="reg-email"
+          name="email"
+          [(ngModel)]="userData.email"
+          class="form-input"
+          placeholder="Enter your email"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="reg-firstname" class="form-label">First Name</label>
+        <input
+          type="text"
+          id="reg-firstname"
+          name="firstName"
+          [(ngModel)]="userData.firstName"
+          class="form-input"
+          placeholder="Enter your first name"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="reg-lastname" class="form-label">Last Name</label>
+        <input
+          type="text"
+          id="reg-lastname"
+          name="lastName"
+          [(ngModel)]="userData.lastName"
+          class="form-input"
+          placeholder="Enter your last name"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="reg-password" class="form-label">Password</label>
+        <input
+          type="password"
+          id="reg-password"
+          name="password"
+          [(ngModel)]="userData.password"
+          class="form-input"
+          placeholder="Create a password"
+          required
+        />
+      </div>
+      <button
+        type="submit"
+        [disabled]="loading"
+        class="register-button"
+      >
+        <span *ngIf="!loading">Register</span>
+        <span *ngIf="loading" class="loading-spinner-container">
+          <svg class="spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Registering...
+        </span>
+      </button>
+    </form>
+
+    <ng-container *ngIf="message.text">
+      <div *ngFor="let msgLine of message.text.split('\n')"
+           class="message-box"
+           [ngClass]="{'success': message.type === 'success', 'error': message.type === 'error'}">
+        {{ msgLine }}
+      </div>
+    </ng-container>
+
+    <p class="alt-action-text">
+      Already have an account?
+      <button
+        (click)="navigateToLogin()"
+        class="alt-action-button"
+      >
+        Login here
+      </button>
+    </p>
+  </div>
+</div>

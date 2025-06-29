@@ -1,0 +1,390 @@
+.capsule-details-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f3f4f6;
+  padding: 2rem 1rem; /* More vertical padding */
+}
+
+.capsule-details-card {
+  background-color: #ffffff;
+  padding: 2.5rem; /* More generous padding */
+  border-radius: 1rem; /* Slightly more rounded */
+  box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.1), 0 8px 15px -5px rgba(0, 0, 0, 0.08); /* Enhanced shadow */
+  width: 100%;
+  max-width: 900px; /* Wider card for details page */
+  box-sizing: border-box;
+  text-align: center;
+  position: relative;
+}
+
+.back-button {
+  position: absolute;
+  top: 1.5rem;
+  left: 1.5rem;
+  background: none;
+  border: none;
+  color: #3b82f6;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s ease-in-out;
+}
+
+.back-button:hover {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.capsule-heading {
+  font-size: 3rem; /* Larger heading */
+  font-weight: 800;
+  color: #2563eb;
+  margin-bottom: 2rem;
+}
+
+/* Page-level messages */
+.page-messages {
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.page-messages .message-box {
+  margin: 0 auto; /* Center messages if needed */
+  max-width: 600px;
+}
+
+
+/* General Section Styling */
+.capsule-section {
+  background-color: #f8fafc; /* Very light background for sections */
+  border: 1px solid #e2e8f0; /* Subtle border */
+  border-radius: 0.75rem;
+  padding: 2rem;
+  margin-bottom: 2rem; /* Space between sections */
+  text-align: left; /* Content aligned left within section */
+}
+
+.section-title {
+  font-size: 1.8rem; /* Larger section titles */
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #e5e7eb; /* Underline for title */
+  padding-bottom: 0.75rem;
+}
+
+.section-divider {
+  margin: 3rem auto; /* More space for dividers */
+  border: 0;
+  border-top: 1px solid #cbd5e1; /* Darker divider */
+  width: 80%; /* Shorter divider */
+}
+
+.loading-message, .no-data-message {
+  color: #6b7280;
+  font-style: italic;
+  padding: 1rem 0;
+  text-align: center;
+}
+
+/* Info Grid for displaying details */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Two columns on larger screens */
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column; /* Stack label and value */
+  margin-bottom: 0.5rem;
+}
+
+.info-label {
+  font-weight: 600;
+  color: #4b5563;
+  font-size: 0.9rem;
+  margin-bottom: 0.2rem;
+}
+
+.info-value {
+  font-size: 1rem;
+  color: #1f2937;
+  word-break: break-word; /* Ensure long words break */
+}
+
+/* Status specific colors */
+.status-created { color: #22c55e; /* green-500 */ font-weight: 700; }
+.status-closed { color: #f97316; /* orange-500 */ font-weight: 700; }
+.status-open { color: #3b82f6; /* blue-500 */ font-weight: 700; }
+
+/* Edit input styles (reused from dashboard or refined) */
+.edit-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  color: #1f2937;
+  background-color: #ffffff;
+  outline: none;
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  box-sizing: border-box;
+  margin-top: 0.2rem; /* space below label */
+}
+.edit-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+}
+.textarea-input.edit-input {
+  min-height: 80px;
+}
+
+
+/* Section Actions (buttons) */
+.section-actions {
+  display: flex;
+  flex-wrap: wrap; /* Allow buttons to wrap */
+  gap: 0.8rem; /* Space between buttons */
+  margin-top: 1.5rem;
+  justify-content: flex-end; /* Align to right */
+}
+
+.action-button {
+  padding: 0.6rem 1.2rem;
+  border-radius: 0.5rem;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  display: inline-flex; /* For spinner alignment */
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+}
+
+.action-button:disabled {
+  background-color: #e5e7eb;
+  color: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.edit-button { background-color: #60a5fa; color: white; } /* blue-400 */
+.edit-button:hover { background-color: #3b82f6; } /* blue-500 */
+
+.save-button { background-color: #22c55e; color: white; } /* green-500 */
+.save-button:hover { background-color: #16a34a; } /* green-600 */
+
+.cancel-button { background-color: #cbd5e1; color: #4b5563; } /* gray-300 */
+.cancel-button:hover { background-color: #9ca3af; } /* gray-400 */
+
+.lock-button { background-color: #f97316; color: white; } /* orange-500 */
+.lock-button:hover { background-color: #ea580c; } /* orange-600 */
+
+/* NEW: Style for the Open Capsule Button */
+.open-capsule-button {
+  background-color: #3b82f6; /* A distinct blue */
+  color: white;
+}
+.open-capsule-button:hover {
+  background-color: #2563eb; /* Darker blue on hover */
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+
+.delete-button { background-color: #ef4444; color: white; } /* red-500 */
+.delete-button:hover { background-color: #dc2626; } /* red-600 */
+
+.add-button { background-color: #10b981; color: white; } /* green-600 */
+.add-button:hover { background-color: #059669; } /* green-700 */
+
+
+/* Smaller spinner for buttons */
+.loading-spinner-container-small .spinner {
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.5rem;
+}
+
+
+/* Memory Section Specific Styles */
+.memories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.memory-card {
+  background-color: #f0f4f8; /* Lighter background for memories */
+  border: 1px solid #dbeafe; /* Light blue border */
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  text-align: left;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.memory-card h4 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+}
+
+.memory-card p {
+  font-size: 0.9rem;
+  color: #4b5563;
+  margin-bottom: 0.5rem;
+}
+
+.memory-date {
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin-top: 0.8rem;
+  font-style: italic;
+}
+
+.memory-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.view-link {
+  color: #3b82f6;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.85rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 0.375rem;
+  border: 1px solid #3b82f6;
+  transition: all 0.2s ease-in-out;
+}
+
+.view-link:hover {
+  background-color: #e0f2fe;
+  color: #2563eb;
+}
+
+.delete-button-small {
+  background-color: #ef4444;
+  color: white;
+  padding: 0.3rem 0.6rem;
+  border-radius: 0.375rem;
+  border: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.delete-button-small:hover {
+  background-color: #dc2626;
+}
+
+.add-memory-form-container {
+  background-color: #f0f9ff; /* Very light blue background */
+  border: 1px dashed #bfdbfe; /* Dashed blue border */
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.form-subheading {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e40af; /* Darker blue */
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .capsule-details-card {
+    padding: 1.5rem;
+  }
+  .capsule-heading {
+    font-size: 2rem;
+  }
+  .back-button {
+    position: static; /* Remove absolute positioning */
+    display: block;
+    margin-bottom: 1rem;
+    text-align: left;
+  }
+  .info-grid {
+    grid-template-columns: 1fr; /* Single column on small screens */
+  }
+  .section-actions {
+    justify-content: center; /* Center buttons on small screens */
+  }
+  .action-button {
+    width: 100%; /* Full width buttons */
+    margin-bottom: 0.5rem; /* Space between stacked buttons */
+  }
+  .memories-grid {
+    grid-template-columns: 1fr; /* Single column for memories */
+  }
+}
+
+.memory-content-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.memory-content-modal {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  position: relative;
+  max-width: 90%;
+  max-height: 90%;
+  overflow: auto;
+}
+
+.memory-content-modal .close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.content-display-area {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.responsive-content-image,
+.responsive-content-video,
+.responsive-content-iframe {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+.responsive-content-iframe {
+  width: 800px; /* Adjust as needed */
+  height: 600px; /* Adjust as needed */
+  border: 1px solid #ccc;
+}

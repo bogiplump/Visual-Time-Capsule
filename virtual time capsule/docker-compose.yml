@@ -15,6 +15,7 @@ services:
   java-app:
     volumes:
       - ./.env:/app/.env
+      - timecapsule_uploads_data:/app/uploads
     working_dir: /app
     image: my-java-app-image
     build:
@@ -32,3 +33,5 @@ services:
 
 volumes:
   pgdata:
+  timecapsule_uploads_data:
+    driver: local 
