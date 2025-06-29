@@ -1,4 +1,4 @@
-import { CapsuleStatus } from './capsule-status.enum';
+import { CapsuleStatus } from '../enums/capsule-status.enum';
 import { UserModel } from './user.model';
 import { Goal } from './goal.model';
 import { Memory } from './memory.model';

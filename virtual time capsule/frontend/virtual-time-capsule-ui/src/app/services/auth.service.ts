@@ -8,19 +8,18 @@ import { UserLoginDto } from '../dtos/user-login.dto';
 import { UsersAuthResponse } from '../dtos/users-auth-response.dto'; // This DTO must include 'user: UserResponseDto'
 import { UserResponseDto } from '../dtos/user-response.dto'; // Import UserResponseDto
 import { Router } from '@angular/router';
+import {environment} from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8080/auth'; // *** IMPORTANT: Replace with your actual backend URL (e.g., http://localhost:8080/auth if /api is not part of it) ***
-
   // BehaviorSubject to track authentication status (as provided by you)
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.hasValidToken());
   isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
   // BehaviorSubject to hold the current user's information (for getting ID)
-  private currentUserSubject: BehaviorSubject<UserResponseDto | null>;
+  public currentUserSubject: BehaviorSubject<UserResponseDto | null>;
   public currentUser$: Observable<UserResponseDto | null>; // Exposed as an observable
 
   constructor(private http: HttpClient, private router: Router) {
@@ -32,6 +31,15 @@ export class AuthService {
     this.currentUser$ = this.currentUserSubject.asObservable();
   }
 
+  getCurrentUsername(): string {
+    return this.currentUserSubject.getValue()?.username || '';
+  }
+
+
+  getCurrentUser(): Observable<UserResponseDto | null> {
+    return this.currentUser$;
+  }
+
   /**
    * Returns the current user's ID if logged in and user data is available, otherwise null.
    */
@@ -39,7 +47,6 @@ export class AuthService {
     const user = this.currentUserSubject.value;
     return user ? user.id : null;
   }
-
   /**
    * Checks if an access token exists in localStorage.
    * @returns boolean
@@ -59,7 +66,7 @@ export class AuthService {
    * @returns Observable of UsersAuthResponse.
    */
   login(credentials: UserLoginDto): Observable<UsersAuthResponse> {
-    return this.http.post<UsersAuthResponse>(`${this.apiUrl}/login`, credentials).pipe(
+    return this.http.post<UsersAuthResponse>(`${environment.backendUrl}/auth/login`, credentials).pipe(
       tap(response => {
         console.log(response);
         localStorage.setItem('accessToken', response.accessToken);
@@ -89,7 +96,7 @@ export class AuthService {
    * @returns Observable of any (or a success message).
    */
   register(userData: UserCreateDto): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/register`, userData).pipe(
+    return this.http.post<any>(`${environment.backendUrl}/auth/register`, userData).pipe(
       catchError((error: HttpErrorResponse) => {
         console.error('Registration failed:', error);
 
@@ -137,7 +144,7 @@ export class AuthService {
       return throwError(() => new Error('No refresh token found. Please log in again.'));
     }
 
-    return this.http.post<UsersAuthResponse>(`${this.apiUrl}/refresh`, { refreshToken }).pipe(
+    return this.http.post<UsersAuthResponse>(`${environment.backendUrl}/auth/refresh`, { refreshToken }).pipe(
       tap(response => {
         localStorage.setItem('accessToken', response.accessToken);
         localStorage.setItem('refreshToken', response.refreshToken);

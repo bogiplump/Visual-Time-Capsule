@@ -1,7 +1,7 @@
 package com.java.web.virtual.time.capsule.model;
 
 
-import com.java.web.virtual.time.capsule.enums.FriendShipStatus;
+import com.java.web.virtual.time.capsule.enums.FriendshipStatus;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -17,6 +17,8 @@ import java.time.LocalDate;
 @Entity
 @Builder
 @AllArgsConstructor
+@Getter
+@Setter
 public class Friendship {
 
     @Id
@@ -29,9 +31,7 @@ public class Friendship {
     @ManyToOne(optional = false)
     private UserModel responder;
 
-    @Setter
-    @Getter
-    private FriendShipStatus status;
+    private FriendshipStatus status;
     private LocalDate lastUpdate;
 
     public Friendship() {

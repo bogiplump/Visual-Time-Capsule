@@ -11,5 +11,9 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Long> {
 
     Friendship findByRequesterAndResponder(UserModel requester, UserModel responder);
 
+    List<Friendship> findAllByRequesterAndResponder(UserModel requester, UserModel responder);
+
     List<Friendship> findByRequester(UserModel requester);
+
+    List<Friendship> findAllByRequesterOrResponder(UserModel requester, UserModel responder);
 }

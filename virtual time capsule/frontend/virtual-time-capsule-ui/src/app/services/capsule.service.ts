@@ -6,12 +6,14 @@ import { Memory } from '../models/memory.model';
 import { Goal } from '../models/goal.model';
 import { CapsuleCreateDto } from '../dtos/capsule-create.dto';
 import { CapsuleUpdateDto } from '../dtos/capsule-update.dto';
+import {CapsuleResponseDto} from '../dtos/capsule-response.dto';
+import {environment} from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CapsuleService {
-  private apiUrl = 'http://localhost:8080/api/v1/capsules/all'; // Adjust to your backend URL
+  private apiUrl = `${environment.backendUrl}/api/v1/capsules`; // Adjust to your backend URL
 
   constructor(private http: HttpClient) { }
 
@@ -27,8 +29,10 @@ export class CapsuleService {
    * Retrieves a specific time capsule by ID.
    * GET /api/v1/capsules/{id}
    */
-  getCapsule(id: number): Observable<Capsule> {
-    return this.http.get<Capsule>(`${this.apiUrl}/${id}`);
+  getCapsule(id: number): Observable<CapsuleResponseDto> {
+    const url = `${this.apiUrl}/${id}`;
+    console.log(url);
+    return this.http.get<CapsuleResponseDto>(`${this.apiUrl}/${id}`);
   }
 
   /**
@@ -36,7 +40,7 @@ export class CapsuleService {
    * GET /api/v1/capsules/
    */
   getAllCapsules(): Observable<Capsule[]> {
-    return this.http.get<Capsule[]>(`${this.apiUrl}`);
+    return this.http.get<Capsule[]>(`${this.apiUrl}/all`);
   }
 
   /**
@@ -78,5 +82,18 @@ export class CapsuleService {
    */
   getGoalForCapsule(capsuleId: number): Observable<Goal> {
     return this.http.get<Goal>(`${this.apiUrl}/${capsuleId}/goal`);
+  }
+
+  openCapsule(id: number): Observable<any> {
+    return this.http.put<Capsule>(`${this.apiUrl}/${id}/open`,null,{});
+  }
+
+
+  getAllMyCapsules(): Observable<CapsuleResponseDto[]> {
+    return this.http.get<CapsuleResponseDto[]>(`${this.apiUrl}/all`);
+  }
+
+  getCapsulesOfUser(id: number | null): Observable<CapsuleResponseDto[]> {
+    return this.http.get<CapsuleResponseDto[]>(`${this.apiUrl}/id`);
   }
 }

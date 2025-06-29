@@ -44,19 +44,7 @@ public class Goal {
     @JoinColumn(name = "created_by_id")
     private UserModel creator;
 
-    @OneToOne
+    @OneToOne(mappedBy = "goal")
     private Capsule capsule;
 
-    public static Goal fromDTO(GoalDto goalDto, UserModel creator) {
-
-        return Goal
-            .builder()
-            .creator(creator)
-            .isVisible(goalDto.isVisible())
-            .isAchieved(false)
-            .content(goalDto.getContent())
-            .creationDate(LocalDate.now())
-            .content(goalDto.getContent())
-            .build();
-    }
 }

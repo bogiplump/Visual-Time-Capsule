@@ -4,12 +4,13 @@ import { Observable } from 'rxjs';
 import { Goal } from '../models/goal.model';
 import { GoalDto } from '../dtos/goal.dto';
 import { UpdateGoalDto } from '../dtos/update-goal.dto';
+import {environment} from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GoalService {
-  private apiUrl = 'http://localhost:8080/api/v1/goals'; // Adjust to your backend URL
+  private apiUrl = `${environment.backendUrl}/api/v1/goals`; // Adjust to your backend URL
 
   constructor(private http: HttpClient) { }
 
@@ -42,7 +43,7 @@ export class GoalService {
    * Updates the content of a specific goal.
    * PUT /api/v1/goals/{id}/update
    */
-  updateGoalContent(id: number, updateGoalDto: UpdateGoalDto): Observable<void> {
+  updateGoal(id: number | null, updateGoalDto: UpdateGoalDto): Observable<void> {
     return this.http.put<void>(`${this.apiUrl}/${id}/update`, updateGoalDto);
   }
 }

@@ -1,6 +1,11 @@
-import { FriendShipStatus } from '../models/friendship-status.enum'; // Assuming you have this enum defined
+import { FriendshipStatus } from '../enums/friendship-status.enum'; // Ensure this path is correct
 
 export interface FriendshipDto {
-  receiverId: number;
-  status: FriendShipStatus;
+  id: number;
+  requesterId: number;
+  requesterUsername: string;
+  responderId: number;
+  responderUsername: string;
+  status: FriendshipStatus;
+  lastUpdate: string; // ISO string
 }

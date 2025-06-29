@@ -24,7 +24,9 @@ import jakarta.persistence.Id;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import lombok.AccessLevel;
@@ -32,154 +34,112 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Setter; // Add Setter if you use it or need it for internal logic, otherwise just Getter
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.proxy.HibernateProxy;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Slf4j
 @Entity
+@Getter // Use @Getter at class level for all fields to have getters
+@Setter // Use @Setter at class level if you want setters for all fields
 @Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED) // Good practice for JPA entities
+@AllArgsConstructor
 @Table(name = "capsules")
 public class Capsule {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Setter(AccessLevel.NONE)
     private Long id;
 
-    @Column(name = "capsule_name", nullable = false)
+    @Column(name = "capsule_name", nullable = false, length = 100) // Increased length for flexibility
     private String capsuleName;
 
-    @Column(nullable = false)
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "created_by_id")
+    private UserModel creator;
+
+    @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
-    @Setter(AccessLevel.NONE)
     private CapsuleStatus status;
 
-    @Column(name = "creation_date", updatable = false, nullable = false)
-    @Setter(AccessLevel.NONE)
+    @Column(name = "creation_date", nullable = false, updatable = false)
     private LocalDateTime creationDate;
 
     @Column(name = "lock_date")
-    @Setter(AccessLevel.NONE)
     private LocalDateTime lockDate;
 
     @Column(name = "open_date")
-    @Setter(AccessLevel.NONE)
-    private LocalDateTime openDate;
+    private LocalDateTime openDateTime;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by_id", nullable = false)
-    private UserModel creator;
-
+    // This is the OWNING side of the @OneToOne relationship from Capsule's perspective.
+    // The foreign key (goal_id) will be in the 'capsules' table.
+    // CascadeType.ALL and orphanRemoval=true ensure that when a Capsule is deleted,
+    // its associated Goal is also deleted.
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "goal_id")
-    @Setter(AccessLevel.NONE)
+    @JoinColumn(name = "goal_id", unique = true, nullable = true) // 'nullable = true' if a Capsule can exist without a Goal initially
     private Goal goal;
 
+    // This remains the same: Capsule owns Memories, which are deleted when Capsule is deleted.
     @OneToMany(mappedBy = "capsule", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @Setter(AccessLevel.NONE)
-    @Getter(AccessLevel.NONE)
-    private Set<Memory> memoryEntries;
+    private Set<Memory> memoryEntries = new HashSet<>();
 
-    public Capsule(String capsuleName, UserModel creator,
-                   Goal goal) {
-        if (capsuleName == null || creator == null ||
-            goal == null) {
-            throw new IllegalArgumentException("Null reference in CapsuleEntity constructor. ");
+
+    // This method ensures capsule is CREATED before changing name
+    public void changeCapsuleName(String newCapsuleName) {
+        if (status != CapsuleStatus.CREATED) {
+            throw new CapsuleHasBeenLocked("Cannot change the name of a capsule that is not in CREATED status.");
         }
+        this.capsuleName = newCapsuleName;
+    }
 
-        this.capsuleName = capsuleName;
-        this.creator = creator;
+    // This method needs to be called in a service when updating the goal's association or content
+    public void setGoal(Goal goal) {
+        if (this.goal != null && !this.goal.equals(goal)) {
+            // Remove old back-reference if existing goal is being replaced
+            this.goal.setCapsule(null);
+        }
         this.goal = goal;
-        this.memoryEntries = new HashSet<>();
-
-        this.status = CapsuleStatus.CREATED;
-        this.creationDate = LocalDateTime.now();
-    }
-
-    public void lock(LocalDateTime openDate) {
-        lockDate = LocalDateTime.now();
-        status = CapsuleStatus.CLOSED;
-        this.openDate = openDate;
-    }
-
-    private void checkIfCapsuleEditable() {
-        if (status == CapsuleStatus.CLOSED) {
-            throw new CapsuleHasBeenLocked("Can not view or add memories or change the goal of a locked capsule");
-        }
-        if (status == CapsuleStatus.OPEN) {
-            throw new CapsuleIsOpened("Can not add memories or change the capsules goal after a capsule has been locked and opened");
+        if (goal != null) {
+            goal.setCapsule(this); // Set the back-reference
         }
     }
 
-    public void setMemoryEntries(Set<Memory> memoryEntries) {
-        if (memoryEntries == null) {
-            throw new IllegalArgumentException("Null reference in CapsuleEntity::setMemoryEntries(). ");
-        }
-
-        checkIfCapsuleEditable();
-
-        this.memoryEntries = memoryEntries;
-    }
-
+    // This method needs to be called in a service when adding/removing memories
     public void addMemory(Memory memory) {
-        if (memory == null) {
-            throw new IllegalArgumentException("Null reference in CapsuleEntity::addMemory(). ");
-        }
-
-        checkIfCapsuleEditable();
-
+        // This is where you would call checkIfCapsuleEditable() if you want to prevent
+        // adding memories to CLOSED or OPEN capsules.
+        // checkIfCapsuleEditable(); // <-- Call here or in CapsuleService.saveMemory
         this.memoryEntries.add(memory);
+        memory.setCapsule(this);
     }
 
     public void removeMemory(Memory memory) {
-        if (memory == null) {
-            throw new IllegalArgumentException("Null reference in CapsuleEntity::removeMemory(). ");
-        }
-
-        checkIfCapsuleEditable();
-
+        // This is where you would call checkIfCapsuleEditable() if you want to prevent
+        // removing memories from CLOSED or OPEN capsules.
+        // checkIfCapsuleEditable(); // <-- Call here or in CapsuleService.deleteMemory
         this.memoryEntries.remove(memory);
-    }
-
-    public void setGoal(Goal goal) {
-        if (goal == null) {
-            throw new IllegalArgumentException("Null reference in CapsuleEntity::setGoal");
-        }
-
-        checkIfCapsuleEditable();
-
-        this.goal = goal;
-        goal.setCapsule(this);
-    }
-
-    public void setOpenDate(LocalDateTime openDate) {
-        if (openDate == null) {
-            throw new IllegalArgumentException("Null reference in CapsuleEntity::setOpenDate");
-        }
-
-        switch (status) {
-            case CapsuleStatus.CREATED ->  throw new CapsuleIsNotClosedYet("Trying to change the openDate of a capsule which is not locked");
-            case CapsuleStatus.OPEN -> throw new CapsuleIsOpened("Trying to change the openDate of opened capsule");
-            case CapsuleStatus.CLOSED ->  this.openDate = openDate;
-        }
-    }
-
-    public Set<Memory> getMemoryEntries() {
-        checkIfCapsuleEditable();
-
-        return memoryEntries;
-    }
-
-    public boolean isTimeToOpen() {
-        return openDate.isBefore(LocalDateTime.now());
+        memory.setCapsule(null); // Detach
     }
 
     public void open() {
-        switch (status) {
-            case CapsuleStatus.CREATED ->  throw new CapsuleIsNotClosedYet("Trying to open a capsule which is not locked");
-            case CapsuleStatus.OPEN -> throw new CapsuleIsOpened("Trying to open an opened capsule");
-            case CapsuleStatus.CLOSED ->  status = CapsuleStatus.OPEN;
+        if (status != CapsuleStatus.CLOSED) {
+            throw new CapsuleIsNotClosedYet("Trying to open a capsule which is not in CLOSED status.");
+        }
+        if (openDateTime == null || openDateTime.isAfter(LocalDateTime.now())) {
+            throw new CapsuleIsNotClosedYet("Cannot open capsule before its scheduled open date.");
+        }
+        this.status = CapsuleStatus.OPEN;
+    }
+
+    // This method is now ONLY for internal validation where needed, NOT in getters
+    // It is `private` because it's an internal helper
+    private void throwIfNotEditable() { // Renamed for clarity: it throws if NOT editable
+        if (this.status == CapsuleStatus.CLOSED) {
+            throw new CapsuleHasBeenLocked("Capsule is locked. Cannot perform this action.");
+        }
+        if (this.status == CapsuleStatus.OPEN) {
+            throw new CapsuleIsOpened("Capsule is opened. Cannot perform this action.");
         }
     }
 
@@ -188,14 +148,48 @@ public class Capsule {
         Goal goal = Goal.builder()
             .content(goalDto.getContent())
             .creator(creator)
-            .isAchieved(false)
+            .isAchieved(goalDto.isAchieved())
             .isVisible(goalDto.isVisible())
             .creationDate(LocalDate.now())
             .build();
-        return new Capsule(
+
+        // Create the capsule
+        Capsule newCapsule = new Capsule(
             capsuleCreateDto.getCapsuleName(),
             creator,
-            goal
+            CapsuleStatus.CREATED,
+            LocalDateTime.now(), // creationDate
+            null, // lockDate
+            null // openDateTime
         );
+        newCapsule.setGoal(goal); // Associate goal with capsule
+
+        return newCapsule;
     }
+
+    // You might need a more comprehensive constructor if using @AllArgsConstructor with specific fields
+    // This constructor matches the fields used in fromDTOAndUser for clarity
+    public Capsule(String capsuleName, UserModel creator, CapsuleStatus status, LocalDateTime creationDate, LocalDateTime lockDate, LocalDateTime openDateTime) {
+        this.capsuleName = capsuleName;
+        this.creator = creator;
+        this.status = status;
+        this.creationDate = creationDate;
+        this.lockDate = lockDate;
+        this.openDateTime = openDateTime;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || (getClass() != o.getClass() && !(o instanceof HibernateProxy))) return false;
+        Capsule capsule = (Capsule) (o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getImplementation() : o);
+        return id != null && Objects.equals(id, capsule.id);
+    }
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+        // Alternatively, if IDs are generated very early and are unique:
+        // return id != null ? id.hashCode() : 0;
+    }
+
 }

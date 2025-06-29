@@ -25,22 +25,46 @@
         <div *ngIf="loadingCapsules" class="loading-message">Loading capsules...</div>
         <div *ngIf="!loadingCapsules && myCapsules.length === 0" class="no-data-message">No capsules found.</div>
         <div *ngIf="!loadingCapsules && myCapsules.length > 0" class="capsule-grid">
-          <div *ngFor="let capsule of myCapsules" class="capsule-card">
+          <div *ngFor="let capsule of myCapsules" class="capsule-card" [routerLink]="['/capsules', capsule.id]">
             <h3>{{ capsule.capsuleName }}</h3>
             <p>Status: **{{ capsule.status }}**</p>
-            <p>Open Date: {{ capsule.openDate | date:'shortDate' }}</p>
+            <p>Open Date: {{ capsule.openDateTime ? (capsule.openDateTime | date:'shortDate') : 'Not Set' }}</p>
           </div>
         </div>
       </div>
 
       <!-- Right Column: Friends Sidebar -->
       <div class="friends-sidebar">
-        <h2 class="section-heading">My Friends</h2>
+        <!-- New Button Position -->
+        <div class="friends-sidebar-header">
+          <h2 class="section-heading">My Friends</h2>
+          <button class="connect-users-button" [routerLink]="['/users']">
+            Connect with other users
+          </button>
+        </div>
+
         <div *ngIf="loadingFriendships" class="loading-message">Loading friendships...</div>
         <div *ngIf="!loadingFriendships && myFriendships.length === 0" class="no-data-message">No friends found.</div>
+
         <ul *ngIf="!loadingFriendships && myFriendships.length > 0" class="friend-list">
           <li *ngFor="let friendship of myFriendships" class="friend-item">
-            Friendship with **{{ friendship.responder.username }}** (Status: {{ friendship.status }})
+            <!-- Determine the friend's ID and link to their profile -->
+            <a [routerLink]="['/users', friendship.requesterId === currentUserId ? friendship.responderId : friendship.requesterId, 'capsules']" class="friend-link">
+              <span class="friend-name">
+                {{ friendship.requesterId === currentUserId ? friendship.responderUsername : friendship.requesterUsername }}
+              </span>
+            </a>
+            <span class="friend-status status-{{ friendship.status?.toLowerCase() }}">
+              {{ friendship.status === FriendshipStatus.PENDING ? (friendship.responderId === currentUserId ? 'Invitation Received' : 'Invitation Sent') : friendship.status }}
+            </span>
+
+            <div class="friend-actions">
+              <!-- Accept/Decline buttons for received pending invitations -->
+              <ng-container *ngIf="friendship.status === FriendshipStatus.PENDING && friendship.responderId === currentUserId">
+                <button class="action-button accept-button" (click)="acceptFriendRequest(friendship.id)">Accept</button>
+                <button class="action-button decline-button" (click)="declineFriendRequest(friendship.id)">Decline</button>
+              </ng-container>
+            </div>
           </li>
         </ul>
       </div>
@@ -50,69 +74,169 @@
   <!-- Create Capsule Dialog (Modal) -->
   <div class="modal-overlay" *ngIf="showCreateCapsuleDialog">
     <div class="modal-content">
-      <h3 class="modal-heading">Create New Time Capsule</h3>
-      <form (ngSubmit)="submitCreateCapsule()" class="modal-form">
-        <div class="form-group">
-          <label for="capsuleName" class="form-label">Capsule Name</label>
-          <input
-            type="text"
-            id="capsuleName"
-            name="capsuleName"
-            [(ngModel)]="newCapsuleData.capsuleName"
-            class="form-input"
-            placeholder="e.g., My 2025 Vision, Memories of Summer"
-            required
-            maxlength="20"
-          />
+      <div class="modal-header-tabs">
+        <button
+          class="modal-tab-button"
+          [ngClass]="{'active': currentModalTab === 'capsule'}"
+          (click)="switchToCapsuleTab()"
+        >
+          Capsule Details
+        </button>
+        <button
+          class="modal-tab-button"
+          [ngClass]="{'active': currentModalTab === 'memory'}"
+          (click)="switchToMemoryTab()"
+          [disabled]="!createdCapsuleId"
+        >
+          Add Memory
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Capsule Details Tab Content -->
+        <div *ngIf="currentModalTab === 'capsule'">
+          <h3 class="modal-heading">Create New Time Capsule</h3>
+          <form (ngSubmit)="submitCreateCapsule()" class="modal-form">
+            <div class="form-group">
+              <label for="capsuleName" class="form-label">Capsule Name</label>
+              <input
+                type="text"
+                id="capsuleName"
+                name="capsuleName"
+                [(ngModel)]="newCapsuleData.capsuleName"
+                class="form-input"
+                placeholder="e.g., My 2025 Vision, Memories of Summer"
+                required
+                maxlength="100"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="openDateTime" class="form-label">Open Date (Optional)</label>
+              <input
+                type="datetime-local"
+                id="openDateTime"
+                name="openDateTime"
+                [(ngModel)]="newCapsuleData.openDateTime"
+                class="form-input"
+              />
+              <small class="form-text-hint">Set a future date for the capsule to automatically open and reveal its contents.</small>
+            </div>
+
+            <div class="form-group">
+              <label for="goalContent" class="form-label">Your Goal Content</label>
+              <textarea
+                id="goalContent"
+                name="goalContent"
+                [(ngModel)]="newCapsuleData.goal.content"
+                class="form-input textarea-input"
+                placeholder="What is a significant goal you want to achieve or remember?"
+                required
+                rows="3"
+              ></textarea>
+            </div>
+
+            <div class="form-group checkbox-group">
+              <input
+                type="checkbox"
+                id="goalVisible"
+                name="goalVisible"
+                [(ngModel)]="newCapsuleData.goal.isVisible"
+                class="form-checkbox"
+              />
+              <label for="goalVisible" class="form-label-checkbox">Goal Visible (to friends)</label>
+            </div>
+
+            <div *ngIf="dialogMessages.length > 0" class="dialog-messages">
+              <div *ngFor="let msg of dialogMessages" [ngClass]="{'message-box': true, 'success': msg.type === 'success', 'error': msg.type === 'error'}">
+                {{ msg.text }}
+              </div>
+            </div>
+
+            <div class="modal-actions">
+              <button type="submit" class="modal-submit-button" [disabled]="loadingCreateCapsule">
+                <span *ngIf="!loadingCreateCapsule">Create Capsule</span>
+                <span *ngIf="loadingCreateCapsule" class="loading-spinner-container">
+                  <svg class="spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Creating...
+                </span>
+              </button>
+              <button type="button" class="modal-cancel-button" (click)="closeCreateCapsuleDialog()">
+                Cancel
+              </button>
+            </div>
+          </form>
         </div>
 
-        <div class="form-group">
-          <label for="goalContent" class="form-label">Your Goal Content</label>
-          <textarea
-            id="goalContent"
-            name="goalContent"
-            [(ngModel)]="newCapsuleData.goal.content"
-            class="form-input textarea-input"
-            placeholder="What is a significant goal you want to achieve or remember?"
-            required
-            rows="3"
-          ></textarea>
-        </div>
+        <div *ngIf="currentModalTab === 'memory'">
+          <h3 class="modal-heading">Add Memory to Capsule {{ newCapsuleData.capsuleName }}</h3>
+          <form (ngSubmit)="submitCreateMemory()" class="modal-form">
+            <div class="form-group">
+              <label for="memoryDescription" class="form-label">Description</label>
+              <textarea
+                id="memoryDescription"
+                name="memoryDescription"
+                [(ngModel)]="newMemoryData.description"
+                class="form-input textarea-input"
+                placeholder="Describe this memory"
+                rows="3"
+                required
+              ></textarea>
+            </div>
 
-        <div class="form-group checkbox-group">
-          <input
-            type="checkbox"
-            id="goalVisible"
-            name="goalVisible"
-            [(ngModel)]="newCapsuleData.goal.isVisible"
-            class="form-checkbox"
-          />
-          <label for="goalVisible" class="form-label-checkbox">Goal Visible (to friends)</label>
-        </div>
+            <div class="form-group">
+              <label for="memoryType" class="form-label">Memory Type</label>
+              <select
+                id="memoryType"
+                name="memoryType"
+                [(ngModel)]="newMemoryData.type"
+                class="form-input select-input"
+                required
+              >
+                <option value="" disabled selected>Select a type</option>
+                <option *ngFor="let type of memoryTypes" [value]="type">{{ type }}</option>
+              </select>
+            </div>
 
-        <!-- Dialog-specific messages -->
-        <div *ngIf="dialogMessages.length > 0" class="dialog-messages">
-          <div *ngFor="let msg of dialogMessages" [ngClass]="{'message-box': true, 'success': msg.type === 'success', 'error': msg.type === 'error'}">
-            {{ msg.text }}
-          </div>
-        </div>
+            <div class="form-group">
+              <label for="memoryContent" class="form-label">Content (File)</label>
+              <input
+                type="file"
+                id="memoryContent"
+                name="memoryContent"
+                (change)="onFileSelected($event)"
+                class="form-input file-input"
+                required
+              />
+            </div>
 
-        <div class="modal-actions">
-          <button type="submit" class="modal-submit-button" [disabled]="loadingCreateCapsule">
-            <span *ngIf="!loadingCreateCapsule">Create Capsule</span>
-            <span *ngIf="loadingCreateCapsule" class="loading-spinner-container">
-              <svg class="spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              Creating...
-            </span>
-          </button>
-          <button type="button" class="modal-cancel-button" (click)="closeCreateCapsuleDialog()">
-            Cancel
-          </button>
+            <div *ngIf="dialogMessages.length > 0" class="dialog-messages">
+              <div *ngFor="let msg of dialogMessages" [ngClass]="{'message-box': true, 'success': msg.type === 'success', 'error': msg.type === 'error'}">
+                {{ msg.text }}
+              </div>
+            </div>
+
+            <div class="modal-actions">
+              <button type="submit" class="modal-submit-button" [disabled]="loadingCreateMemory">
+                <span *ngIf="!loadingCreateMemory">Add Memory</span>
+                <span *ngIf="loadingCreateMemory" class="loading-spinner-container">
+                  <svg class="spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Adding...
+                </span>
+              </button>
+              <button type="button" class="modal-cancel-button" (click)="closeCreateCapsuleDialog()">
+                Done / Cancel
+              </button>
+            </div>
+          </form>
         </div>
-      </form>
+      </div>
     </div>
   </div>
 </div>

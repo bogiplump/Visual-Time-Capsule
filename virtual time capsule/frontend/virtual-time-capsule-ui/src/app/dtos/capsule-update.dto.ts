@@ -1,7 +1,13 @@
 import { GoalDto } from './goal.dto';
 
 export interface CapsuleUpdateDto {
-  capsuleName?: string; // Marked as optional based on typical update DTOs
-  openDate: string;     // LocalDateTime in Java maps to string (ISO 8601)
-  goal: GoalDto;
+  capsuleName?: string; // Optional for partial updates
+  openDateTime?: string | null; // Changed from 'openDate' to 'openDateTime'
+  goal?: NestedGoalUpdateDto | null; // Allow goal to be optional or null
+}
+
+export interface NestedGoalUpdateDto {
+  content: string;
+  isAchieved: boolean;
+  isVisible: boolean;
 }

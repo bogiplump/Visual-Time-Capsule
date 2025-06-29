@@ -4,6 +4,7 @@ import com.java.web.virtual.time.capsule.dto.GoalDto;
 import com.java.web.virtual.time.capsule.dto.UpdateGoalDto;
 import com.java.web.virtual.time.capsule.exception.goal.GoalNotFoundException;
 import com.java.web.virtual.time.capsule.exception.goal.GoalNotVisibleException;
+import com.java.web.virtual.time.capsule.mapper.GoalMapper;
 import com.java.web.virtual.time.capsule.model.Capsule;
 import com.java.web.virtual.time.capsule.model.Goal;
 import com.java.web.virtual.time.capsule.model.UserModel;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class GoalServiceImpl implements GoalService {
 
+    private GoalMapper goalMapper;
     private GoalRepository goalRepository;
     private UserRepository userRepository;
     private CapsuleRepository capsuleRepository;
@@ -31,7 +33,7 @@ public class GoalServiceImpl implements GoalService {
     public Goal createGoal(Long capsuleId, GoalDto goalEntity, String creator) {
         Capsule capsule = capsuleRepository.findById(capsuleId).orElseThrow(GoalNotFoundException::new);
         UserModel user = userRepository.findByUsername(creator);
-        Goal goal = Goal.fromDTO(goalEntity,user);
+        Goal goal = goalMapper.toEntity(goalEntity);
         goal.setCapsule(capsule);
         return goalRepository.save(goal);
     }

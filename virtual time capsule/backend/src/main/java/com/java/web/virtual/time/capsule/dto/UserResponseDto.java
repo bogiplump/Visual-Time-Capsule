@@ -29,19 +29,6 @@ public class UserResponseDto {
 
     private List<Friendship> friendships;
 
-    public static UserResponseDto fromUserAndHisFriends(final UserModel user, List<Friendship> friendships) {
-        UserResponseDto userResponseDto = fromUser(user);
-        userResponseDto.friendships = friendships;
-        return userResponseDto;
-    }
+    private String creationDate;
 
-    public static UserResponseDto fromUser(final UserModel user) {
-        final UserResponseDto userResponseDto = new UserResponseDto();
-        userResponseDto.setId(user.getId());
-        userResponseDto.setUsername(user.getUsername());
-        userResponseDto.setFirstName(user.getFirstName());
-        userResponseDto.setLastName(user.getLastName());
-        userResponseDto.setEmail(user.getEmail());
-        return userResponseDto;
-    }
 }

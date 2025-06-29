@@ -1,6 +1,6 @@
-import { MemoryType } from './memory-type.enum';
 import { Capsule } from './capsule.model'; // For the ManyToOne relationship
 import { UserModel } from './user.model';
+import {MemoryType} from '../enums/memory-type.enum';
 
 export interface Memory {
   id: number;

@@ -13,11 +13,13 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.proxy.HibernateProxy;
 
 @Data
 @AllArgsConstructor
@@ -51,6 +53,21 @@ public class Memory {
 
     public Memory() {
 
+    }
+
+    // Manual equals and hashCode for JPA entities
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || (getClass() != o.getClass() && !(o instanceof HibernateProxy))) return false;
+        Memory memory = (Memory) (o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getImplementation() : o);
+        return id != null && Objects.equals(id, memory.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+        // Alternatively: return id != null ? id.hashCode() : 0;
     }
 
 }

@@ -1,26 +1,19 @@
 package com.java.web.virtual.time.capsule.controller;
 
+import com.java.web.virtual.time.capsule.dto.MemoryDto;
 import com.java.web.virtual.time.capsule.dto.CapsuleCreateDto;
+import com.java.web.virtual.time.capsule.dto.CapsuleResponseDto;
 import com.java.web.virtual.time.capsule.dto.CapsuleUpdateDto;
-import com.java.web.virtual.time.capsule.model.Capsule;
-import com.java.web.virtual.time.capsule.model.Goal;
-import com.java.web.virtual.time.capsule.model.Memory;
 import com.java.web.virtual.time.capsule.service.CapsuleService;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.security.Principal;
 import java.util.Set;
 
@@ -33,49 +26,72 @@ public class CapsuleController {
     private final CapsuleService capsuleService;
 
     @PostMapping
-    public ResponseEntity<?> createCapsule(@NotNull @RequestBody CapsuleCreateDto capsuleDto, Principal principal) {
-        Long capsuleId = capsuleService.createCapsule(capsuleDto, principal.getName());
-        URI location = URI.create("/api/v1/capsules/" + capsuleId);
-        return ResponseEntity.created(location).build();
+    public ResponseEntity<CapsuleResponseDto> createCapsule(@Valid @RequestBody CapsuleCreateDto capsuleDto, Principal principal) {
+        log.info("Received request to create capsule: {} for user: {} and openTime: {}", capsuleDto.getCapsuleName(), principal.getName(),capsuleDto.getOpenDateTime());
+        CapsuleResponseDto createdCapsule = capsuleService.createCapsule(capsuleDto, principal.getName());
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdCapsule);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Capsule> getCapsuleById(@NotNull @PathVariable Long id,Principal principal) {
-        return ResponseEntity.ok(capsuleService.getCapsule(id,principal.getName()));
-    }
-
+ 
     @GetMapping("/all")
-    public ResponseEntity<Set<Capsule>> getAllCapsules(Principal principal) {
-        log.info("principal: {}", principal.getName());
-        return ResponseEntity.ok(capsuleService.getAllCapsulesOfUser(principal.getName()));
+    public ResponseEntity<Set<CapsuleResponseDto>> getAllCapsulesOfUser(Principal principal) {
+        log.info("Received request to get all capsules for user: {}", principal.getName());
+        Set<CapsuleResponseDto> capsules = capsuleService.getAllCapsulesOfUser(principal.getName());
+        log.info("Open times {}", capsules.stream().map(CapsuleResponseDto::getOpenDateTime).toList());
+        return ResponseEntity.ok(capsules);
     }
 
-    @PutMapping("/{id}/lock")
-    public ResponseEntity<?> lockCapsule(@NotNull @PathVariable Long id, @NotNull @RequestParam String openDate, Principal principal) {
-        capsuleService.lockCapsule(id, openDate,principal.getName());
-        return ResponseEntity.noContent().build();
+ 
+    @GetMapping("/{id}")
+    public ResponseEntity<CapsuleResponseDto> getCapsule(@NotNull @PathVariable Long id, Principal principal) {
+        log.info("Received request to get capsule with id: {} for user: {}", id, principal.getName());
+        CapsuleResponseDto capsule = capsuleService.getCapsuleById(id, principal.getName());
+        return ResponseEntity.ok(capsule);
     }
 
+ 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateCapsule(@NotNull @PathVariable Long id, @NotNull @RequestBody CapsuleUpdateDto capsuleDto, Principal principal) {
-        capsuleService.updateCapsule(id, capsuleDto, principal.getName());
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<CapsuleResponseDto> updateCapsule(
+        @NotNull @PathVariable Long id,
+        @Valid @RequestBody CapsuleUpdateDto capsuleDto, // Now expects CapsuleUpdateDto with nested GoalUpdatePartDto
+        Principal principal) {
+        log.info("Received request to update capsule with id: {} for user: {}", id, principal.getName());
+        CapsuleResponseDto updatedCapsule = capsuleService.updateCapsule(id, capsuleDto, principal.getName());
+        return ResponseEntity.ok(updatedCapsule);
     }
 
+ 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteCapsule(@NotNull @PathVariable Long id, Principal principal) {
-        capsuleService.deleteCapsule(id,principal.getName());
+    public ResponseEntity<Void> deleteCapsule(@NotNull @PathVariable Long id, Principal principal) {
+        log.info("Received request to delete capsule with id: {} for user: {}", id, principal.getName());
+        capsuleService.deleteCapsule(id, principal.getName());
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{id}/memories")
-    public ResponseEntity<Set<Memory>> getMemoriesForCapsule(@NotNull @PathVariable Long id, Principal principal) {
-        Set<Memory> memories = capsuleService.getMemoriesFromCapsule(id,principal.getName());
-        return ResponseEntity.ok(memories);
+ 
+    @PutMapping("/{id}/lock")
+    public ResponseEntity<CapsuleResponseDto> lockCapsule(
+        @NotNull @PathVariable Long id,
+        @NotNull @RequestParam String openDate, // This parameter is still directly here for locking specific path
+        Principal principal) {
+        log.info("Received request to lock capsule with id: {} for user: {} with openDate: {}", id, principal.getName(), openDate);
+        CapsuleResponseDto lockedCapsule = capsuleService.lockCapsule(id, openDate, principal.getName());
+        return ResponseEntity.ok(lockedCapsule);
     }
 
-    @GetMapping("/{id}/goal")
-    public ResponseEntity<Goal> getGoalForCapsule(@NotNull @PathVariable Long id, Principal principal) {
-        return ResponseEntity.ok(capsuleService.getGoalForCapsule(id,principal.getName()));
+ 
+    @PutMapping("/{id}/open")
+    public ResponseEntity<CapsuleResponseDto> openCapsule(@NotNull @PathVariable Long id, Principal principal) {
+        log.info("Received request to open capsule with id: {} for user: {}", id, principal.getName());
+        CapsuleResponseDto openedCapsule = capsuleService.openCapsule(id, principal.getName());
+        return ResponseEntity.ok(openedCapsule);
+    }
+
+ 
+    @GetMapping("/{id}/memories")
+    public ResponseEntity<Set<MemoryDto>> getMemoriesForCapsule(@NotNull @PathVariable Long id, Principal principal) {
+        log.info("Received request to get memories for capsule with id: {} for user: {}", id, principal.getName());
+        Set<MemoryDto> memories = capsuleService.getMemoriesFromCapsule(id, principal.getName());
+        return ResponseEntity.ok(memories);
     }
 }

@@ -4,14 +4,17 @@ import { Observable } from 'rxjs';
 import { UserResponseDto } from '../dtos/user-response.dto';
 import { GoalDto } from '../dtos/goal.dto';
 import { FriendshipDto } from '../dtos/friendship.dto';
+import {CapsuleResponseDto} from '../dtos/capsule-response.dto';
+import {environment} from '../../environments/environment';
+import {map} from 'rxjs/operators';
+import {UserProfileDto} from '../dtos/user-profile.dto';
+import {FriendshipStatus} from '../enums/friendship-status.enum';
 
 // Define a placeholder for UserUpdateDto if not yet created.
-// In a real app, you would have this as a separate file.
 export interface UserUpdateDto {
   firstName?: string;
   lastName?: string;
   email?: string;
-  // Add other updatable fields as per your backend's UserUpdateDto
 }
 
 
@@ -19,8 +22,7 @@ export interface UserUpdateDto {
   providedIn: 'root'
 })
 export class UserService {
-  // Assuming the base path for user-related operations is /api/v1/users
-  private apiUrl = 'http://localhost:8080/api/v1/users'; // Adjust to your backend URL
+  private apiUrl = `${environment.backendUrl}/api/v1/users`;
 
   constructor(private http: HttpClient) { }
 
@@ -30,6 +32,14 @@ export class UserService {
    */
   getUserProfile(id: number): Observable<UserResponseDto> {
     return this.http.get<UserResponseDto>(`${this.apiUrl}/${id}`);
+  }
+
+  /**
+   * Retrieves all capsules for a specific user ID.
+   * GET /api/v1/users/{id}/capsules
+   */
+  getUserCapsules(userId: number): Observable<CapsuleResponseDto[]> {
+    return this.http.get<CapsuleResponseDto[]>(`${this.apiUrl}/${userId}/capsules`);
   }
 
   /**
@@ -50,20 +60,23 @@ export class UserService {
 
   /**
    * Sends a friendship invitation to another user.
-   * POST /api/v1/users/friendship/{id}
-   * 'id' here is the receiverId based on the controller.
+   * Corresponds to backend: POST /api/v1/users/friendship/{id} where {id} is responderId.
+   * @param responderId The ID of the user to send a friend request to.
    */
-  createFriendshipInvitation(receiverId: number): Observable<string> {
-    return this.http.post<string>(`${this.apiUrl}/friendship/${receiverId}`, null);
+  sendFriendRequest(responderId: number): Observable<string> {
+    return this.http.post(`${this.apiUrl}/friendship/${responderId}`, null, { responseType: 'text' });
   }
 
   /**
-   * Answers a friendship invitation (accept/decline/block).
-   * PUT /api/v1/users/friendship/{id}
-   * 'id' here is the friendship ID from the path variable, not receiverId.
+   * Answers a friendship invitation (accept/decline).
+   * Corresponds to backend: PUT /api/v1/users/friendship/{id} where {id} is the friendshipId
+   * and the body contains the FriendshipDto with the updated status.
+   * @param friendshipId The ID of the friendship record to update.
+   * @param friendshipDto The FriendshipDto containing the updated status (e.g., ACCEPTED, DECLINED).
    */
-  updateFriendship(friendshipId: number, friendshipDto: FriendshipDto): Observable<string> {
-    return this.http.put<string>(`${this.apiUrl}/friendship/${friendshipId}`, friendshipDto);
+  answerFriendshipInvitation(friendshipId: number, friendshipDto: FriendshipDto): Observable<string> {
+    console.log(friendshipId);
+    return this.http.put(`${this.apiUrl}/friendship/${friendshipId}`, friendshipDto, { responseType: 'text' });
   }
 
   /**
@@ -72,5 +85,68 @@ export class UserService {
    */
   getUserGoals(userId: number): Observable<GoalDto[]> {
     return this.http.get<GoalDto[]>(`${this.apiUrl}/${userId}/goals`);
+  }
+
+  /**
+   * Retrieves all users (excluding the current one) for display.
+   * GET /api/v1/users
+   */
+  getAllUsers(): Observable<UserProfileDto[]> {
+    console.log('UserService: Making HTTP GET request to:', this.apiUrl);
+    return this.http.get<any[]>(this.apiUrl).pipe(
+      map(rawUsersData => {
+        console.log('UserService: Raw data received from HTTP client (before manual mapping):', rawUsersData);
+
+        const mappedUsers: UserProfileDto[] = rawUsersData.map(rawUser => {
+          // Perform a deep clone of the rawUser object
+          // This creates a plain JavaScript object from the JSON string,
+          // stripping away any potential hidden properties or getter/setter issues
+          // that might be present on the object returned by HttpClient.
+          const clonedRawUser = JSON.parse(JSON.stringify(rawUser));
+
+          console.log('  Inside map callback - clonedRawUser:', clonedRawUser);
+          console.log('    clonedRawUser.id:', clonedRawUser.id);
+          console.log('    clonedRawUser.username:', clonedRawUser.username);
+          console.log('    clonedRawUser.friendshipStatus:', clonedRawUser.friendshipStatus);
+          console.log('    clonedRawUser.associatedFriendshipId:', clonedRawUser.associatedFriendshipId);
+          console.log('    clonedRawUser.isRequestFromCurrentUser:', clonedRawUser.isRequestFromCurrentUser);
+          console.log('    clonedRawUser.isRequestToCurrentUser:', clonedRawUser.isRequestToCurrentUser);
+
+          // Now, map from the cloned object
+          const userProfile: UserProfileDto = {
+            id: clonedRawUser.id,
+            username: clonedRawUser.username,
+            friendshipStatus: clonedRawUser.friendshipStatus as FriendshipStatus, // Explicitly cast the string to enum type
+            associatedFriendshipId: clonedRawUser.associatedFriendshipId,
+            isRequestFromCurrentUser: clonedRawUser.isRequestFromCurrentUser,
+            isRequestToCurrentUser: clonedRawUser.isRequestToCurrentUser
+          };
+
+          console.log('  Inside map callback - created userProfile:', userProfile);
+          return userProfile;
+        });
+
+        console.log('UserService: Data after manual mapping to UserProfileDto (final service output):', mappedUsers);
+        return mappedUsers;
+      })
+    );
+  }
+
+  /**
+   * Retrieves public capsules for a user.
+   * GET /api/v1/users/{userId}/capsules/public
+   */
+  getPublicCapsulesByUserId(userId: number): Observable<CapsuleResponseDto[]> {
+    console.log(`UserService: Making HTTP GET request to public capsules for user ${userId}:`, `${this.apiUrl}/${userId}/capsules`);
+    return this.http.get<CapsuleResponseDto[]>(`${this.apiUrl}/${userId}/capsules`);
+  }
+
+  /**
+   * Retrieves all friendships for a given user.
+   * Corresponds to backend: GET /api/v1/users/{id}/friendships
+   * @param userId The ID of the user whose friendships to retrieve.
+   */
+  getFriendships(userId: number | null): Observable<FriendshipDto[]> {
+    return this.http.get<FriendshipDto[]>(`${this.apiUrl}/${userId}/friendships`);
   }
 }

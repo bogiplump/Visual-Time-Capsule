@@ -85,26 +85,41 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version> <!-- Ensure this version is compatible -->
                 <configuration>
                     <annotationProcessorPaths>
+                        <!-- 1. Lombok's processor MUST come first -->
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
-                            <version>${lombok.version}</version> </path>
-                        <path>
-                            <groupId>org.mapstruct</groupId>
-                            <artifactId>mapstruct-processor</artifactId>
-                            <version>${mapstruct.version}</version> </path>
+                            <version>${lombok.version}</version> <!-- Verify this property is defined -->
+                        </path>
+                        <!-- 2. Lombok-MapStruct binding (crucial bridge) -->
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok-mapstruct-binding</artifactId>
-                            <version>0.2.0</version> </path>
+                            <version>0.2.0</version> <!-- This version is for MapStruct 1.5.x -->
+                        </path>
+                        <!-- 3. MapStruct's processor MUST come after Lombok -->
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${mapstruct.version}</version> <!-- Verify this property is defined -->
+                        </path>
                     </annotationProcessorPaths>
+                    <compilerArgs>
+                        <!-- NEW: Add this argument -->
+                        <arg>-parameters</arg>
+                        <!-- Keep your existing MapStruct arg -->
+                        <arg>-Amapstruct.defaultComponentModel=spring</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
+            <!-- Include your spring-boot-maven-plugin here if it's part of your project -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <!-- ... your existing configuration ... -->
             </plugin>
         </plugins>
     </build>

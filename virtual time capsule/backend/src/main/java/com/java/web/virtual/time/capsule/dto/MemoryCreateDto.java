@@ -7,7 +7,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Data
 public class MemoryCreateDto {
-    private String name;
     private String description;
     private MemoryType type;
     private MultipartFile content;
