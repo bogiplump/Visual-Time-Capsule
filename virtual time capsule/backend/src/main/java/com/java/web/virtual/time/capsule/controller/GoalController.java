@@ -12,7 +12,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,7 +36,7 @@ public class GoalController {
         return ResponseEntity.ok(goalService.getGoal(id));
     }
 
-    @PostMapping("/")
+    @PostMapping("/capsule/{id}")
     public ResponseEntity<Goal> createGoal(@RequestParam Long capsuleId,@RequestBody @Valid GoalDto goalDto, Principal principal) {
         goalService.createGoal(capsuleId, goalDto,principal.getName());
         return ResponseEntity.status(HttpStatus.CREATED).build();

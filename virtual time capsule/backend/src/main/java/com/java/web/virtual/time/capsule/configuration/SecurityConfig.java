@@ -1,4 +1,4 @@
-package com.java.web.virtual.time.capsule.config;
+package com.java.web.virtual.time.capsule.configuration;
 
 import com.java.web.virtual.time.capsule.filter.JwtFilter;
 import com.java.web.virtual.time.capsule.repository.UserRepository; // NEW: Import UserRepository
