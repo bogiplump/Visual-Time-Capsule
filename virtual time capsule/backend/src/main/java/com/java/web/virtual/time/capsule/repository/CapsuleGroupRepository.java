@@ -9,6 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface CapsuleGroupRepository extends JpaRepository<CapsuleGroup, Long> {
-    @Query("SELECT DISTINCT g FROM CapsuleGroupEntity g JOIN g.capsules c WHERE c.creator.id = :userId")
+    @Query("SELECT DISTINCT g FROM CapsuleGroup g JOIN g.capsules c WHERE c.creator.id = :userId")
     List<CapsuleGroup> findDistinctByCapsulesCreatorId(@Param("userId") Long userId);
 }

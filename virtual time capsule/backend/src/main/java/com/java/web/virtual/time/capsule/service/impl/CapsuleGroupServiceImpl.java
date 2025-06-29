@@ -8,7 +8,11 @@ import com.java.web.virtual.time.capsule.model.CapsuleGroup;
 
 import com.java.web.virtual.time.capsule.repository.CapsuleGroupRepository;
 
+import com.java.web.virtual.time.capsule.repository.CapsuleRepository;
+import com.java.web.virtual.time.capsule.repository.UserRepository;
 import com.java.web.virtual.time.capsule.service.CapsuleGroupService;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +26,10 @@ import org.springframework.stereotype.Service;
 public class CapsuleGroupServiceImpl implements CapsuleGroupService {
     @Autowired
     private CapsuleGroupRepository capsuleGroupRepository;
+    @Autowired
+    private CapsuleRepository capsuleRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
     public List<CapsuleGroup> getAllCapsuleGroupsByUserId(Long userId) {
@@ -29,13 +37,16 @@ public class CapsuleGroupServiceImpl implements CapsuleGroupService {
     }
 
     @Override
-    public void createCapsuleGroup(CreateGroupDto createGroupDto) {
+    public void createCapsuleGroup(CreateGroupDto createGroupDto, String user) {
         CapsuleGroup groupEntity = new CapsuleGroup();
 
         groupEntity.setName(createGroupDto.getName());
         groupEntity.setTheme(createGroupDto.getTheme());
         groupEntity.setOpenTime(createGroupDto.getOpenTime());
         groupEntity.setTimeBetweenCapsules(createGroupDto.getTimeBetweenCapsules());
+        groupEntity.setCapsules(capsuleRepository.findAllByIdIn(createGroupDto.getCapsuleIds()));
+        groupEntity.setTimeOfCreation(LocalDateTime.now());
+        groupEntity.setCreator(userRepository.findByUsername(user));
 
         capsuleGroupRepository.save(groupEntity);
     }
@@ -63,6 +74,9 @@ public class CapsuleGroupServiceImpl implements CapsuleGroupService {
         }
         if (groupUpdateDto.getTimeBetweenCapsules() != null) {
             group.setTimeBetweenCapsules(groupUpdateDto.getTimeBetweenCapsules());
+        }
+        if (groupUpdateDto.getCapsuleIds() != null) {
+            group.setCapsules(capsuleRepository.findAllById(groupUpdateDto.getCapsuleIds()));
         }
 
         capsuleGroupRepository.save(group);

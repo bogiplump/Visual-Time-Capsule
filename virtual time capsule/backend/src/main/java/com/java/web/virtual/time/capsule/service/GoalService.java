@@ -7,9 +7,8 @@ import com.java.web.virtual.time.capsule.model.Goal;
 import java.util.List;
 
 public interface GoalService {
-
     void createGoal(Long capsuleId, GoalCreateDto goalCreateDto, String creator);
-
+  
     void updateGoal(Long id, UpdateGoalDto updateGoalDto);
 
     void deleteGoal(Long id);

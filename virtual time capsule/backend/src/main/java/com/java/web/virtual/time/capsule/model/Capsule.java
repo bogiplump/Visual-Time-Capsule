@@ -73,6 +73,10 @@ public class Capsule {
     @Column(name = "open_date")
     private LocalDateTime openDateTime;
 
+    @ManyToOne
+    @JoinColumn(name = "capsule_group_id")
+    private CapsuleGroup group;
+
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "goal_id", unique = true, nullable = true)
     private Goal goal;

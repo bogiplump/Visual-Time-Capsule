@@ -7,6 +7,7 @@ import com.java.web.virtual.time.capsule.service.CapsuleGroupService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
+import java.security.Principal;
 import lombok.AllArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,13 +28,13 @@ public class CapsuleGroupsController {
     private final CapsuleGroupService capsuleGroupService;
 
     @GetMapping("/user/{id}")
-    public ResponseEntity<?> getGoal(@NotNull @PathVariable Long id) {
-        return ResponseEntity.ok(capsuleGroupService.getAllCapsuleGroupsByUserId(id));
+    public ResponseEntity<?> getGroups(@NotNull @PathVariable Long userId) {
+        return ResponseEntity.ok(capsuleGroupService.getAllCapsuleGroupsByUserId(userId));
     }
 
     @PostMapping("/")
-    public ResponseEntity<?> createGoal(@RequestBody @Valid CreateGroupDto createGroupDto) {
-        capsuleGroupService.createCapsuleGroup(createGroupDto);
+    public ResponseEntity<?> createGroup(@RequestBody @Valid CreateGroupDto createGroupDto, Principal principal) {
+        capsuleGroupService.createCapsuleGroup(createGroupDto, principal.getName());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -43,8 +44,7 @@ public class CapsuleGroupsController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<?> updateGoalContent(@NotNull @PathVariable Long id, @NotNull @RequestBody
-    GroupUpdateDto groupUpdateDto) {
+    public ResponseEntity<?> updateGroupContent(@NotNull @RequestBody GroupUpdateDto groupUpdateDto) {
         capsuleGroupService.updateGroup(groupUpdateDto);
         return ResponseEntity.ok(HttpStatus.OK);
     }

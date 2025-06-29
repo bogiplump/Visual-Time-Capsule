@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -17,7 +18,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.catalina.User;
 
 @Data
 @Builder
@@ -31,6 +31,7 @@ public class CapsuleGroup {
     private Long id;
 
     private String name;
+
     private String theme;
 
     @OneToMany(mappedBy = "group")
@@ -45,7 +46,7 @@ public class CapsuleGroup {
     @Column(name = "created_at")
     private LocalDateTime timeOfCreation;
 
-    @Column(name = "created_by")
     @ManyToOne
-    private User createdById;
+    @JoinColumn(name = "created_by_id", nullable = false)
+    private UserModel creator;
 }
