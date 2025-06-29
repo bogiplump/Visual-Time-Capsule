@@ -32,7 +32,6 @@ public class GoalServiceImpl implements GoalService {
     @Override
     public Goal createGoal(Long capsuleId, GoalDto goalEntity, String creator) {
         Capsule capsule = capsuleRepository.findById(capsuleId).orElseThrow(GoalNotFoundException::new);
-        UserModel user = userRepository.findByUsername(creator);
         Goal goal = goalMapper.toEntity(goalEntity);
         goal.setCapsule(capsule);
         return goalRepository.save(goal);

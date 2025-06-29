@@ -13,7 +13,7 @@ public class GroupUpdateDto {
     private Long id;
     private String name;
     private String theme;
-    private List<Capsule> capsules;
+    private List<Long> capsuleIds;
     private LocalDateTime timeBetweenCapsules;
     private LocalDateTime openTime;
 }

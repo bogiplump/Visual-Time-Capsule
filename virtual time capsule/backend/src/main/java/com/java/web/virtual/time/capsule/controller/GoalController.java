@@ -38,7 +38,7 @@ public class GoalController {
 
     @PostMapping("/capsule/{id}")
     public ResponseEntity<Goal> createGoal(@RequestParam Long capsuleId,@RequestBody @Valid GoalDto goalDto, Principal principal) {
-        goalService.createGoal(capsuleId, goalDto,principal.getName());
+        goalService.createGoal(capsuleId, goalDto, principal.getName());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 

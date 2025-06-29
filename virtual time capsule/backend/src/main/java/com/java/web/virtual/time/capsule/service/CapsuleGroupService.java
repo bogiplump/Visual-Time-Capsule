@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 public interface CapsuleGroupService {
     List<CapsuleGroup> getAllCapsuleGroupsByUserId(Long userId);
 
-    void createCapsuleGroup(CreateGroupDto createGroupDto);
+    void createCapsuleGroup(CreateGroupDto createGroupDto, String user);
 
     List<Capsule> getCapsulesInGroup(Long groupId);
 

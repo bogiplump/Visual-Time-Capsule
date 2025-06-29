@@ -12,5 +12,5 @@ public class CreateGroupDto {
     private String theme;
     private LocalDateTime timeBetweenCapsules;
     private LocalDateTime openTime;
-    private List<CapsuleInfoForGroupDto> capsules;
+    private List<Long> capsuleIds;
 }
