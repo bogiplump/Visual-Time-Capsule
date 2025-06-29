@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface GoalService {
     void createGoal(Long capsuleId, GoalCreateDto goalCreateDto, String creator);
-
+  
     void updateGoal(Long id, UpdateGoalDto updateGoalDto);
 
     void deleteGoal(Long id);

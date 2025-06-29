@@ -23,7 +23,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Table(name = "friendship")
 public class Friendship {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Getter
@@ -38,4 +37,8 @@ public class Friendship {
     private FriendshipStatus status;
 
     private LocalDate lastUpdate;
+
+    public Friendship() {
+
+    }
 }
