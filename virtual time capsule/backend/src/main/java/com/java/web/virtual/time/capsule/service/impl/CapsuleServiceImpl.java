@@ -91,7 +91,7 @@ public class CapsuleServiceImpl implements CapsuleService {
 
         // Check if the current user is the creator or a shared participant
         boolean isCreator = capsule.getCreator().equals(currentUser);
-        boolean isSharedParticipant = capsule.isShared() && capsule.getSharedWithUsers().contains(currentUser);
+        boolean isSharedParticipant = capsule.getIsShared() && capsule.getSharedWithUsers().contains(currentUser);
 
         if (!isCreator && !isSharedParticipant) {
             throw new AccessDeniedException("You do not have access to view this capsule.");
@@ -99,7 +99,7 @@ public class CapsuleServiceImpl implements CapsuleService {
 
         // For response DTO, if it's a shared capsule, populate participant counts
         CapsuleResponseDto dto = capsuleMapper.toDto(capsule);
-        if (capsule.isShared()) {
+        if (capsule.getIsShared()) {
             dto.setTotalParticipantsCount(capsule.getSharedWithUsers().size());
             dto.setReadyParticipantsCount(capsule.getReadyToCloseUsers().size());
             dto.setIsCurrentUserReadyToClose(capsule.getReadyToCloseUsers().contains(currentUser));
@@ -126,7 +126,7 @@ public class CapsuleServiceImpl implements CapsuleService {
         // Populate shared capsule details (counts, current user readiness)
         for (CapsuleResponseDto dto : allCapsules) {
             Optional<Capsule> originalCapsuleOpt = capsuleRepository.findById(dto.getId());
-            if (originalCapsuleOpt.isPresent() && originalCapsuleOpt.get().isShared()) {
+            if (originalCapsuleOpt.isPresent() && originalCapsuleOpt.get().getIsShared()) {
                 Capsule originalCapsule = originalCapsuleOpt.get();
                 dto.setTotalParticipantsCount(originalCapsule.getSharedWithUsers().size());
                 dto.setReadyParticipantsCount(originalCapsule.getReadyToCloseUsers().size());
@@ -147,7 +147,7 @@ public class CapsuleServiceImpl implements CapsuleService {
 
         capsule.addReadyUser(currentUser);
 
-        if (!capsule.getCreator().equals(currentUser)) {
+        if (!capsule.getCreator().equals(currentUser) && !capsule.getSharedWithUsers().contains(currentUser)) {
             throw new AccessDeniedException("Only the creator can lock this capsule.");
         }
 
@@ -157,22 +157,29 @@ public class CapsuleServiceImpl implements CapsuleService {
 
         LocalDateTime openDateTime = parseInputDateTimeToUTC(openDateTimeInString);
 
-        if (capsule.isShared()) {
+        if (capsule.getIsShared()) {
+            log.info("in shared capsule");
             int totalParticipants = capsule.getSharedWithUsers().size();
             int readyParticipants = capsule.getReadyToCloseUsers().size();
             double halfParticipants = (double) totalParticipants / 2.0;
 
-            if (readyParticipants < halfParticipants) {
-                throw new IllegalStateException("Cannot close capsule: Less than half of the participants (" + readyParticipants + "/" + totalParticipants + ") are ready.");
+            if (readyParticipants > halfParticipants) {
+                capsule.setLockDate(LocalDateTime.now(ZoneOffset.UTC));
+                capsule.setOpenDateTime(openDateTime);
+                capsule.setStatus(CapsuleStatus.CLOSED);
             }
+        } else {
+            capsule.setLockDate(LocalDateTime.now(ZoneOffset.UTC));
+            capsule.setOpenDateTime(openDateTime);
+            capsule.setStatus(CapsuleStatus.CLOSED);
         }
 
 
-        capsule.setLockDate(LocalDateTime.now());
-        capsule.setOpenDateTime(openDateTime);
-        capsule.setStatus(CapsuleStatus.CLOSED);
-
-        return capsuleMapper.toDto(capsuleRepository.save(capsule));
+        CapsuleResponseDto capsuleResponseDto = capsuleMapper.toDto(capsuleRepository.save(capsule));
+        capsuleResponseDto.setReadyParticipantsCount(capsule.getReadyToCloseUsers().size());
+        capsuleResponseDto.setTotalParticipantsCount(capsule.getSharedWithUsers().size());
+        capsuleResponseDto.setIsCurrentUserReadyToClose(true);
+        return capsuleResponseDto;
     }
 
     @Override
@@ -183,8 +190,7 @@ public class CapsuleServiceImpl implements CapsuleService {
 
         UserModel currentUser = userRepository.findByUsername(currentUsername);
 
-        // Only creator can update capsule details (name, open date before lock)
-        if (!capsule.getCreator().equals(currentUser)) {
+        if (!capsule.getCreator().equals(currentUser) && !capsule.getSharedWithUsers().contains(currentUser)){
             throw new AccessDeniedException("You do not have permission to update this capsule.");
         }
 
@@ -198,19 +204,19 @@ public class CapsuleServiceImpl implements CapsuleService {
 
         // Update openDateTime if provided (only if not locked yet)
         Optional.ofNullable(capsuleDto.getOpenDateTime())
-            .map(LocalDateTime::parse) // Convert string to LocalDateTime
+            .map(this::parseInputDateTimeToUTC) // Convert string to LocalDateTime
             .ifPresent(capsule::setOpenDateTime);
 
         // Update goal if provided
         if (capsuleDto.getGoal() != null && capsule.getGoal() != null) {
             capsule.getGoal().setContent(capsuleDto.getGoal().getContent());
-            capsule.getGoal().setAchieved(capsuleDto.getGoal().isAchieved());
-            capsule.getGoal().setVisible(capsuleDto.getGoal().isVisible());
+            capsule.getGoal().setIsAchieved(capsuleDto.getGoal().isAchieved());
+            capsule.getGoal().setIsVisible(capsuleDto.getGoal().isVisible());
             goalRepository.save(capsule.getGoal()); // Save the updated goal
         }
 
         // NEW: Handle participant marking themselves "ready to close"
-        if (capsule.isShared() && capsuleDto.getIsReadyToClose() != null) {
+        if (capsule.getIsShared() && capsuleDto.getIsReadyToClose() != null) {
             if (!capsule.getSharedWithUsers().contains(currentUser)) {
                 throw new AccessDeniedException("Only shared participants can mark readiness for this capsule.");
             }
@@ -249,7 +255,7 @@ public class CapsuleServiceImpl implements CapsuleService {
         UserModel currentUser = userRepository.findByUsername(currentUsername);
 
         boolean isCreator = capsule.getCreator().equals(currentUser);
-        boolean isSharedParticipant = capsule.isShared() && capsule.getSharedWithUsers().contains(currentUser);
+        boolean isSharedParticipant = capsule.getIsShared() && capsule.getSharedWithUsers().contains(currentUser);
 
         // Memories are only visible if capsule is OPENED OR if user is creator/shared participant (for adding/managing)
         if (capsule.getStatus() != CapsuleStatus.OPEN && !isCreator && !isSharedParticipant) {
@@ -286,7 +292,7 @@ public class CapsuleServiceImpl implements CapsuleService {
 
         UserModel user = userRepository.findByUsername(currentUsername);
 
-        if (!capsule.isShared() || !capsule.getSharedWithUsers().contains(user)) {
+        if (!capsule.getIsShared() || !capsule.getSharedWithUsers().contains(user)) {
             throw new AccessDeniedException("You are not a participant of this shared capsule.");
         }
 

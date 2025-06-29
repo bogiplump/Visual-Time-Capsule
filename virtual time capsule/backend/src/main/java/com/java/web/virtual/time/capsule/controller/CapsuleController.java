@@ -33,7 +33,6 @@ public class CapsuleController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdCapsule);
     }
 
-    @PreAuthorize("isAuthenticated()")
     @GetMapping("/all")
     public ResponseEntity<Set<CapsuleResponseDto>> getAllCapsulesOfUser(Principal principal) {
         log.info("Received request to get all capsules for user: {}", principal.getName());
@@ -42,7 +41,6 @@ public class CapsuleController {
         return ResponseEntity.ok(capsules);
     }
 
-    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}")
     public ResponseEntity<CapsuleResponseDto> getCapsule(@NotNull @PathVariable Long id, Principal principal) {
         log.info("Received request to get capsule with id: {} for user: {}", id, principal.getName());
@@ -50,7 +48,6 @@ public class CapsuleController {
         return ResponseEntity.ok(capsule);
     }
 
-    @PreAuthorize("isAuthenticated()")
     @PutMapping("/{id}")
     public ResponseEntity<CapsuleResponseDto> updateCapsule(
         @NotNull @PathVariable Long id,
@@ -61,7 +58,6 @@ public class CapsuleController {
         return ResponseEntity.ok(updatedCapsule);
     }
 
-    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCapsule(@NotNull @PathVariable Long id, Principal principal) {
         log.info("Received request to delete capsule with id: {} for user: {}", id, principal.getName());
@@ -69,7 +65,6 @@ public class CapsuleController {
         return ResponseEntity.noContent().build();
     }
 
-    @PreAuthorize("isAuthenticated()")
     @PutMapping("/lock/{id}")
     public ResponseEntity<CapsuleResponseDto> lockCapsule(
         @NotNull @PathVariable Long id,
@@ -80,7 +75,6 @@ public class CapsuleController {
         return ResponseEntity.ok(lockedCapsule);
     }
 
-    @PreAuthorize("isAuthenticated()")
     @PutMapping("/{id}/open")
     public ResponseEntity<CapsuleResponseDto> openCapsule(@NotNull @PathVariable Long id, Principal principal) {
         log.info("Received request to open capsule with id: {} for user: {}", id, principal.getName());
@@ -88,8 +82,6 @@ public class CapsuleController {
         return ResponseEntity.ok(openedCapsule);
     }
 
-    // NEW: Endpoint for users to mark themselves as "ready" to close a shared capsule
-    @PreAuthorize("isAuthenticated()")
     @PutMapping("/{id}/ready-to-close")
     public ResponseEntity<CapsuleResponseDto> markReadyToClose(
         @NotNull @PathVariable Long id,
@@ -99,8 +91,7 @@ public class CapsuleController {
         return ResponseEntity.ok(updatedCapsule);
     }
 
-    // Existing method to get memories for capsule, ensure it returns Set<MemoryDto>
-    @PreAuthorize("isAuthenticated()")
+
     @GetMapping("/{id}/memories")
     public ResponseEntity<Set<com.java.web.virtual.time.capsule.dto.MemoryDto>> getMemoriesForCapsule(@NotNull @PathVariable Long id, Principal principal) {
         log.info("Received request to get memories for capsule with id: {} for user: {}", id, principal.getName());

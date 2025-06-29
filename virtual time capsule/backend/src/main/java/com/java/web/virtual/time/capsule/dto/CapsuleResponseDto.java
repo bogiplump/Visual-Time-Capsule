@@ -22,15 +22,12 @@ public class CapsuleResponseDto {
     private String creationDate;
     private String lockDate;
     private String openDateTime;
-
     private UserProfileDto creator;
-    private GoalDto goal;
+    private Long goalId;
     private Set<MemoryDto> memories;
-
-    // NEW: Fields for shared capsules
-    private boolean isShared;
-    private Set<UserProfileDto> sharedWithUsers; // List of users the capsule is shared with
-    private Integer readyParticipantsCount; // 'm' in m/n
-    private Integer totalParticipantsCount; // 'n' in m/n
-    private Boolean isCurrentUserReadyToClose; // True if the current authenticated user has marked themselves "ready"
+    private Boolean isShared;
+    private Set<UserProfileDto> sharedWithUsers; 
+    private Integer readyParticipantsCount; 
+    private Integer totalParticipantsCount; 
+    private Boolean isCurrentUserReadyToClose; 
 }

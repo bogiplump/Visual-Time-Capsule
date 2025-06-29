@@ -16,35 +16,35 @@
     <div *ngIf="loadingCapsules" class="loading-message">Loading capsules...</div>
 
     <!-- Updated: No specific "public capsules" text, just "No capsules found" -->
-    <div *ngIf="!loadingCapsules && publicCapsules.length === 0" class="no-data-message">No capsules found for this user.</div>
+    <div *ngIf="!loadingCapsules && capsulesWrappers.length === 0" class="no-data-message">No capsules found for this user.</div>
 
-    <div *ngIf="!loadingCapsules && publicCapsules.length > 0" class="capsules-grid">
-      <div *ngFor="let capsule of publicCapsules" class="capsule-card" (click)="viewCapsuleDetails(capsule.id)">
-        <h3>{{ capsule.capsuleName }}</h3>
-        <p>Status: **{{ capsule.status }}**</p>
-        <p>Open Date: {{ capsule.openDateTime ? (capsule.openDateTime | date:'shortDate') : 'Not Set' }}</p>
+    <div *ngIf="!loadingCapsules && capsulesWrappers.length > 0" class="capsules-grid">
+      <div *ngFor="let pair of capsulesWrappers" class="capsule-card" (click)="viewCapsuleDetails(pair.capsule.id)">
+        <h3>{{ pair.capsule.capsuleName }}</h3>
+        <p>Status: **{{ pair.capsule.status }}**</p>
+        <p>Open Date: {{ pair.capsule.openDateTime ? (pair.capsule.openDateTime | date:'shortDate') : 'Not Set' }}</p>
 
         <!-- Display goal content if visible (using isGoalContentVisible) -->
-        <div *ngIf="capsule.goal">
+        <div *ngIf="getGoal(pair.capsule.goalId)">
           <p class="goal-label">Goal:</p>
-          <ng-container *ngIf="isGoalContentVisible(capsule); else hiddenGoalInPublic">
-            <p class="goal-preview">{{ capsule.goal.content }}</p>
+          <ng-container *ngIf="isGoalContentVisible(pair.goal); else hiddenGoalInPublic">
+            <p class="goal-preview">{{ pair.goal.content }}</p>
           </ng-container>
           <ng-template #hiddenGoalInPublic>
             <p class="goal-hidden">Goal is hidden</p>
           </ng-template>
         </div>
-        <p *ngIf="!capsule.goal" class="no-data-message-small">No goal set.</p>
+        <p *ngIf="!pair.goal" class="no-data-message-small">No goal set.</p>
 
 
         <!-- Display Memories based on Capsule Status (using isMemoriesVisible) -->
         <div class="memories-preview">
           <p class="memories-label">Memories:</p>
-          <ng-container *ngIf="isMemoriesVisible(capsule); else lockedMemoriesInPublic">
-            <p *ngIf="capsule.memories && capsule.memories.length > 0">
-              ({{ capsule.memories.length }} memories available)
+          <ng-container *ngIf="isMemoriesVisible(pair.capsule); else lockedMemoriesInPublic">
+            <p *ngIf="pair.capsule.memories && pair.capsule.memories.length > 0">
+              ({{ pair.capsule.memories.length }} memories available)
             </p>
-            <p *ngIf="!capsule.memories || capsule.memories.length === 0" class="no-data-message-small">
+            <p *ngIf="!pair.capsule.memories || pair.capsule.memories.length === 0" class="no-data-message-small">
               No memories added yet.
             </p>
           </ng-container>

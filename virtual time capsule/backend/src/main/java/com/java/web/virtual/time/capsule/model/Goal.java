@@ -30,10 +30,10 @@ public class Goal {
     private Long id;
 
     @Column(name = "is_visible", nullable = false)
-    private boolean isVisible;
+    private Boolean isVisible;
 
     @Column(name = "is_achieved", nullable = false)
-    private boolean isAchieved;
+    private Boolean isAchieved;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDate creationDate;

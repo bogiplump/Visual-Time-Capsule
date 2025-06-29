@@ -6,11 +6,15 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
+import javax.crypto.spec.PSource;
 import java.time.LocalDate;
 
 @Mapper(componentModel = "spring", imports = {LocalDate.class}) // Add LocalDate to imports for expressions
 public interface GoalMapper {
 
+    @Mapping(target = "content", source = "content")
+    @Mapping(target = "isAchieved" , source = "isAchieved")
+    @Mapping(target = "isVisible",source = "isVisible")
     @Mapping(target = "creationDate", expression = "java(goal.getCreationDate() != null ? goal.getCreationDate().toString() : null)")
     @Mapping(target = "creator", source = "creator.id") // Map creator UserModel's ID to creator Long in DTO
     @Mapping(target = "capsuleId", source = "capsule.id") // Map capsule's ID to capsuleId Long in DTO

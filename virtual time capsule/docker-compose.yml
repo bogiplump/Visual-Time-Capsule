@@ -31,7 +31,16 @@ services:
     ports:
       - "8080:8080"
 
+  angular-frontend:
+    build:
+      context: ./frontend/virtual-time-capsule-ui
+      dockerfile: Dockerfile
+    ports:
+      - "4200:80"
+    depends_on:
+      - java-app
+
 volumes:
   pgdata:
   timecapsule_uploads_data:
-    driver: local 
+    driver: local

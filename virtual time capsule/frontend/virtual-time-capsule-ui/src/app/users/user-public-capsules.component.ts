@@ -8,7 +8,15 @@ import {CapsuleService} from '../services/capsule.service'; // Re-use existing C
 // DTOs
 import {CapsuleResponseDto} from '../dtos/capsule-response.dto';
 import {CapsuleStatus} from '../enums/capsule-status.enum'; // Use the correct enum import
-import {UserService} from '../services/user.service'; // Re-use existing DTO
+import {UserService} from '../services/user.service';
+import {GoalDto} from '../dtos/goal.dto';
+import {GoalService} from '../services/goal.service';
+import {Observable} from 'rxjs'; // Re-use existing DTO
+
+interface CapsuleGoalPair {
+  capsule: CapsuleResponseDto;
+  goal: GoalDto;
+}
 
 interface Message {
   text: string;
@@ -25,7 +33,7 @@ interface Message {
 export class UserPublicCapsulesComponent implements OnInit {
   userId: number | null = null;
   username: string | null = null; // To display whose capsules are being viewed
-  publicCapsules: CapsuleResponseDto[] = [];
+  capsulesWrappers: CapsuleGoalPair[] = [];
   loadingCapsules = true;
   messages: Message[] = [];
 
@@ -33,7 +41,8 @@ export class UserPublicCapsulesComponent implements OnInit {
     private route: ActivatedRoute,
     protected router: Router,
     private capsuleService: CapsuleService,
-    private userService: UserService
+    private userService: UserService,
+    private goalService: GoalService
   ) { }
 
   ngOnInit(): void {
@@ -65,28 +74,16 @@ export class UserPublicCapsulesComponent implements OnInit {
     this.messages = [];
     this.addMessage(`Loading capsules for user ID: ${userId}...`, 'success');
 
-    // First, try to get the username if not already in the route (optional, but good for display)
-    // You might have a userService.getUserProfile(userId) to get this
-    // For now, assume username might come from route or later from capsule data if it includes creator info.
-
-    // Request all capsules for the target user.
-    // The backend's getPublicCapsulesByUserId should already filter for public goals.
-    // Ensure your backend's getPublicCapsulesByUserId returns *all* capsules
-    // for that user, and then the frontend conditionally displays goals/memories.
-    // OR, if the backend truly only sends "public" capsules, then the naming of
-    // this.publicCapsules implies that. Let's stick with the current backend filtering
-    // in getPublicCapsulesByUserId.
     this.userService.getPublicCapsulesByUserId(userId).subscribe({
       next: (capsulesData: CapsuleResponseDto[]) => {
-        this.publicCapsules = capsulesData;
-        console.log(capsulesData);
-        // If username wasn't in route, try to get it from the first capsule
-        if (!this.username && capsulesData.length > 0 && capsulesData[0].creator.id) {
-          // You might need a way to map creator ID to username if not directly in DTO
-          // For now, if your CapsuleResponseDto has creator username, use it.
-          // Assuming CapsuleResponseDto has a `creatorUsername` or similar.
-          // If not, you'd need another UserService call to get the username by ID.
+        for (const capsule of capsulesData) {
+          this.goalService.getGoal(capsule.goalId).subscribe({
+            next: goal => {
+              this.capsulesWrappers.push({capsule,goal});
+            }
+          });
         }
+        console.log(capsulesData);
         this.addMessage('Capsules loaded successfully!', 'success');
       },
       error: (error: HttpErrorResponse) => {
@@ -104,15 +101,18 @@ export class UserPublicCapsulesComponent implements OnInit {
     this.router.navigate(['/capsules', capsuleId]);
   }
 
+  getGoal(goalId: number | null): Observable<GoalDto> {
+    return this.goalService.getGoal(goalId);
+  }
+
   // Helper method to determine if a goal should be displayed on this "public" page
-  isGoalContentVisible(capsule: CapsuleResponseDto): boolean {
-    // Goal content is visible ONLY if the goal exists and its 'isVisible' flag is true.
-    return capsule.goal?.isVisible === true;
+  isGoalContentVisible(goalDto: GoalDto): boolean {
+    return goalDto?.visible === true;
   }
 
   // Helper method to determine if memories should be shown on this "public" page
   isMemoriesVisible(capsule: CapsuleResponseDto): boolean {
     // Memories are visible only if the capsule's status is 'OPENED'.
-    return capsule.status === CapsuleStatus.OPEN;
+    return capsule.status === CapsuleStatus.OPEN || capsule.status === CapsuleStatus.CREATED;
   }
 }

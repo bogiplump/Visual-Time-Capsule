@@ -20,10 +20,12 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.proxy.HibernateProxy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+@Slf4j
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -58,12 +60,16 @@ public class UserModel implements UserDetails {
     @OneToMany(mappedBy = "creator")
     private Set<Capsule> capsules;
 
+    private static int count = 0;
+
     @Override
     public boolean equals(Object o) {
+        count++;
+        log.info(String.valueOf(count));
         if (this == o) return true;
-        // Use HibernateProxy for safe comparison if using lazy loading
         if (o == null || (getClass() != o.getClass() && !(o instanceof HibernateProxy))) return false;
         UserModel userModel = (UserModel) (o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getImplementation() : o);
+        log.info("UserModel is equal {}", Objects.equals(id, userModel.id));
         return id != null && Objects.equals(id, userModel.id);
     }
 
