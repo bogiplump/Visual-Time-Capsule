@@ -44,8 +44,7 @@ public class CapsuleGroupsController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<?> updateGroupContent(@NotNull @PathVariable Long id, @NotNull @RequestBody
-    GroupUpdateDto groupUpdateDto) {
+    public ResponseEntity<?> updateGroupContent(@NotNull @RequestBody GroupUpdateDto groupUpdateDto) {
         capsuleGroupService.updateGroup(groupUpdateDto);
         return ResponseEntity.ok(HttpStatus.OK);
     }
