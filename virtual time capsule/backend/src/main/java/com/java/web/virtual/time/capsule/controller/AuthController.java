@@ -2,7 +2,6 @@ package com.java.web.virtual.time.capsule.controller;
 
 import com.java.web.virtual.time.capsule.dto.UserCreateDto;
 import com.java.web.virtual.time.capsule.dto.UserLoginDto;
-import com.java.web.virtual.time.capsule.dto.UserResponseDto;
 import com.java.web.virtual.time.capsule.dto.UserAuthResponse;
 import com.java.web.virtual.time.capsule.mapper.UserMapper;
 import com.java.web.virtual.time.capsule.model.UserModel;

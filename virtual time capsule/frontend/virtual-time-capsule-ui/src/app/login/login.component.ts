@@ -1,16 +1,16 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
-import { UserLoginDto } from '../models/auth.models';
 import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common'; // Import CommonModule for ngIf
+import { CommonModule } from '@angular/common';
+import {UserLoginDto} from '../dtos/user-login.dto';
 
 @Component({
   selector: 'app-login',
-  standalone: true, // Use standalone components in modern Angular
+  standalone: true,
   imports: [FormsModule, CommonModule],
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css'] // Link to the component's CSS file
+  styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
   credentials: UserLoginDto = { username: '', password: '' };
@@ -19,9 +19,6 @@ export class LoginComponent {
 
   constructor(private authService: AuthService, private router: Router) { }
 
-  /**
-   * Handles the login form submission.
-   */
   onSubmit(): void {
     this.loading = true;
     this.message = { text: '', type: '' };
@@ -41,9 +38,6 @@ export class LoginComponent {
     });
   }
 
-  /**
-   * Navigates to the registration page.
-   */
   navigateToRegister(): void {
     this.router.navigate(['/register']);
   }

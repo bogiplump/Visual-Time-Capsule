@@ -9,19 +9,14 @@ import lombok.Data;
 
 @Data
 public class UserCreateDto {
-
     @ValidUsername
     private String username;
-
     @ValidPassword
     private String password;
-
     @ValidName
     private String firstName;
-
     @ValidName
     private String lastName;
-
     @ValidEmail
     private String email;
 }

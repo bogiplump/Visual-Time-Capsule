@@ -1,6 +1,5 @@
 package com.java.web.virtual.time.capsule.model;
 
-import com.java.web.virtual.time.capsule.dto.GoalDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -19,11 +18,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Entity
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "goals")
+@Table(name = "goal")
 public class Goal {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

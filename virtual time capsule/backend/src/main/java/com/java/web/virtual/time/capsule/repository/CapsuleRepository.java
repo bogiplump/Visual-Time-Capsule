@@ -14,8 +14,6 @@ public interface CapsuleRepository extends JpaRepository<Capsule, Long> {
 
     Set<Capsule> findByCreator_Id(Long createdById);
 
-    boolean existsByIdAndCreator_Id(Long id, Long createdById);
-
     Set<Capsule> findBySharedWithUsersContaining(Set<UserModel> sharedWithUsers);
 
     List<Capsule> findAllByIdIn(List<Long> capsuleIds);

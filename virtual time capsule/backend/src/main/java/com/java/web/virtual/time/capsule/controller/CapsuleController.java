@@ -9,7 +9,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
@@ -28,7 +27,6 @@ public class CapsuleController {
     @PostMapping
     public ResponseEntity<CapsuleResponseDto> createCapsule(@Valid @RequestBody CapsuleCreateDto capsuleDto, Principal principal) {
         log.info("Received request to create capsule: {} for user: {} and openDateTime: {}", capsuleDto.getCapsuleName(), principal.getName(), capsuleDto.getOpenDateTime());
-        // Pass the sharedWithUserIds from the DTO
         CapsuleResponseDto createdCapsule = capsuleService.createCapsule(capsuleDto, principal.getName(), capsuleDto.getSharedWithUserIds());
         return ResponseEntity.status(HttpStatus.CREATED).body(createdCapsule);
     }
@@ -37,7 +35,6 @@ public class CapsuleController {
     public ResponseEntity<Set<CapsuleResponseDto>> getAllCapsulesOfUser(Principal principal) {
         log.info("Received request to get all capsules for user: {}", principal.getName());
         Set<CapsuleResponseDto> capsules = capsuleService.getAllCapsulesOfUser(principal.getName());
-        log.info("Open times {}", capsules.stream().map(CapsuleResponseDto::getOpenDateTime).toList());
         return ResponseEntity.ok(capsules);
     }
 
@@ -68,7 +65,7 @@ public class CapsuleController {
     @PutMapping("/lock/{id}")
     public ResponseEntity<CapsuleResponseDto> lockCapsule(
         @NotNull @PathVariable Long id,
-        @NotNull @RequestParam String openDateTime, // Changed to openDateTime
+        @NotNull @RequestParam String openDateTime,
         Principal principal) {
         log.info("Received request to lock capsule with id: {} for user: {} with openDateTime: {}", id, principal.getName(), openDateTime);
         CapsuleResponseDto lockedCapsule = capsuleService.lockCapsule(id, openDateTime, principal.getName());
@@ -93,9 +90,9 @@ public class CapsuleController {
 
 
     @GetMapping("/{id}/memories")
-    public ResponseEntity<Set<com.java.web.virtual.time.capsule.dto.MemoryDto>> getMemoriesForCapsule(@NotNull @PathVariable Long id, Principal principal) {
+    public ResponseEntity<Set<MemoryDto>> getMemoriesForCapsule(@NotNull @PathVariable Long id, Principal principal) {
         log.info("Received request to get memories for capsule with id: {} for user: {}", id, principal.getName());
-        Set<com.java.web.virtual.time.capsule.dto.MemoryDto> memories = capsuleService.getMemoriesFromCapsule(id, principal.getName());
+        Set<MemoryDto> memories = capsuleService.getMemoriesFromCapsule(id, principal.getName());
         return ResponseEntity.ok(memories);
     }
 }

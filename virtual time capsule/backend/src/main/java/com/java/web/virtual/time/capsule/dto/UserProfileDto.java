@@ -14,8 +14,8 @@ public class UserProfileDto {
     private Long id;
     private String username;
     private FriendshipStatus friendshipStatus;
-    private Long associatedFriendshipId; // The ID of the friendship entity if one exists
-    private Boolean isRequestFromCurrentUser; // True if current user sent a PENDING request to this user
-    private Boolean isRequestToCurrentUser;   // True if this user sent a PENDING request to current user (current user needs to accept)
+    private Long associatedFriendshipId; 
+    private Boolean isRequestFromCurrentUser; 
+    private Boolean isRequestToCurrentUser;   
 }
 

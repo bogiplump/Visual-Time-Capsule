@@ -1,10 +1,10 @@
-import { MemoryType } from '../enums/memory-type.enum'; // Assuming MemoryType is also in 'enums'
+import { MemoryType } from '../enums/memory-type.enum';
 
 export interface MemoryDto {
   id: number;
   memoryType: MemoryType;
   path: string;
-  creationDate: string; // LocalDate in Java maps to string in TS
+  creationDate: string;
   description: string;
 
 }

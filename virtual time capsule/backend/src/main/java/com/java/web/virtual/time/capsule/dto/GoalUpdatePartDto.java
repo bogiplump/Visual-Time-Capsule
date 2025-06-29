@@ -8,10 +8,6 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-/**
- * DTO for partial updates to a Goal, nested within CapsuleUpdateDto.
- * Only includes fields that can be updated via the capsule update mechanism.
- */
 @Data
 @Builder
 @Getter

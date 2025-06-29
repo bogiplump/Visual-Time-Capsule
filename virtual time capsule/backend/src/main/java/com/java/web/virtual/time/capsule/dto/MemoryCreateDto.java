@@ -1,6 +1,5 @@
 package com.java.web.virtual.time.capsule.dto;
 
-
 import com.java.web.virtual.time.capsule.enums.MemoryType;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;

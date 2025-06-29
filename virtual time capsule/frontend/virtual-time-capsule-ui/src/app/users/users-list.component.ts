@@ -1,31 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { Observable, of } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
-import { map } from 'rxjs/operators';
-
-// Services
 import { UserService } from '../services/user.service';
 import { AuthService } from '../services/auth.service';
-
-// DTOs and Enums
 import { FriendshipDto } from '../dtos/friendship.dto';
 import { FriendshipStatus } from '../enums/friendship-status.enum';
+import {UserResponseDto} from '../dtos/user-response.dto';
+import {UserProfileDto} from '../dtos/user-profile.dto';
 
-interface AuthUser {
-  id: number;
-  username: string;
-}
-
-interface UserProfileDto {
-  id: number;
-  username: string;
-  friendshipStatus?: FriendshipStatus;
-  associatedFriendshipId?: number;
-  isRequestFromCurrentUser?: boolean;
-  isRequestToCurrentUser?: boolean;
-}
 
 interface Message {
   text: string;
@@ -55,7 +38,7 @@ export class UsersListComponent implements OnInit {
 
   ngOnInit(): void {
     console.log('UsersListComponent ngOnInit called.');
-    this.authService.getCurrentUser().subscribe((user: AuthUser | null) => {
+    this.authService.getCurrentUser().subscribe((user: UserResponseDto | null) => {
       if (user?.id) {
         this.currentUserId = user.id;
         this.loadUsers();
@@ -84,12 +67,7 @@ export class UsersListComponent implements OnInit {
     console.log('UsersListComponent: Calling userService.getAllUsers() to get basic user list.');
     this.userService.getAllUsers().subscribe({
       next: (usersData: UserProfileDto[]) => {
-        // UsersData here will still have friendship-related fields as undefined due to the mapping issue in UserService.
-        // We will populate them in checkAndSetFriendshipStatuses().
         this.users = usersData.filter(user => user.id !== this.currentUserId);
-        console.log('UsersListComponent: Users after initial load and filtering (friendship flags might be missing/undefined):', this.users);
-
-        // Now, fetch and apply friendship statuses in a separate step
         this.checkAndSetFriendshipStatuses();
         this.addMessage('Users loaded successfully!', 'success');
       },
@@ -99,24 +77,17 @@ export class UsersListComponent implements OnInit {
       },
       complete: () => {
         console.log('UsersListComponent: Initial user loading complete.');
-        // Set loadingUsers to false only after friendships are also processed
-        // or handle separately if friendships can be loaded asynchronously
       }
     });
   }
 
   checkAndSetFriendshipStatuses(): void {
     if (this.currentUserId === null || this.users.length === 0) {
-      this.loadingUsers = false; // If no users or current user, stop loading
+      this.loadingUsers = false;
       return;
     }
-
-    console.log('UsersListComponent: Starting checkAndSetFriendshipStatuses to enrich user profiles.');
     this.userService.getFriendships(this.currentUserId).subscribe({
       next: (friendships: FriendshipDto[]) => {
-        console.log('UsersListComponent: Friendships received for current user:', friendships);
-
-        // Iterate over the already loaded 'users' and update their friendship properties
         this.users = this.users.map(user => {
           const existingFriendship = friendships.find(f =>
             (f.requesterId === this.currentUserId && f.responderId === user.id) ||
@@ -135,7 +106,7 @@ export class UsersListComponent implements OnInit {
               user.isRequestToCurrentUser = false;
             }
           } else {
-            // Explicitly ensure these are undefined/false if no friendship exists
+
             user.friendshipStatus = undefined;
             user.associatedFriendshipId = undefined;
             user.isRequestFromCurrentUser = false;
@@ -151,7 +122,7 @@ export class UsersListComponent implements OnInit {
       },
       complete: () => {
         console.log('UsersListComponent: Friendship status processing complete.');
-        this.loadingUsers = false; // Set loading to false only after all data is ready
+        this.loadingUsers = false;
       }
     });
   }
@@ -165,7 +136,7 @@ export class UsersListComponent implements OnInit {
     this.userService.sendFriendRequest(responderId).subscribe({
       next: (response) => {
         this.addMessage(`Friend request sent to user ID ${responderId}!`, 'success');
-        this.loadUsers(); // Reload users to update status
+        this.loadUsers();
       },
       error: (error: HttpErrorResponse) => {
         console.error('Error sending friend request:', error);

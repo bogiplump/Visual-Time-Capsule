@@ -7,5 +7,5 @@ export interface FriendshipDto {
   responderId: number;
   responderUsername: string;
   status: FriendshipStatus;
-  lastUpdate: string; // ISO string
+  lastUpdate: string;
 }

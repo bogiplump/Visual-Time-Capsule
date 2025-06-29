@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
-import { UserCreateDto } from '../models/auth.models';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import {UserCreateDto} from '../dtos/user-create.dto';
 
 @Component({
   selector: 'app-register',
@@ -19,9 +19,6 @@ export class RegisterComponent {
 
   constructor(private authService: AuthService, private router: Router) { }
 
-  /**
-   * Handles the registration form submission.
-   */
   onSubmit(): void {
     this.loading = true;
     this.message = { text: '', type: '' };
@@ -45,9 +42,6 @@ export class RegisterComponent {
     });
   }
 
-  /**
-   * Navigates to the login page.
-   */
   navigateToLogin(): void {
     this.router.navigate(['/login']);
   }

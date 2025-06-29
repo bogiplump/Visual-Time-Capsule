@@ -14,8 +14,8 @@ public class MemoryDto {
     private Long id;
     private String description;
     private MemoryType memoryType;
-    private String path; // Path to the stored content
-    private String creationDate; // ISO string
-    private Long creatorId; // Expecting creator's ID here
-    private Long capsuleId; // Back-reference to capsule ID
+    private String path; 
+    private String creationDate; 
+    private Long creatorId; 
+    private Long capsuleId; 
 }

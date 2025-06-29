@@ -3,7 +3,6 @@
     <h1 class="dashboard-heading">Welcome to Your Dashboard!</h1>
     <p class="dashboard-welcome">Manage your capsules and connect with friends.</p>
 
-    <!-- Message Display (for general dashboard messages) -->
     <div *ngIf="messages.length > 0" style="margin-bottom: 1rem;">
       <div *ngFor="let message of messages" [ngClass]="{'message-box': true, 'success': message.type === 'success', 'error': message.type === 'error'}">
         {{ message.text }}
@@ -13,7 +12,6 @@
     <hr class="section-divider">
 
     <div class="dashboard-main-content">
-      <!-- Left Column: Capsules Feed -->
       <div class="capsules-feed">
         <div class="capsules-header">
           <h2 class="section-heading">My Capsules</h2>
@@ -30,7 +28,6 @@
             <p>Status: **{{ capsule.status }}**</p>
             <p>Open Date: {{ capsule.openDateTime ? (capsule.openDateTime | date:'shortDate') : 'Not Set' }}</p>
 
-            <!-- NEW: Display for shared capsules -->
             <p *ngIf="capsule.isShared" class="shared-capsule-info">
               Shared with:
               <span *ngFor="let user of capsule.sharedWithUsers; let last = last">
@@ -40,7 +37,6 @@
             <p *ngIf="capsule.isShared && capsule.status === capsuleStatus.CREATED" class="shared-capsule-info">
               Participants ready to close: {{ capsule.readyParticipantsCount ?? 0 }}/{{ capsule.totalParticipantsCount ?? 0 }}
             </p>
-            <!-- NEW: Button for participant to mark ready -->
             <button
               *ngIf="capsule.isShared && capsule.status === capsuleStatus.CREATED && !capsule.isCurrentUserReadyToClose"
               class="action-button mark-ready-button"
@@ -59,7 +55,6 @@
         </div>
       </div>
 
-      <!-- Right Column: Friends Sidebar -->
       <div class="friends-sidebar">
         <div class="friends-sidebar-header">
           <h2 class="section-heading">My Friends</h2>
@@ -86,7 +81,7 @@
                 <ng-container *ngIf="friendship.requesterId === currentUserId">
                   Invitation Sent
                 </ng-container>
-                <!-- This case should theoretically not happen if myFriendships is correctly filtered on backend -->
+
                 <ng-container *ngIf="friendship.requesterId !== currentUserId && friendship.responderId !== currentUserId">
                   Pending (Unknown Party)
                 </ng-container>
@@ -108,7 +103,6 @@
     </div>
   </div>
 
-  <!-- Create Capsule Dialog (Modal) -->
   <div class="modal-overlay" *ngIf="showCreateCapsuleDialog">
     <div class="modal-content">
       <div class="modal-header-tabs">
@@ -130,7 +124,6 @@
       </div>
 
       <div class="modal-body">
-        <!-- Capsule Details Tab Content -->
         <div *ngIf="currentModalTab === 'capsule'">
           <h3 class="modal-heading">Create New Time Capsule</h3>
           <form (ngSubmit)="submitCreateCapsule()" class="modal-form">
@@ -184,7 +177,6 @@
               <label for="goalVisible" class="form-label-checkbox">Goal Visible</label>
             </div>
 
-            <!-- NEW: Share with Friends section -->
             <div class="form-group">
               <label for="sharedWithUsers" class="form-label">Share with Friends (Optional)</label>
               <select

@@ -1,5 +1,4 @@
 import { CapsuleStatus } from '../enums/capsule-status.enum';
-import { GoalDto } from './goal.dto';
 import { MemoryDto } from './memory.dto';
 import { UserProfileDto } from './user-profile.dto';
 

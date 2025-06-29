@@ -44,9 +44,9 @@ import org.hibernate.proxy.HibernateProxy;
 @Getter
 @Setter
 @Builder
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Table(name = "capsules")
+@Table(name = "capsule")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Capsule {
 
     @Id
@@ -84,7 +84,6 @@ public class Capsule {
     @OneToMany(mappedBy = "capsule", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Memory> memoryEntries = new HashSet<>();
 
-    // NEW: For Shared Capsules
     @Column(name = "is_shared", nullable = false)
     private Boolean isShared;
 
@@ -96,8 +95,6 @@ public class Capsule {
     )
     private Set<UserModel> sharedWithUsers = new HashSet<>();
 
-    // NEW: Track users who are "ready" to close the capsule
-    // This could also be a separate entity if more data is needed (e.g., date they became ready)
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "capsule_ready_users",
@@ -107,8 +104,6 @@ public class Capsule {
     private Set<UserModel> readyToCloseUsers = new HashSet<>();
 
 
-    // --- Constructors ---
-    // Constructor matching fields used in fromDTOAndUser for clarity
     public Capsule(String capsuleName, UserModel creator, CapsuleStatus status, LocalDateTime creationDate, LocalDateTime lockDate, LocalDateTime openDateTime, boolean isShared, Set<UserModel> sharedWithUsers) {
         this.capsuleName = capsuleName;
         this.creator = creator;
@@ -122,9 +117,9 @@ public class Capsule {
         }
     }
 
-
-    // --- Helper Methods for Bidirectional Relationship Management ---
+    
     public void setGoal(Goal goal) {
+        throwIfNotEditable();
         if (this.goal != null && !this.goal.equals(goal)) {
             this.goal.setCapsule(null);
         }
@@ -135,39 +130,41 @@ public class Capsule {
     }
 
     public void addMemory(Memory memory) {
+        throwIfNotEditable();
         this.memoryEntries.add(memory);
         memory.setCapsule(this);
     }
 
     public void removeMemory(Memory memory) {
+        throwIfNotEditable();
         this.memoryEntries.remove(memory);
         memory.setCapsule(null);
     }
 
-    // NEW: Add/Remove shared users
+    
     public void addSharedUser(UserModel user) {
+        throwIfNotEditable();
         if(this.sharedWithUsers == null) {
             this.sharedWithUsers = new HashSet<>();
         }
         this.sharedWithUsers.add(user);
     }
 
-    public void removeSharedUser(UserModel user) {
-        this.sharedWithUsers.remove(user);
-    }
-
-    // NEW: Mark user as ready to close
+    
     public void addReadyUser(UserModel user) {
+        throwIfNotEditable();
         this.readyToCloseUsers.add(user);
     }
 
     public void removeReadyUser(UserModel user) {
+        throwIfNotEditable();
         this.readyToCloseUsers.remove(user);
     }
 
 
-    // --- Business Logic Methods ---
+
     public void changeCapsuleName(String newCapsuleName) {
+        throwIfNotEditable();
         if (status != CapsuleStatus.CREATED) {
             throw new CapsuleHasBeenLocked("Cannot change the name of a capsule that is not in CREATED status.");
         }
@@ -175,6 +172,7 @@ public class Capsule {
     }
 
     public void open() {
+        throwIfNotEditable();
         if (status != CapsuleStatus.CLOSED) {
             throw new CapsuleIsNotClosedYet("Trying to open a capsule which is not in CLOSED status.");
         }
@@ -191,37 +189,6 @@ public class Capsule {
         if (this.status == CapsuleStatus.OPEN) {
             throw new CapsuleIsOpened("Capsule is opened. Cannot perform this action.");
         }
-    }
-
-    public static Capsule fromDTOAndUser(CapsuleCreateDto capsuleCreateDto, UserModel creator, Set<UserModel> sharedUsers) {
-        Capsule newCapsule = Capsule.builder()
-            .capsuleName(capsuleCreateDto.getCapsuleName())
-            .creator(creator)
-            .status(CapsuleStatus.CREATED)
-            .creationDate(LocalDateTime.now())
-            .lockDate(null)
-            .openDateTime(null)
-            .isShared(sharedUsers != null && !sharedUsers.isEmpty()) // Set isShared based on provided users
-            .build();
-
-        // Set the goal
-        Goal goal = Goal.builder()
-            .content(capsuleCreateDto.getGoal().getContent())
-            .creator(creator)
-            .isAchieved(false) // Default to false on creation
-            .isVisible(capsuleCreateDto.getGoal().getIsVisible())
-            .creationDate(LocalDate.now())
-            .capsule(newCapsule) // Set back-reference immediately
-            .build();
-        newCapsule.setGoal(goal); // Associate goal with capsule (will also set back-ref)
-
-        // Add shared users
-        if (sharedUsers != null) {
-            log.info("Adding shared user: {}", newCapsule.getSharedWithUsers());
-            sharedUsers.forEach(newCapsule::addSharedUser);
-        }
-
-        return newCapsule;
     }
 
     @Override

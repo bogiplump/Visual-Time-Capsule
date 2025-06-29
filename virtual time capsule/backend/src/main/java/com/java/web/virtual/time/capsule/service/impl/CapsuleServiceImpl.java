@@ -8,13 +8,10 @@ import com.java.web.virtual.time.capsule.enums.CapsuleStatus;
 import com.java.web.virtual.time.capsule.exception.ResourceNotFoundException;
 import com.java.web.virtual.time.capsule.mapper.CapsuleMapper;
 import com.java.web.virtual.time.capsule.mapper.MemoryMapper;
-import com.java.web.virtual.time.capsule.mapper.UserMapper; // Import UserMapper
 import com.java.web.virtual.time.capsule.model.Capsule;
-import com.java.web.virtual.time.capsule.model.Goal; // Import Goal model
 import com.java.web.virtual.time.capsule.model.UserModel;
 import com.java.web.virtual.time.capsule.repository.CapsuleRepository;
-import com.java.web.virtual.time.capsule.repository.GoalRepository; // Import GoalRepository
-import com.java.web.virtual.time.capsule.repository.MemoryRepository;
+import com.java.web.virtual.time.capsule.repository.GoalRepository;
 import com.java.web.virtual.time.capsule.repository.UserRepository;
 import com.java.web.virtual.time.capsule.service.CapsuleService;
 import lombok.AllArgsConstructor;
@@ -41,11 +38,9 @@ public class CapsuleServiceImpl implements CapsuleService {
 
     private final CapsuleRepository capsuleRepository;
     private final UserRepository userRepository;
-    private final MemoryRepository memoryRepository; // Not used in provided methods, but good to have
-    private final GoalRepository goalRepository; // Inject GoalRepository
+    private final GoalRepository goalRepository; 
     private final CapsuleMapper capsuleMapper;
-    private final MemoryMapper memoryMapper; // Inject MemoryMapper
-    private final UserMapper userMapper; // Inject UserMapper for mapping UserModels to UserProfileDtos
+    private final MemoryMapper memoryMapper;
 
     @Override
     @Transactional
@@ -54,25 +49,17 @@ public class CapsuleServiceImpl implements CapsuleService {
 
         Set<UserModel> sharedUsers = new HashSet<>();
         if (sharedWithUserIds != null && !sharedWithUserIds.isEmpty()) {
-            // Fetch shared users from database
-            sharedWithUserIds.forEach(userId -> {
-                userRepository.findById(userId).ifPresent(sharedUsers::add);
-            });
-            // Ensure creator is not added to sharedWithUsers if it's implicitly part of "participants"
-            // If creator is supposed to be in sharedWithUsers for 'n', add them here.
-            // For now, let's assume sharedWithUsers is only *additional* users.
-            // If the capsule is shared, the creator is also a participant by default.
-            sharedUsers.add(creator); // Creator is implicitly a participant if shared
+            sharedWithUserIds.forEach(userId -> userRepository.findById(userId).ifPresent(sharedUsers::add));
+            sharedUsers.add(creator); 
         }
 
         LocalDateTime openDateTime = parseInputDateTimeToUTC(capsuleDto.getOpenDateTime());
 
-        // Create the capsule entity
-        Capsule newCapsule = Capsule.fromDTOAndUser(capsuleDto, creator, sharedUsers);
+        Capsule newCapsule = capsuleMapper.toEntity(capsuleDto);
         newCapsule.setOpenDateTime(openDateTime);
         Capsule savedCapsule = capsuleRepository.save(newCapsule);
 
-        // Ensure the goal's capsule back-reference is set and save the goal
+        
         if (savedCapsule.getGoal() != null) {
             savedCapsule.getGoal().setCapsule(savedCapsule);
             goalRepository.save(savedCapsule.getGoal());
@@ -89,7 +76,6 @@ public class CapsuleServiceImpl implements CapsuleService {
 
         UserModel currentUser = userRepository.findByUsername(username);
 
-        // Check if the current user is the creator or a shared participant
         boolean isCreator = capsule.getCreator().equals(currentUser);
         boolean isSharedParticipant = capsule.getIsShared() && capsule.getSharedWithUsers().contains(currentUser);
 
@@ -97,7 +83,6 @@ public class CapsuleServiceImpl implements CapsuleService {
             throw new AccessDeniedException("You do not have access to view this capsule.");
         }
 
-        // For response DTO, if it's a shared capsule, populate participant counts
         CapsuleResponseDto dto = capsuleMapper.toDto(capsule);
         if (capsule.getIsShared()) {
             dto.setTotalParticipantsCount(capsule.getSharedWithUsers().size());
@@ -112,18 +97,15 @@ public class CapsuleServiceImpl implements CapsuleService {
     @Transactional(readOnly = true)
     public Set<CapsuleResponseDto> getAllCapsulesOfUser(String currentUsername) {
         UserModel user = userRepository.findByUsername(currentUsername);
-        // Get capsules created by the user
+
         Set<Capsule> createdCapsules = capsuleRepository.findByCreator_Id(user.getId());
 
-        // Get capsules shared with the user
         Set<Capsule> sharedCapsules = capsuleRepository.findBySharedWithUsersContaining(Set.of(user));
 
-        // Combine and convert to DTOs
         Set<CapsuleResponseDto> allCapsules = new HashSet<>();
         allCapsules.addAll(createdCapsules.stream().map(capsuleMapper::toDto).collect(Collectors.toSet()));
         allCapsules.addAll(sharedCapsules.stream().map(capsuleMapper::toDto).collect(Collectors.toSet()));
 
-        // Populate shared capsule details (counts, current user readiness)
         for (CapsuleResponseDto dto : allCapsules) {
             Optional<Capsule> originalCapsuleOpt = capsuleRepository.findById(dto.getId());
             if (originalCapsuleOpt.isPresent() && originalCapsuleOpt.get().getIsShared()) {
@@ -198,24 +180,20 @@ public class CapsuleServiceImpl implements CapsuleService {
             throw new IllegalStateException("Cannot update a capsule that is already CLOSED or OPENED.");
         }
 
-        // Update name if provided
         Optional.ofNullable(capsuleDto.getCapsuleName())
-            .ifPresent(capsule::setCapsuleName);
+            .ifPresent(capsule::changeCapsuleName);
 
-        // Update openDateTime if provided (only if not locked yet)
         Optional.ofNullable(capsuleDto.getOpenDateTime())
-            .map(this::parseInputDateTimeToUTC) // Convert string to LocalDateTime
+            .map(this::parseInputDateTimeToUTC) 
             .ifPresent(capsule::setOpenDateTime);
 
-        // Update goal if provided
         if (capsuleDto.getGoal() != null && capsule.getGoal() != null) {
             capsule.getGoal().setContent(capsuleDto.getGoal().getContent());
             capsule.getGoal().setIsAchieved(capsuleDto.getGoal().isAchieved());
             capsule.getGoal().setIsVisible(capsuleDto.getGoal().isVisible());
-            goalRepository.save(capsule.getGoal()); // Save the updated goal
+            goalRepository.save(capsule.getGoal()); 
         }
 
-        // NEW: Handle participant marking themselves "ready to close"
         if (capsule.getIsShared() && capsuleDto.getIsReadyToClose() != null) {
             if (!capsule.getSharedWithUsers().contains(currentUser)) {
                 throw new AccessDeniedException("Only shared participants can mark readiness for this capsule.");
@@ -226,7 +204,6 @@ public class CapsuleServiceImpl implements CapsuleService {
                 capsule.removeReadyUser(currentUser);
             }
         }
-
 
         return capsuleMapper.toDto(capsuleRepository.save(capsule));
     }
@@ -257,7 +234,6 @@ public class CapsuleServiceImpl implements CapsuleService {
         boolean isCreator = capsule.getCreator().equals(currentUser);
         boolean isSharedParticipant = capsule.getIsShared() && capsule.getSharedWithUsers().contains(currentUser);
 
-        // Memories are only visible if capsule is OPENED OR if user is creator/shared participant (for adding/managing)
         if (capsule.getStatus() != CapsuleStatus.OPEN && !isCreator && !isSharedParticipant) {
             throw new AccessDeniedException("You do not have access to view memories for this capsule yet.");
         }
@@ -274,12 +250,11 @@ public class CapsuleServiceImpl implements CapsuleService {
 
         UserModel currentUser = userRepository.findByUsername(currentUsername);
 
-        // Only creator can open the capsule
         if (!capsule.getCreator().equals(currentUser)) {
             throw new AccessDeniedException("Only the creator can open this capsule.");
         }
 
-        capsule.open(); // This method has internal checks for status and openDateTime
+        capsule.open(); 
 
         return capsuleMapper.toDto(capsuleRepository.save(capsule));
     }
@@ -302,7 +277,6 @@ public class CapsuleServiceImpl implements CapsuleService {
 
         if (capsule.getReadyToCloseUsers().contains(user)) {
             log.warn("User {} already marked ready for capsule {}", currentUsername, capsuleId);
-            // Optionally, throw an error or just return current state
         } else {
             capsule.addReadyUser(user);
         }
@@ -310,39 +284,23 @@ public class CapsuleServiceImpl implements CapsuleService {
         return capsuleMapper.toDto(capsuleRepository.save(capsule));
     }
 
-    /**
-     * Parses an incoming date/time string from the frontend and converts it to a LocalDateTime representing UTC.
-     * This handles ISO 8601 strings with 'Z' or offset, and also plain 'yyyy-MM-ddTHH:mm' strings
-     * by interpreting them as local time in the server's default timezone and converting to UTC.
-     *
-     * @param dateTimeString The date/time string from the frontend.
-     * @return A LocalDateTime object representing the UTC time, or null if parsing fails.
-     */
     private LocalDateTime parseInputDateTimeToUTC(String dateTimeString) {
         log.info("in parseInputDateTimeToUTC: {}", dateTimeString);
         if (dateTimeString == null || dateTimeString.isEmpty()) {
             return null;
         }
 
-        // 1. Try parsing as ZonedDateTime or OffsetDateTime (handles "yyyy-MM-ddTHH:mm:ss.SSSZ" or "+HH:mm")
-        // This is the most robust for ISO 8601 strings with timezone info.
         try {
-            // First, check if it's an ISO_LOCAL_DATE_TIME which contains no offset/zone info
-            // If it has 'Z' or an explicit offset, OffsetDateTime.parse should handle it.
             if (dateTimeString.endsWith("Z") || dateTimeString.matches(".*[+-]\\d{2}:\\d{2}$")) {
                 OffsetDateTime odt = OffsetDateTime.parse(dateTimeString);
-                return odt.toLocalDateTime(); // Convert to LocalDateTime, effectively representing the UTC point
+                return odt.toLocalDateTime(); 
             } else {
-                // If no 'Z' or offset, assume it's a plain LocalDateTime string (from datetime-local input)
-                // We'll treat this as a local time in the server's default timezone and convert it to UTC.
                 LocalDateTime localDateTime = LocalDateTime.parse(dateTimeString);
                 ZonedDateTime zdt = localDateTime.atZone(ZoneId.systemDefault());
                 return zdt.withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
             }
         } catch (DateTimeParseException e) {
             log.warn("Failed to parse '{}' as ISO Z/OffsetDateTime or default LocalDateTime. Error: {}", dateTimeString, e.getMessage());
-            // Fallback for unexpected formats, though the above two cases should cover most
-            // If you get here, it means the format is truly unexpected.
             return null;
         }
     }

@@ -414,51 +414,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.selectedFile = null;
       },
       error: (error: HttpErrorResponse) => {
-        let errorMessage = 'Failed to add memory. Please try again.';
-        if (error.error instanceof Blob) {
-          error.error.text().then(text => {
-            try {
-              const errorObj = JSON.parse(text);
-              if (errorObj.message) errorMessage = errorObj.message;
-              else if (errorObj.error) errorMessage = errorObj.error;
-            } catch {
-              errorMessage = text || errorMessage;
-            }
-            this.addDialogMessage(errorMessage, 'error');
-          });
-        } else if (error.error && Array.isArray(error.error) && error.error.length > 0) {
-          errorMessage = error.error.map((msg: string) => {
-            const match = msg.match(/^[^:]+:\s*"(.*)"$/);
-            return match && match[1] ? match[1] : msg;
-          }).join('\n');
-          this.addDialogMessage(errorMessage, 'error');
-        } else if (error.error && typeof error.error.message === 'string') {
-          errorMessage = error.error.message;
-          this.addDialogMessage(errorMessage, 'error');
-        } else if (typeof error.error === 'string') {
-          errorMessage = error.error;
-          this.addDialogMessage(errorMessage, 'error');
-        } else {
-          this.addDialogMessage(errorMessage, 'error');
-        }
+        this.addMessage(error.error, 'error');
         this.loadingCreateMemory = false;
       },
       complete: () => {
         this.loadingCreateMemory = false;
       }
     });
-  }
-
-  canOpenCapsule(capsule: CapsuleResponseDto): boolean {
-    if (!capsule || capsule.status !== CapsuleStatus.CLOSED || !capsule.openDateTime) {
-      return false;
-    }
-    const capsuleOpenDate = new Date(capsule.openDateTime);
-    return this.currentDate >= capsuleOpenDate;
-  }
-
-  canAddMemory(capsule: CapsuleResponseDto): boolean {
-    return capsule.status === CapsuleStatus.CREATED;
   }
 
   protected readonly FriendshipStatus = FriendshipStatus;

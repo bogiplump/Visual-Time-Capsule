@@ -2,16 +2,13 @@ import {Component, OnInit} from '@angular/core';
 import {CommonModule, DatePipe} from '@angular/common';
 import {ActivatedRoute, Router, RouterModule} from '@angular/router';
 import {HttpErrorResponse} from '@angular/common/http';
-
-// Services
-import {CapsuleService} from '../services/capsule.service'; // Re-use existing CapsuleService
-// DTOs
+import {CapsuleService} from '../services/capsule.service';
 import {CapsuleResponseDto} from '../dtos/capsule-response.dto';
-import {CapsuleStatus} from '../enums/capsule-status.enum'; // Use the correct enum import
+import {CapsuleStatus} from '../enums/capsule-status.enum';
 import {UserService} from '../services/user.service';
 import {GoalDto} from '../dtos/goal.dto';
 import {GoalService} from '../services/goal.service';
-import {Observable} from 'rxjs'; // Re-use existing DTO
+import {Observable} from 'rxjs';
 
 interface CapsuleGoalPair {
   capsule: CapsuleResponseDto;
@@ -32,7 +29,7 @@ interface Message {
 })
 export class UserPublicCapsulesComponent implements OnInit {
   userId: number | null = null;
-  username: string | null = null; // To display whose capsules are being viewed
+  username: string | null = null;
   capsulesWrappers: CapsuleGoalPair[] = [];
   loadingCapsules = true;
   messages: Message[] = [];
@@ -40,7 +37,6 @@ export class UserPublicCapsulesComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     protected router: Router,
-    private capsuleService: CapsuleService,
     private userService: UserService,
     private goalService: GoalService
   ) { }
@@ -48,13 +44,13 @@ export class UserPublicCapsulesComponent implements OnInit {
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
       const id = params.get('userId');
-      // Attempt to get username from route param, or fetch it if needed (though backend provides it in CapsuleResponseDto)
+
       const name = params.get('username');
 
       if (id) {
         this.userId = +id;
-        this.username = name; // Set username if available from route
-        this.loadUserAndCapsules(this.userId); // Consolidated loading
+        this.username = name;
+        this.loadUserAndCapsules(this.userId);
       } else {
         this.addMessage('User ID not found in route. Redirecting to users list.', 'error');
         this.router.navigate(['/users']);
@@ -96,8 +92,6 @@ export class UserPublicCapsulesComponent implements OnInit {
   }
 
   viewCapsuleDetails(capsuleId: number): void {
-    // Navigate to the capsule details page.
-    // The capsule-details component already has logic to conditionally hide edit buttons.
     this.router.navigate(['/capsules', capsuleId]);
   }
 
@@ -105,14 +99,11 @@ export class UserPublicCapsulesComponent implements OnInit {
     return this.goalService.getGoal(goalId);
   }
 
-  // Helper method to determine if a goal should be displayed on this "public" page
   isGoalContentVisible(goalDto: GoalDto): boolean {
     return goalDto?.visible === true;
   }
 
-  // Helper method to determine if memories should be shown on this "public" page
   isMemoriesVisible(capsule: CapsuleResponseDto): boolean {
-    // Memories are visible only if the capsule's status is 'OPENED'.
     return capsule.status === CapsuleStatus.OPEN || capsule.status === CapsuleStatus.CREATED;
   }
 }
