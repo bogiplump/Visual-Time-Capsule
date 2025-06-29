@@ -10,17 +10,17 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { CapsuleService } from '../services/capsule.service';
 import { GoalService } from '../services/goal.service';
 import { MemoryService } from '../services/memory.service';
-import { AuthService } from '../services/auth.service'; // Assuming you have an Auth Service
+import { AuthService } from '../services/auth.service';
 
 // Models & DTOs
-import { CapsuleUpdateDto } from '../dtos/capsule-update.dto';
-import { UpdateGoalDto } from '../dtos/update-goal.dto';
+import { CapsuleUpdateDto, GoalUpdatePartDto } from '../dtos/capsule-update.dto';
 import { MemoryCreateDto } from '../dtos/memory-create.dto';
 import { CapsuleStatus } from '../enums/capsule-status.enum';
 import { CapsuleResponseDto } from '../dtos/capsule-response.dto';
 import { GoalDto } from '../dtos/goal.dto';
 import { MemoryDto } from '../dtos/memory.dto';
 import { MemoryType } from '../enums/memory-type.enum';
+import {UpdateGoalDto} from '../dtos/update-goal.dto';
 
 interface Message {
   text: string;
@@ -37,12 +37,15 @@ interface Message {
 export class CapsuleDetailsComponent implements OnInit, OnDestroy {
   capsuleId: number | null = null;
   capsule: CapsuleResponseDto | null = null;
-  currentGoal: GoalDto | null = null;
+  currentGoalId: number | null = null;
+  displayingGoal: GoalDto | null = null;
+  currentAuthenticatedUsername: string | null = null;
+  goalAchievementMessage: string | null = null;
+  hasAchievementBeenSet = false;
 
   editingCapsule = false;
   updatedCapsuleName = '';
-  updatedOpenDate: string | null = ''; // Used for datetime-local binding
-
+  updatedOpenDate: string | null = null;
   capsuleStatus: typeof CapsuleStatus = CapsuleStatus;
 
   editingGoal = false;
@@ -60,6 +63,7 @@ export class CapsuleDetailsComponent implements OnInit, OnDestroy {
 
   loadingCapsule = true;
   loadingMemories = true;
+  loadingGoalDetails = false;
   loadingUpdateCapsule = false;
   loadingUpdateGoal = false;
   loadingAddMemory = false;
@@ -75,7 +79,11 @@ export class CapsuleDetailsComponent implements OnInit, OnDestroy {
   currentDate: Date = new Date();
   private dateUpdateSubscription: Subscription | undefined;
 
-  currentAuthenticatedUsername: string = ''; // Property to hold current user's username
+  // NEW: Goal Achievement Dialog properties
+  showGoalAchievedDialog = false;
+  goalAchievedStatus: 'achieved' | 'notAchieved' | null = null;
+  submittingGoalAchievedStatus = false;
+
 
   constructor(
     private route: ActivatedRoute,
@@ -83,12 +91,14 @@ export class CapsuleDetailsComponent implements OnInit, OnDestroy {
     private capsuleService: CapsuleService,
     private goalService: GoalService,
     private memoryService: MemoryService,
-    private sanitizer: DomSanitizer,
-    private authService: AuthService // Inject AuthService
+    private authService: AuthService,
+    private sanitizer: DomSanitizer
   ) { }
 
   ngOnInit(): void {
-    this.currentAuthenticatedUsername = this.authService.getCurrentUsername();
+    this.authService.getCurrentUser().subscribe(user => {
+      this.currentAuthenticatedUsername = user?.username || null;
+    });
 
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
@@ -138,20 +148,21 @@ export class CapsuleDetailsComponent implements OnInit, OnDestroy {
     this.capsuleService.getCapsule(this.capsuleId).subscribe({
       next: (capsuleData: CapsuleResponseDto) => {
         this.capsule = capsuleData;
-        console.log(this.capsule);
         this.updatedCapsuleName = capsuleData.capsuleName;
-        // Use the openDateTime from the capsule response, formatted for datetime-local
-        this.updatedOpenDate = capsuleData.openDateTime ? this.formatDateForDateTimeLocal(capsuleData.openDateTime) : '';
+        // Correctly use capsuleData.openDate which is now consistent in DTOs
+        this.updatedOpenDate = capsuleData.openDateTime ? this.formatDateForDateTimeLocal(capsuleData.openDateTime) : null;
 
-        console.log("Capsule loaded openDateTime:", capsuleData.openDateTime); // Still log this to verify backend output
-        console.log("Capsule loaded lockDate:", capsuleData.lockDate); // Still log this to verify backend output
-
-
-        this.currentGoal = capsuleData.goal || null;
-        this.updatedGoalContent = capsuleData.goal?.content || '';
-
+        // Ensure currentGoalId is correctly extracted from the nested goal object
+        this.currentGoalId = capsuleData.goalId || null;
         this.memories = Array.from(capsuleData.memories || []);
         this.addMessage('Capsule details and memories loaded successfully!', 'success');
+
+        // Fetch full goal details if a goal exists
+        if (this.currentGoalId !== null) {
+          this.fetchGoalDetails(this.currentGoalId);
+        } else {
+          this.displayingGoal = null;
+        }
       },
       error: (error: HttpErrorResponse) => {
         this.addMessage(`Failed to load capsule: ${error.message || 'Unknown error'}`, 'error');
@@ -160,6 +171,33 @@ export class CapsuleDetailsComponent implements OnInit, OnDestroy {
       complete: () => {
         this.loadingCapsule = false;
         this.loadingMemories = false;
+      }
+    });
+  }
+
+  fetchGoalDetails(goalId: number): void {
+    this.loadingGoalDetails = true;
+    this.goalService.getGoal(goalId).subscribe({
+      next: (goalDto: GoalDto) => {
+        this.displayingGoal = goalDto;
+        this.updatedGoalContent = goalDto.content; // Pre-populate for editing if needed
+        this.goalAchievedStatus = goalDto.achieved ? 'achieved' : 'notAchieved';
+
+        // Set goal achievement message if goal is achieved
+        if (this.displayingGoal.achieved) {
+          this.goalAchievementMessage = 'Congratulations! You achieved this goal.';
+        } else if (this.capsule?.status === CapsuleStatus.OPEN) {
+          this.goalAchievementMessage = 'You did not achieve this goal. Keep striving for your next one!';
+        } else {
+          this.goalAchievementMessage = ''; // Clear message if capsule is not open or goal status not finalized
+        }
+      },
+      error: (error: HttpErrorResponse) => {
+        this.addMessage(`Failed to load goal details: ${error.message || 'Unknown error'}`, 'error');
+        this.displayingGoal = null;
+      },
+      complete: () => {
+        this.loadingGoalDetails = false;
       }
     });
   }
@@ -183,8 +221,7 @@ export class CapsuleDetailsComponent implements OnInit, OnDestroy {
 
   private formatDateForDateTimeLocal(isoString: string): string {
     if (!isoString) return '';
-    const date = new Date(isoString); // This should correctly interpret the ISO string with 'Z'
-    // Get the local components for the datetime-local input
+    const date = new Date(isoString);
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const day = date.getDate().toString().padStart(2, '0');
@@ -194,25 +231,13 @@ export class CapsuleDetailsComponent implements OnInit, OnDestroy {
   }
 
 
-  // isEditable: Can edit capsule name, set open date, add memories, edit goal
-  get isEditable(): boolean {
-    return this.capsule !== null &&
-      this.capsule.status === CapsuleStatus.CREATED &&
-      this.capsule.creator?.username === this.currentAuthenticatedUsername;
-  }
-
-  // canDeleteCapsule: Can delete the capsule (only creator, regardless of status)
-  get canDeleteCapsule(): boolean {
-    return this.capsule !== null &&
-      this.capsule.creator?.username === this.currentAuthenticatedUsername;
-  }
-
+  // --- Capsule Management ---
   toggleEditCapsule(): void {
     if (this.isEditable) {
       this.editingCapsule = !this.editingCapsule;
       if (this.editingCapsule && this.capsule) {
         this.updatedCapsuleName = this.capsule.capsuleName;
-        this.updatedOpenDate = this.capsule.openDateTime ? this.formatDateForDateTimeLocal(this.capsule.openDateTime) : '';
+        this.updatedOpenDate = this.capsule.openDateTime ? this.formatDateForDateTimeLocal(this.capsule.openDateTime) : null;
       }
     } else {
       this.addMessage('This capsule cannot be edited. It must be in CREATED status and you must be the creator.', 'error');
@@ -228,32 +253,43 @@ export class CapsuleDetailsComponent implements OnInit, OnDestroy {
     this.loadingUpdateCapsule = true;
     this.messages = [];
 
-    const goalUpdatePart = this.currentGoal ? {
+    const goalUpdatePart: GoalUpdatePartDto | null = this.displayingGoal ? {
       content: this.updatedGoalContent,
-      isAchieved: this.currentGoal.isAchieved,
-      isVisible: this.currentGoal.isVisible
+      isAchieved: this.displayingGoal.achieved,
+      isVisible: this.displayingGoal.visible
     } : null;
 
-    // Send updatedOpenDate (from datetime-local) directly.
-    // The backend's parseInputDateTimeToUTC will handle converting this local time to UTC.
+
     const updateDto: CapsuleUpdateDto = {
       capsuleName: this.updatedCapsuleName,
-      openDateTime: this.updatedOpenDate || null, // Changed: Send directly from datetime-local input
+      openDateTime: this.updatedOpenDate ? new Date(this.updatedOpenDate).toISOString() : null,
       goal: goalUpdatePart
     };
 
-    // Moved 'lock' logic into lockCapsuleAction(). This 'save' is now purely for update.
-    this.capsuleService.updateCapsule(this.capsuleId, updateDto).subscribe({
-      next: () => {
-        this.addMessage('Capsule updated successfully!', 'success');
-        this.loadCapsuleDetails();
-        this.toggleEditCapsule();
-      },
-      error: (error: HttpErrorResponse) => {
-        this.addMessage(`Failed to update capsule: ${error.message || 'Unknown error'}`, 'error');
-      },
-      complete: () => { this.loadingUpdateCapsule = false; }
-    });
+    if (this.capsule.status === CapsuleStatus.CREATED && updateDto.openDateTime) {
+      const selectedOpenDate = new Date(this.updatedOpenDate!);
+      if (selectedOpenDate <= this.currentDate) {
+        this.addMessage('Open date must be in the future to lock the capsule.', 'error');
+        this.loadingUpdateCapsule = false;
+        return;
+      }
+
+      console.log("Updateing ......")
+
+      this.capsuleService.updateCapsule(this.capsuleId, updateDto).subscribe({
+        next: (updatedCapsule: CapsuleResponseDto) => {
+          this.addMessage('Capsule updated successfully!', 'success');
+          this.capsule = updatedCapsule;
+          this.toggleEditCapsule();
+        },
+        error: (error: HttpErrorResponse) => {
+
+          this.addMessage(`Failed to update capsule: ${error.error || 'Unknown error'}`, 'error');
+          this.loadingUpdateCapsule = false;
+        },
+        complete: () => { this.loadingUpdateCapsule = false; }
+      });
+    }
   }
 
   lockCapsuleAction(): void {
@@ -267,14 +303,20 @@ export class CapsuleDetailsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (this.capsule.creator?.username !== this.currentAuthenticatedUsername) {
+    console.log("Locking capsule..." + this.isAuthorized);
+    if (!this.isAuthorized) {
       this.addMessage('You are not authorized to lock this capsule.', 'error');
       return;
     }
 
-    // Use the stored openDateTime, which should already be in ISO UTC format
-    if (!this.capsule.openDateTime) {
+    if (!this.updatedOpenDate) {
       this.addMessage('Please set an "Opens On" date for the capsule by editing it before locking.', 'error');
+      return;
+    }
+
+    const selectedOpenDate = new Date(this.updatedOpenDate);
+    if (selectedOpenDate <= this.currentDate) {
+      this.addMessage('Open date must be in the future to lock the capsule.', 'error');
       return;
     }
 
@@ -283,23 +325,30 @@ export class CapsuleDetailsComponent implements OnInit, OnDestroy {
     }
 
     this.loadingUpdateCapsule = true;
-    // Pass the existing openDateTime from the capsule object
-    this.capsuleService.lockCapsule(this.capsuleId, this.capsule.openDateTime).subscribe({
-      next: () => {
+    const openDateTimeISO = new Date(this.updatedOpenDate).toISOString();
+
+    this.capsuleService.lockCapsule(this.capsuleId, openDateTimeISO).subscribe({
+      next: (updatedCapsule: CapsuleResponseDto) => {
         this.addMessage('Capsule locked successfully! It will open on the set date.', 'success');
-        this.loadCapsuleDetails();
+        this.capsule = updatedCapsule;
+        if (this.capsule.status === CapsuleStatus.OPEN && this.currentGoalId !== null) {
+          this.fetchGoalDetails(this.currentGoalId);
+        }
       },
       error: (error: HttpErrorResponse) => {
-        this.addMessage(`Failed to lock capsule: ${error.message || 'Unknown error'}`, 'error');
+        console.log(error);
+        this.addMessage(`Failed to lock capsule: ${error.error || 'Unknown error'}`, 'error');
       },
-      complete: () => { this.loadingUpdateCapsule = false; }
+      complete: () => {
+        this.loadingUpdateCapsule = false;
+      }
     });
   }
 
+
   deleteCapsule(): void {
-    // Check canDeleteCapsule instead of isEditable
     if (!this.capsuleId || !this.canDeleteCapsule || !confirm('Are you sure you want to delete this capsule? This action cannot be undone.')) {
-      if (!this.canDeleteCapsule) { // Provide specific error if not authorized for deletion
+      if (!this.canDeleteCapsule) {
         this.addMessage('You are not authorized to delete this capsule.', 'error');
       }
       return;
@@ -330,7 +379,7 @@ export class CapsuleDetailsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (this.capsule.creator?.username !== this.currentAuthenticatedUsername) {
+    if (!this.isAuthorized) {
       this.addMessage('You are not authorized to open this capsule.', 'error');
       return;
     }
@@ -347,19 +396,36 @@ export class CapsuleDetailsComponent implements OnInit, OnDestroy {
     this.capsuleService.openCapsule(this.capsuleId).subscribe({
       next: () => {
         this.addMessage('Capsule opened successfully! All contents are now visible.', 'success');
-        this.loadCapsuleDetails();
+        this.loadCapsuleDetails(); // This will re-fetch capsule, which will then trigger fetchGoalDetails
       },
       error: (error: HttpErrorResponse) => {
-        this.addMessage(`Failed to open capsule: ${error.message || 'Unknown error'}`, 'error');
+        this.addMessage(`Failed to open capsule: ${error.error || 'Unknown error'}`, 'error');
       }
     });
+    this.showGoalAchievedDialog = true;
   }
 
+  get isEditable(): boolean {
+    return this.isAuthorized;
+  }
+
+  get isAuthorized(): boolean {
+    return <boolean>(this.capsule?.creator?.username === this.currentAuthenticatedUsername ||
+      (this.capsule?.isShared && this.capsule.sharedWithUsers?.map(u => u.username).includes(<string>this.currentAuthenticatedUsername)) &&
+      this.capsule?.status === CapsuleStatus.CREATED);
+  }
+
+  get canDeleteCapsule(): boolean {
+    return this.capsule !== null &&
+      this.capsule.creator?.username === this.currentAuthenticatedUsername;
+  }
+
+  // --- Goal Management ---
   toggleEditGoal(): void {
     if (this.isEditable) {
       this.editingGoal = !this.editingGoal;
-      if (this.editingGoal && this.currentGoal) {
-        this.updatedGoalContent = this.currentGoal.content;
+      if (this.editingGoal && this.displayingGoal) {
+        this.updatedGoalContent = this.displayingGoal.content;
       }
     } else {
       this.addMessage('Goal cannot be edited. Capsule must be in CREATED status and you must be the creator.', 'error');
@@ -367,8 +433,8 @@ export class CapsuleDetailsComponent implements OnInit, OnDestroy {
   }
 
   saveGoalContent(): void {
-    if (!this.currentGoal || !this.capsuleId) {
-      this.addMessage('Goal or Capsule ID not loaded. Cannot save goal.', 'error');
+    if (!this.displayingGoal || !this.displayingGoal.id) {
+      this.addMessage('Goal details not loaded or Goal ID is missing. Cannot save goal.', 'error');
       return;
     }
     if (!this.isEditable) {
@@ -381,23 +447,48 @@ export class CapsuleDetailsComponent implements OnInit, OnDestroy {
 
     const updateGoalDto: UpdateGoalDto = {
       contentUpdate: this.updatedGoalContent,
-      isVisible: this.currentGoal.isVisible,
-      isAchieved: this.currentGoal.isAchieved
+      isAchieved: this.displayingGoal.visible,
+      isVisible: this.displayingGoal.visible,
     };
 
-    this.goalService.updateGoal(this.currentGoal.id, updateGoalDto).subscribe({
-      next: () => {
-        this.addMessage('Goal updated successfully!', 'success');
-        this.loadCapsuleDetails();
-        this.toggleEditGoal();
-      },
-      error: (error: HttpErrorResponse) => {
-        this.addMessage(`Failed to update goal: ${error.message || 'Unknown error'}`, 'error');
-      },
-      complete: () => { this.loadingUpdateGoal = false; }
-    });
+    this.goalService.updateGoal(this.displayingGoal.id, updateGoalDto)
   }
 
+  // NEW: Methods for Goal Achievement Dialog
+  openGoalAchievedDialog(): void {
+    if (this.displayingGoal) {
+      this.showGoalAchievedDialog = true;
+    }
+  }
+
+  closeGoalAchievedDialog(): void {
+    this.showGoalAchievedDialog = false;
+    this.goalAchievedStatus = null; // Reset selection
+  }
+
+  submitGoalAchievedStatus(): void {
+    if (!this.displayingGoal || !this.displayingGoal.id || this.goalAchievedStatus === null) {
+      this.addMessage('Goal data is missing or achievement status not selected.', 'error');
+      return;
+    }
+
+    this.submittingGoalAchievedStatus = true;
+
+    console.log(this.goalAchievedStatus === 'achieved');
+    console.log(typeof (this.goalAchievedStatus === 'achieved'));
+    this.goalService.setIsAchieved(this.displayingGoal.id, this.goalAchievedStatus === 'achieved').subscribe({
+      next: () => {
+        console.log(this.showGoalAchievedDialog);
+        this.showGoalAchievedDialog = false;
+        this.hasAchievementBeenSet = true;
+        this.loadCapsuleDetails();
+      }
+    });
+    console.log(this.hasAchievementBeenSet);
+  }
+
+
+  // --- Memory Management ---
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
@@ -462,13 +553,14 @@ export class CapsuleDetailsComponent implements OnInit, OnDestroy {
           this.addMemoryDialogMessage(errorMessage, 'error');
         } else if (error.error && typeof error.error.message === 'string') {
           errorMessage = error.error.message;
-          this.addMemoryDialogMessage(errorMessage, 'error'); // Fixed: Changed addDialogMessage to addMemoryDialogMessage
+          this.addMemoryDialogMessage(errorMessage, 'error');
         } else if (typeof error.error === 'string') {
           errorMessage = error.error;
-          this.addMemoryDialogMessage(errorMessage, 'error'); // Fixed: Changed addDialogMessage to addMemoryDialogMessage
+          this.addMemoryDialogMessage(errorMessage, 'error');
         } else {
           this.addMemoryDialogMessage(errorMessage, 'error');
         }
+        this.loadingAddMemory = false;
       },
       complete: () => { this.loadingAddMemory = false; }
     });

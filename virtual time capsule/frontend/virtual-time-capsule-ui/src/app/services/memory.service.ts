@@ -31,6 +31,7 @@ export class MemoryService {
         // Error handling for missing file
       }
 
+      console.log(memoryDto);
       let params = new HttpParams().set('capsuleId', capsuleId.toString()); // Matches @RequestParam("capsuleId")
 
       return this.http.post<any>(`${this.apiUrl}`, formData, { params });

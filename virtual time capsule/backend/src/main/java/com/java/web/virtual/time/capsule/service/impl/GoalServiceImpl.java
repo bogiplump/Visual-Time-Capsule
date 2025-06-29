@@ -1,9 +1,9 @@
 package com.java.web.virtual.time.capsule.service.impl;
 
+import com.java.web.virtual.time.capsule.dto.GoalCreateDto;
 import com.java.web.virtual.time.capsule.dto.GoalDto;
 import com.java.web.virtual.time.capsule.dto.UpdateGoalDto;
 import com.java.web.virtual.time.capsule.exception.goal.GoalNotFoundException;
-import com.java.web.virtual.time.capsule.exception.goal.GoalNotVisibleException;
 import com.java.web.virtual.time.capsule.mapper.GoalMapper;
 import com.java.web.virtual.time.capsule.model.Capsule;
 import com.java.web.virtual.time.capsule.model.Goal;
@@ -12,14 +12,17 @@ import com.java.web.virtual.time.capsule.repository.CapsuleRepository;
 import com.java.web.virtual.time.capsule.repository.GoalRepository;
 import com.java.web.virtual.time.capsule.repository.UserRepository;
 
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.List;
 
 import com.java.web.virtual.time.capsule.service.GoalService;
 import lombok.AllArgsConstructor;
 
-import org.jetbrains.annotations.NotNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class GoalServiceImpl implements GoalService {
@@ -30,11 +33,19 @@ public class GoalServiceImpl implements GoalService {
     private CapsuleRepository capsuleRepository;
 
     @Override
-    public Goal createGoal(Long capsuleId, GoalDto goalEntity, String creator) {
+    public void createGoal(Long capsuleId, GoalCreateDto goalCreateDto, String creator) {
         Capsule capsule = capsuleRepository.findById(capsuleId).orElseThrow(GoalNotFoundException::new);
-        Goal goal = goalMapper.toEntity(goalEntity);
+        UserModel user = userRepository.findByUsername(creator);
+        Goal goal = Goal.builder()
+            .content(goalCreateDto.getContent())
+            .isVisible(goalCreateDto.getIsVisible())
+            .build();
+        goal.setIsAchieved(false);
         goal.setCapsule(capsule);
-        return goalRepository.save(goal);
+        goal.setCreator(user);
+        goal.setCreationDate(LocalDate.now(ZoneOffset.UTC));
+        log.info("Creating goal {}", goal);
+        goalRepository.save(goal);
     }
 
     @Override
@@ -49,12 +60,10 @@ public class GoalServiceImpl implements GoalService {
         goalRepository.save(goal);
     }
 
-    public Goal getGoal(Long id) {
+    public GoalDto getGoal(Long id) {
         Goal goal = goalRepository.getReferenceById(id);
-        if (!goal.isVisible()) {
-            throw new GoalNotVisibleException("Goal not visible to user.");
-        }
-        return goal;
+        log.info(goal.toString());
+        return goalMapper.toDto(goal);
     }
 
     @Override
@@ -73,20 +82,15 @@ public class GoalServiceImpl implements GoalService {
         List<Goal> userGoals = goalRepository.findByCreator(userRepository.findByUsername(username));
 
         return userGoals.stream()
-            .filter(Goal::isVisible)
+            .filter(Goal::getIsVisible)
             .toList();
     }
 
     @Override
-    public void makeGoalVisible(Long id) {
-        goalRepository.getReferenceById(id).setVisible(true);
-    }
-
-    @Override
-    public void setGoalIsAchieved(Long id) {
+    public void setGoalIsAchievedAndMakeVisible(Long id, Boolean isAchieved) {
         Goal goal = goalRepository.getReferenceById(id);
-
-        goal.setAchieved(true);
+        goal.setIsVisible(true);
+        goal.setIsAchieved(isAchieved);
         goalRepository.save(goal);
     }
 }

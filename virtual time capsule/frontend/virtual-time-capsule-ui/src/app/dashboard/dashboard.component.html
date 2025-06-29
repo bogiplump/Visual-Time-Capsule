@@ -96,12 +96,6 @@
               </ng-container>
             </span>
 
-            <!-- DEBUG INFO START -->
-            <span style="font-size: 0.7em; color: grey; margin-left: 10px;">
-              (ReqID: {{ friendship.requesterId }}, ResID: {{ friendship.responderId }}, CurrentUserID: {{ currentUserId }})
-            </span>
-            <!-- DEBUG INFO END -->
-
             <div class="friend-actions">
               <ng-container *ngIf="friendship.status === FriendshipStatus.PENDING && friendship.responderId === currentUserId">
                 <button class="action-button accept-button" (click)="acceptFriendRequest(friendship.id)">Accept</button>
@@ -187,7 +181,7 @@
                 [(ngModel)]="newCapsuleData.goal.isVisible"
                 class="form-checkbox"
               />
-              <label for="goalVisible" class="form-label-checkbox">Goal Visible (to friends)</label>
+              <label for="goalVisible" class="form-label-checkbox">Goal Visible</label>
             </div>
 
             <!-- NEW: Share with Friends section -->

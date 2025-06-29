@@ -258,7 +258,7 @@
   margin-top: 1rem;
 }
 
-.view-link {
+.view-link-button { /* Changed from .view-link to .view-link-button for consistency with other buttons */
   color: #3b82f6;
   text-decoration: none;
   font-weight: 500;
@@ -267,9 +267,11 @@
   border-radius: 0.375rem;
   border: 1px solid #3b82f6;
   transition: all 0.2s ease-in-out;
+  background-color: transparent; /* Ensure transparent background */
+  cursor: pointer;
 }
 
-.view-link:hover {
+.view-link-button:hover {
   background-color: #e0f2fe;
   color: #2563eb;
 }
@@ -290,6 +292,7 @@
   background-color: #dc2626;
 }
 
+/* Styles for the "Add New Memory" form container */
 .add-memory-form-container {
   background-color: #f0f9ff; /* Very light blue background */
   border: 1px dashed #bfdbfe; /* Dashed blue border */
@@ -297,6 +300,7 @@
   padding: 1.5rem;
   margin-top: 1.5rem;
   margin-bottom: 2rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05); /* Subtle shadow for depth */
 }
 
 .form-subheading {
@@ -306,6 +310,73 @@
   margin-bottom: 1.5rem;
   text-align: center;
 }
+
+.modal-form .form-group {
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.modal-form .form-label {
+  display: block;
+  font-weight: 600;
+  color: #4b5563;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.modal-form .form-input,
+.modal-form .select-input,
+.modal-form .textarea-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  color: #1f2937;
+  background-color: #ffffff;
+  outline: none;
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  box-sizing: border-box;
+}
+
+.modal-form .form-input:focus,
+.modal-form .select-input:focus,
+.modal-form .textarea-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+}
+
+.modal-form .textarea-input {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.modal-form .file-input {
+  padding: 0.5rem; /* Adjust padding for file input */
+}
+
+.modal-form .dialog-messages {
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.modal-form .action-button {
+  width: auto; /* Allow buttons to size naturally within the form */
+  padding: 0.7rem 1.4rem;
+  font-size: 1rem;
+}
+
+.modal-form .add-button {
+  background-color: #22c55e; /* Green for add action */
+}
+.modal-form .add-button:hover {
+  background-color: #16a34a;
+}
+.modal-form .add-button:disabled {
+  background-color: #a7f3d0; /* Lighter green when disabled */
+  cursor: not-allowed;
+}
+
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
@@ -333,6 +404,12 @@
   }
   .memories-grid {
     grid-template-columns: 1fr; /* Single column for memories */
+  }
+  /* Ensure form elements are full width on small screens */
+  .modal-form .form-input,
+  .modal-form .select-input,
+  .modal-form .textarea-input {
+    width: 100%;
   }
 }
 
@@ -387,4 +464,173 @@
   width: 800px; /* Adjust as needed */
   height: 600px; /* Adjust as needed */
   border: 1px solid #ccc;
+}
+
+/* NEW: Styles for the Goal Achievement Dialog */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1001; /* Higher z-index than other modals if multiple are present */
+}
+
+.modal-content.goal-achieved-modal {
+  background-color: #ffffff;
+  padding: 2.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  max-width: 500px; /* Adjust max-width for better dialog appearance */
+  width: 90%;
+  text-align: center;
+  position: relative;
+  animation: fadeInScale 0.3s ease-out forwards; /* Add animation */
+}
+
+/* Modal header/subheading */
+.modal-heading {
+  font-size: 2rem;
+  color: #1e40af; /* Dark blue */
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+.modal-subheading {
+  font-size: 1rem;
+  color: #4b5563;
+  margin-bottom: 1.5rem;
+}
+
+/* Goal content display within the dialog */
+.goal-content-display {
+  background-color: #e0f2fe; /* Light blue background */
+  border: 1px solid #90cdf4; /* Blue border */
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.goal-text {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+  font-style: italic; /* Emphasize the goal content */
+}
+
+.goal-created-date {
+  font-size: 0.85rem;
+  color: #6b7280;
+  text-align: right;
+  margin-top: 1rem;
+}
+
+.goal-question {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-bottom: 2rem;
+  align-items: flex-start; /* Align radios to the left */
+}
+
+.radio-group label {
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+  color: #374151;
+  cursor: pointer;
+}
+
+.radio-group input[type="radio"] {
+  margin-right: 0.75rem;
+  /* Custom radio styling */
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #90cdf4;
+  border-radius: 50%;
+  outline: none;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease-in-out;
+}
+
+.radio-group input[type="radio"]:checked {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+.radio-group input[type="radio"]:checked::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  background-color: white;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Modal actions for dialog */
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.modal-submit-button {
+  background-color: #22c55e; /* Green */
+  color: white;
+  padding: 0.8rem 1.5rem;
+  border-radius: 0.5rem;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.modal-submit-button:hover:not(:disabled) {
+  background-color: #16a34a; /* Darker green */
+  transform: translateY(-1px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.modal-submit-button:disabled {
+  background-color: #e5e7eb;
+  color: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Animation for modal appearance */
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }

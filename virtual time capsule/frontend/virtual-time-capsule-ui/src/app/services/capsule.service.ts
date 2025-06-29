@@ -46,6 +46,7 @@ export class CapsuleService {
    * Returns CapsuleResponseDto now.
    */
   updateCapsule(id: number, capsuleDto: CapsuleUpdateDto): Observable<CapsuleResponseDto> {
+    console.log("Sending request" +`${this.apiUrl}/${id}`);
     return this.http.put<CapsuleResponseDto>(`${this.apiUrl}/${id}`, capsuleDto);
   }
 

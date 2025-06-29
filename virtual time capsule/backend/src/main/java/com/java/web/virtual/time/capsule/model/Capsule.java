@@ -86,7 +86,7 @@ public class Capsule {
 
     // NEW: For Shared Capsules
     @Column(name = "is_shared", nullable = false)
-    private boolean isShared;
+    private Boolean isShared;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -209,7 +209,7 @@ public class Capsule {
             .content(capsuleCreateDto.getGoal().getContent())
             .creator(creator)
             .isAchieved(false) // Default to false on creation
-            .isVisible(capsuleCreateDto.getGoal().isVisible())
+            .isVisible(capsuleCreateDto.getGoal().getIsVisible())
             .creationDate(LocalDate.now())
             .capsule(newCapsule) // Set back-reference immediately
             .build();
@@ -217,7 +217,7 @@ public class Capsule {
 
         // Add shared users
         if (sharedUsers != null) {
-            log.info("Adding shared user: " + newCapsule.getSharedWithUsers());
+            log.info("Adding shared user: {}", newCapsule.getSharedWithUsers());
             sharedUsers.forEach(newCapsule::addSharedUser);
         }
 
