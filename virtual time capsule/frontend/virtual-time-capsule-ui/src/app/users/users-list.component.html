@@ -6,7 +6,6 @@
 
     <h1 class="users-heading">All Users</h1>
 
-    <!-- Message Display -->
     <div *ngIf="messages.length > 0" class="page-messages">
       <div *ngFor="let msg of messages" [ngClass]="{'message-box': true, 'success': msg.type === 'success', 'error': msg.type === 'error'}">
         {{ msg.text }}
@@ -25,7 +24,6 @@
             View Public Capsules
           </button>
 
-          <!-- Friendship Buttons -->
           <ng-container *ngIf="!user.friendshipStatus">
             <button
               class="action-button friendship-button send-request"
@@ -35,7 +33,6 @@
             </button>
           </ng-container>
 
-          <!-- If current user sent the request -->
           <button
             *ngIf="user.friendshipStatus === FriendshipStatus.PENDING && user.isRequestFromCurrentUser"
             class="action-button friendship-button pending"
@@ -44,7 +41,6 @@
             Request Sent
           </button>
 
-          <!-- If current user received the request -->
           <button
             *ngIf="user.friendshipStatus === FriendshipStatus.PENDING && user.isRequestToCurrentUser"
             class="action-button friendship-button accept-request"
@@ -53,7 +49,6 @@
             Accept Request
           </button>
 
-          <!-- If friendship is accepted -->
           <button
             *ngIf="user.friendshipStatus === FriendshipStatus.ACCEPTED"
             class="action-button friendship-button accepted"
@@ -62,7 +57,6 @@
             Friends
           </button>
 
-          <!-- If friendship is declined -->
           <button
             *ngIf="user.friendshipStatus === FriendshipStatus.DECLINED"
             class="action-button friendship-button declined"

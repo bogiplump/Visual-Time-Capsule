@@ -6,17 +6,13 @@
 
     <h1 class="capsule-heading">Capsule Details</h1>
 
-    <!-- Page-level messages -->
-    <div *ngIf="messages.length > 0" class="page-messages">
+    <div [@If]="messages.length > 0" class="page-messages">
       <div *ngFor="let msg of messages" [ngClass]="{'message-box': true, 'success': msg.type === 'success', 'error': msg.type === 'error'}">
         {{ msg.text }}
       </div>
     </div>
 
-    <div *ngIf="loadingCapsule" class="loading-message">Loading capsule details...</div>
-
     <div *ngIf="!loadingCapsule && capsule">
-      <!-- Capsule Information Section -->
       <div class="capsule-section">
         <h2 class="section-title">Capsule Information</h2>
         <div class="info-grid">
@@ -48,9 +44,7 @@
         </div>
 
         <div class="section-actions">
-          <!-- Edit Capsule Button: Only visible if editable and not currently editing -->
           <button *ngIf="!editingCapsule && isEditable" class="action-button edit-button" (click)="toggleEditCapsule()">Edit Capsule</button>
-          <!-- Save/Cancel Buttons: Only visible if currently editing -->
           <button *ngIf="editingCapsule" class="action-button save-button" (click)="saveCapsuleDetails()" [disabled]="loadingUpdateCapsule">
             <span *ngIf="!loadingUpdateCapsule">Save Changes</span>
             <span *ngIf="loadingUpdateCapsule" class="loading-spinner-container-small">
@@ -63,7 +57,6 @@
           </button>
           <button *ngIf="editingCapsule" class="action-button cancel-button" (click)="toggleEditCapsule()">Cancel</button>
 
-          <!-- NEW: Lock Capsule Button -->
           <button
             *ngIf="capsule?.status === capsuleStatus.CREATED && isEditable && !editingCapsule"
             class="action-button lock-button"
@@ -73,20 +66,16 @@
             Lock Capsule
           </button>
 
-          <!-- Open Capsule Button: Controlled by canOpenCapsule (date + status) and ownership -->
           <button *ngIf="canOpenCapsule && capsule?.creator?.username === currentAuthenticatedUsername" class="action-button open-capsule-button" (click)="openCapsule()">Open Capsule</button>
-          <!-- Delete Capsule Button: Now visible if canDeleteCapsule is true -->
           <button *ngIf="canDeleteCapsule" class="action-button delete-button" (click)="deleteCapsule()">Delete Capsule</button>
         </div>
       </div>
 
       <hr class="section-divider">
 
-      <!-- Goal Section - Hidden if capsule is CLOSED -->
       <ng-container *ngIf="capsule?.status !== capsuleStatus.CLOSED">
         <div class="capsule-section goal-section">
           <h2 class="section-title">Your Goal</h2>
-          <!-- Display goal content ONLY if currentGoal exists AND isVisible is true -->
           <ng-container *ngIf="displayingGoal?.visible">
             <div class="info-grid">
               <div class="info-item">
@@ -108,9 +97,7 @@
               </div>
             </div>
             <div class="section-actions">
-              <!-- Edit Goal Button: Only visible if editable and not currently editing -->
               <button *ngIf="!editingGoal && isEditable" class="action-button edit-button" (click)="toggleEditGoal()">Edit Goal</button>
-              <!-- Save/Cancel Buttons: Only visible if currently editing -->
               <button *ngIf="editingGoal" class="action-button save-button" (click)="saveGoalContent()" [disabled]="loadingUpdateGoal">
                 <span *ngIf="!loadingUpdateGoal">Save Goal</span>
                 <span *ngIf="loadingUpdateGoal" class="loading-spinner-container-small">
@@ -124,10 +111,8 @@
               <button *ngIf="editingGoal" class="action-button cancel-button" (click)="toggleEditGoal()">Cancel</button>
             </div>
           </ng-container>
-          <!-- Message when goal is not visible or doesn't exist, with an edit option for the owner -->
           <ng-container *ngIf="!displayingGoal?.visible">
             <p class="no-data-message">Goal is currently hidden or not set.</p>
-            <!-- Edit Goal button if capsule is editable (implies current user is owner & status is CREATED) -->
             <div class="section-actions" *ngIf="isEditable">
               <button class="action-button edit-button" (click)="toggleEditGoal()">Edit Goal</button>
             </div>
@@ -137,18 +122,15 @@
 
       <hr class="section-divider">
 
-      <!-- Memories Section - Hidden if capsule is CLOSED -->
       <ng-container *ngIf="capsule?.status !== capsuleStatus.CLOSED">
         <div class="capsule-section memories-section">
           <h2 class="section-title">Memories</h2>
           <div class="section-actions">
-            <!-- Add New Memory Button: Only visible if editable -->
             <button *ngIf="isEditable" class="action-button add-button" (click)="addingMemory = !addingMemory">
               {{ addingMemory ? 'Cancel Add Memory' : 'Add New Memory' }}
             </button>
           </div>
 
-          <!-- Add Memory Form: Only visible if 'addingMemory' is true AND editable -->
           <div *ngIf="addingMemory && isEditable" class="add-memory-form-container">
             <h4 class="form-subheading">New Memory Details</h4>
             <form (ngSubmit)="submitAddMemory()" class="modal-form">
@@ -213,11 +195,9 @@
               <h4>{{ memory.description || 'Untitled Memory' }} ({{ memory.memoryType }})</h4>
               <p class="memory-date">Added: {{ memory.creationDate | date:'shortDate' }}</p>
               <div class="memory-actions">
-                <!-- View Content Button: Always available if content path exists -->
                 <button *ngIf="memory.path" class="view-link-button" (click)="viewMemoryContent(memory)" [disabled]="loadingMemoryContent">
                   View Content
                 </button>
-                <!-- Delete Memory Button: Only visible if canDeleteCapsule is true -->
                 <button *ngIf="canDeleteCapsule" class="delete-button-small" (click)="deleteMemory(memory.id)" [disabled]="loadingDeleteMemory">Delete</button>
               </div>
             </div>
@@ -227,26 +207,21 @@
     </div>
   </div>
 
-  <!-- Memory Content Display Overlay (Modal) -->
   <div *ngIf="currentMemoryContentUrl" class="memory-content-overlay">
     <div class="memory-content-modal">
       <button class="close-button" (click)="closeMemoryContent()">&times;</button>
       <h3>Viewing: {{ displayingMemory?.description || 'Memory Content' }} ({{ displayingMemory?.memoryType }})</h3>
 
       <div class="content-display-area">
-        <!-- Display PHOTO -->
+
         <img *ngIf="displayingMemory?.memoryType === 'PHOTO'" [src]="currentMemoryContentUrl" alt="Memory Photo" class="responsive-content-image">
 
-        <!-- Display VIDEO -->
         <video *ngIf="displayingMemory?.memoryType === 'VIDEO'" [src]="currentMemoryContentUrl" controls class="responsive-content-video"></video>
 
-        <!-- Display VOICE_MESSAGE -->
         <audio *ngIf="displayingMemory?.memoryType === 'VOICE_MESSAGE'" [src]="currentMemoryContentUrl" controls></audio>
 
-        <!-- Display TEXT or any other type that might be rendered in an iframe -->
         <iframe *ngIf="displayingMemory?.memoryType === 'TEXT'" [src]="currentMemoryContentUrl" class="responsive-content-iframe"></iframe>
 
-        <!-- Fallback for types not explicitly handled for direct display, or for download option -->
         <p *ngIf="!['PHOTO', 'VIDEO', 'VOICE_MESSAGE', 'TEXT'].includes(displayingMemory?.memoryType ?? '')">
           Content type ({{ displayingMemory?.memoryType }}) not supported for direct preview. <a [href]="currentMemoryContentUrl" target="_blank">Download to view</a>.
         </p>
@@ -255,7 +230,6 @@
     </div>
   </div>
 
-  <!-- NEW: Goal Achievement Dialog -->
   <div class="modal-overlay" *ngIf="showGoalAchievedDialog && !hasAchievementBeenSet">
     <div class="modal-content goal-achieved-modal">
       <h3 class="modal-heading">Your Goal Unveiled!</h3>

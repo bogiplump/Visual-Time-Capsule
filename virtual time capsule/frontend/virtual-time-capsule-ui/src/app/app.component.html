@@ -1,5 +1,4 @@
 <div class="app-container">
-<!-- Navigation/Header (Optional, shown if logged in) -->
 <header *ngIf="this.authService.isAuthenticated$ | async" class="app-header">
   <div class="header-title">Virtual Time Capsule</div>
   <nav>
@@ -18,7 +17,6 @@
   </nav>
 </header>
 
-<!-- Main content area where routes are rendered -->
 <main class="main-content">
   <router-outlet></router-outlet>
 </main>

@@ -1,6 +1,7 @@
 package com.java.web.virtual.time.capsule.handler;
 
 import com.java.web.virtual.time.capsule.exception.BadRequestException;
+import com.java.web.virtual.time.capsule.exception.ResourceNotFoundException;
 import com.java.web.virtual.time.capsule.exception.user.EmailAlreadyTakenException;
 import com.java.web.virtual.time.capsule.exception.user.InvitationAlreadySent;
 import com.java.web.virtual.time.capsule.exception.user.UserNotFoundException;
@@ -72,5 +73,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<String> handleAccessDeniedException(AccessDeniedException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<String> handleResourceNotFoundException(ResourceNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 }

@@ -8,9 +8,7 @@ import com.java.web.virtual.time.capsule.dto.UserResponseDto;
 import com.java.web.virtual.time.capsule.dto.UserUpdateDto;
 import com.java.web.virtual.time.capsule.mapper.GoalMapper;
 import com.java.web.virtual.time.capsule.mapper.UserMapper;
-import com.java.web.virtual.time.capsule.model.Friendship;
 import com.java.web.virtual.time.capsule.model.UserModel;
-import com.java.web.virtual.time.capsule.service.CapsuleService;
 import com.java.web.virtual.time.capsule.service.GoalService;
 import com.java.web.virtual.time.capsule.service.UserService;
 import jakarta.validation.constraints.Positive;
@@ -37,15 +35,14 @@ import java.util.Set;
 @Validated
 public class UserController {
 
-    private final CapsuleService capsuleService;
+
     private final UserService userService;
     private final GoalService goalService;
     private final GoalMapper goalMapper;
     private final UserMapper userMapper;
 
-    public UserController(CapsuleService capsuleService, UserService userService, GoalService goalService,
+    public UserController(UserService userService, GoalService goalService,
                           GoalMapper goalMapper, UserMapper userMapper) {
-        this.capsuleService = capsuleService;
         this.userService = userService;
         this.goalService = goalService;
         this.goalMapper = goalMapper;
@@ -73,9 +70,6 @@ public class UserController {
 
     @PostMapping("/friendship/{id}")
     public ResponseEntity<String> createFriendshipInvitation(@Positive @PathVariable Long id, Principal principal) {
-        if (principal == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
         String user = principal.getName();
         UserModel currentUser = userService.getUser(user);
         userService.sendInvitation(currentUser.getId(),id);
@@ -83,7 +77,7 @@ public class UserController {
     }
 
     @PutMapping("/friendship/{id}")
-    public ResponseEntity<String> updateFriendship(@Positive @PathVariable Long id, @RequestBody FriendshipDto friendshipDto, Principal principal) {
+    public ResponseEntity<String> updateFriendship(@Positive @PathVariable Long id, @RequestBody FriendshipDto friendshipDto) {
         userService.answerInvitation(id, friendshipDto);
         return ResponseEntity.ok("Friendship invitation answered");
     }
@@ -105,8 +99,9 @@ public class UserController {
     @GetMapping
     public ResponseEntity<List<UserProfileDto>> getAllUsersExceptCurrent(Principal principal) {
         log.info("Received request to get all user profiles");
-        // You'll need a method in UserService to convert UserModel to UserProfileDto
+
         List<UserProfileDto> users = userService.getAllUserProfilesExceptCurrentUser(principal.getName());
+
         log.info("User profiles except current user: {}", users.toString());
         return ResponseEntity.ok(users);
     }
@@ -114,9 +109,10 @@ public class UserController {
     @GetMapping("/{id}/friendships")
     public ResponseEntity<List<FriendshipDto>> getUserFriendships(@PathVariable Long id) {
         log.info("Received request to get all user friendships");
+
         UserModel user = userService.getUserById(id);
         List<FriendshipDto> friendshipDtos = userService.getFriendships(user.getId());
-        return new ResponseEntity<>(friendshipDtos, HttpStatus.OK);
+        return ResponseEntity.ok(friendshipDtos);
     }
 
 }

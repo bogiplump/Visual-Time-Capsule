@@ -25,7 +25,7 @@ import org.hibernate.proxy.HibernateProxy;
 @AllArgsConstructor
 @Entity
 @Builder
-@Table(name = "memory_entries")
+@Table(name = "memory")
 public class Memory {
     @Id
     @GeneratedValue
@@ -55,7 +55,6 @@ public class Memory {
 
     }
 
-    // Manual equals and hashCode for JPA entities
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -67,7 +66,5 @@ public class Memory {
     @Override
     public int hashCode() {
         return getClass().hashCode();
-        // Alternatively: return id != null ? id.hashCode() : 0;
     }
-
 }

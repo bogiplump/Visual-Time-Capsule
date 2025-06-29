@@ -14,7 +14,7 @@ public class GoalDto {
     private String content;
     private boolean isAchieved;
     private boolean isVisible;
-    private String creationDate; // ISO string
-    private Long creator; // Expecting creator's ID here
-    private Long capsuleId; // Back-reference to capsule ID if needed in DTO
+    private String creationDate; 
+    private Long creator; 
+    private Long capsuleId; 
 }

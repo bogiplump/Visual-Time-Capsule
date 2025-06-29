@@ -5,7 +5,6 @@ import com.java.web.virtual.time.capsule.dto.FriendshipDto;
 import com.java.web.virtual.time.capsule.dto.UserCreateDto;
 import com.java.web.virtual.time.capsule.dto.UserLoginDto;
 import com.java.web.virtual.time.capsule.dto.UserProfileDto;
-import com.java.web.virtual.time.capsule.dto.UserResponseDto;
 import com.java.web.virtual.time.capsule.dto.UserUpdateDto;
 import com.java.web.virtual.time.capsule.enums.FriendshipStatus;
 import com.java.web.virtual.time.capsule.exception.user.EmailAlreadyTakenException;
@@ -14,7 +13,6 @@ import com.java.web.virtual.time.capsule.exception.user.UserNotFoundException;
 import com.java.web.virtual.time.capsule.exception.user.UsernameAlreadyTakenException;
 import com.java.web.virtual.time.capsule.mapper.CapsuleMapper;
 import com.java.web.virtual.time.capsule.mapper.FriendshipMapper;
-import com.java.web.virtual.time.capsule.mapper.UserMapper;
 import com.java.web.virtual.time.capsule.model.Friendship;
 import com.java.web.virtual.time.capsule.model.UserModel;
 import com.java.web.virtual.time.capsule.repository.CapsuleRepository;
@@ -46,7 +44,6 @@ public class UserServiceImpl implements UserService {
     private final CapsuleRepository capsuleRepository;
     private final BCryptPasswordEncoder encoder;
     private final CapsuleMapper capsuleMapper;
-    private final UserMapper userMapper;
     private final FriendshipMapper friendshipMapper;
 
     @Override
@@ -77,7 +74,7 @@ public class UserServiceImpl implements UserService {
         if(!userRepository.existsById(id)) {
             throw new UserNotFoundException("User not found");
         }
-        UserModel user = userRepository.findById(id).get();
+        UserModel user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
         user.setFirstName(updateDto.getFirstName());
         user.setLastName(updateDto.getLastName());
         user.setUsername(user.getUsername());
@@ -107,12 +104,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserResponseDto> getUsers() {
-        return userRepository.findAll()
-            .stream().map(userMapper::toUserResponseDto).toList();
-    }
-
-    @Override
     public void sendInvitation(Long sender, Long receiver) {
         UserModel userRequester = userRepository.findById(sender).orElseThrow(() -> new UserNotFoundException("User not found"));
         UserModel userReceiver = userRepository.findById(receiver).orElseThrow(() -> new UserNotFoundException("User not found"));
@@ -120,6 +111,7 @@ public class UserServiceImpl implements UserService {
             throw new UserNotFoundException("User not found");
         }
         Friendship friendship = friendshipRepository.findByRequesterAndResponder(userRequester, userReceiver);
+
         if(friendship != null && friendship.getStatus() == FriendshipStatus.PENDING) {
             throw new InvitationAlreadySent(String.format("Invitation by %s to %s already sent", userRequester.getUsername(), userReceiver.getUsername()));
         }
@@ -140,7 +132,6 @@ public class UserServiceImpl implements UserService {
             .lastUpdate(LocalDate.now())
             .build();
         friendshipRepository.save(friendship);
-        log.info("Friendship sent: {}", friendship.getStatus());
     }
 
     @Override
@@ -175,76 +166,53 @@ public class UserServiceImpl implements UserService {
             .map(friendshipMapper::toDto).collect(Collectors.toList());
     }
 
-
     @Override
     @Transactional(readOnly = true)
     public List<UserProfileDto> getAllUserProfilesExceptCurrentUser(String username) {
         log.info("Fetching all user profiles except current user: {}", username);
 
-        // 1. Get the current authenticated user's model
         UserModel currentUser = userRepository.findByUsername(username);
-
-        // 2. Fetch all friendships where the current user is either requester or responder.
-        // You'll need a method in your FriendshipRepository for this, e.g.:
-        // List<Friendship> findByRequesterIdOrResponderId(Long requesterId, Long responderId);
+        
         List<Friendship> currentUserFriendships = friendshipRepository.findAllByRequesterOrResponder(currentUser, currentUser);
         log.info("Found {} friendships for current user {}", currentUserFriendships.size(), username);
 
-        // 3. Stream all users, filter out the current user, and map them to UserProfileDto
-        // The convertToUserProfileDto method now receives the necessary context (current user and their friendships)
         return userRepository.findAll().stream()
-            .filter(u -> !u.getUsername().equals(username)) // Exclude the current user
-            .map(otherUser -> convertToUserProfileDto(otherUser, currentUser, currentUserFriendships)) // Pass context for enrichment
+            .filter(u -> !u.getUsername().equals(username)) 
+            .map(otherUser -> convertToUserProfileDto(otherUser, currentUser, currentUserFriendships)) 
             .collect(Collectors.toList());
     }
 
-    /**
-     * Converts a UserModel to UserProfileDto, populating friendship status fields
-     * based on the context of the current authenticated user.
-     *
-     * @param otherUser The UserModel representing the "other" user whose profile is being created.
-     * @param currentUser The UserModel of the currently authenticated user.
-     * @param currentUserFriendships A list of all Friendship entities involving the currentUser.
-     * @return A UserProfileDto with populated friendship-related fields.
-     */
     private UserProfileDto convertToUserProfileDto(UserModel otherUser, UserModel currentUser, List<Friendship> currentUserFriendships) {
-        log.info("Converting UserModel to UserProfileDto: {}", otherUser.getUsername());
         UserProfileDto dto = new UserProfileDto();
         dto.setId(otherUser.getId());
         dto.setUsername(otherUser.getUsername());
-
-        // Initialize friendship-related flags to default false/null
         dto.setIsRequestFromCurrentUser(false);
         dto.setIsRequestToCurrentUser(false);
         dto.setFriendshipStatus(null);
         dto.setAssociatedFriendshipId(null);
-
-        // Find the specific friendship (if any) between otherUser and currentUser
+        
         Optional<Friendship> foundFriendship = currentUserFriendships.stream()
             .filter(f -> (f.getRequester().getId().equals(currentUser.getId()) && f.getResponder().getId().equals(otherUser.getId())) ||
                 (f.getRequester().getId().equals(otherUser.getId()) && f.getResponder().getId().equals(currentUser.getId())))
             .findFirst();
 
 
-        if (foundFriendship.isPresent()) {
+        if(foundFriendship.isEmpty()) {
+            return dto;
+        }
 
-            Friendship friendship = foundFriendship.get();
-            log.info("Found friendship: {}", friendship.getStatus());
-            log.info("Found friendship: {}", friendship.getId());
-            dto.setFriendshipStatus(friendship.getStatus());
-            dto.setAssociatedFriendshipId(friendship.getId());
+        Friendship friendship = foundFriendship.get();
+        dto.setFriendshipStatus(friendship.getStatus());
+        dto.setAssociatedFriendshipId(friendship.getId());
 
-            if (friendship.getStatus() == FriendshipStatus.PENDING) {
-                if (friendship.getRequester().getId().equals(currentUser.getId())) {
-                    // Current user sent the request to 'otherUser'
-                    dto.setIsRequestFromCurrentUser(true);
-                } else if (friendship.getResponder().getId().equals(currentUser.getId())) {
-                    // 'otherUser' sent the request to current user
-                    dto.setIsRequestToCurrentUser(true);
-                }
-            }
-            // For ACCEPTED or DECLINED statuses, isRequestFromCurrentUser/isRequestToCurrentUser remain false
-            // as they specifically relate to the PENDING state.
+        if(friendship.getStatus() != FriendshipStatus.PENDING) {
+            return dto;
+        }
+
+        if (friendship.getRequester().getId().equals(currentUser.getId())) {
+            dto.setIsRequestFromCurrentUser(true);
+        } else if (friendship.getResponder().getId().equals(currentUser.getId())) {
+            dto.setIsRequestToCurrentUser(true);
         }
 
         return dto;

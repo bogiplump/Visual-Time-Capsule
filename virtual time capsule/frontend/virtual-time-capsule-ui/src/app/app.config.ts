@@ -1,15 +1,13 @@
-// src/app/app.config.ts
 import {ApplicationConfig, importProvidersFrom, inject} from '@angular/core';
 import { provideRouter } from '@angular/router';
-import {HTTP_INTERCEPTORS, provideHttpClient, withInterceptors, withInterceptorsFromDi} from '@angular/common/http'; // Import provideHttpClient and withInterceptors
+import {HTTP_INTERCEPTORS, provideHttpClient, withInterceptors, withInterceptorsFromDi} from '@angular/common/http';
 import { HttpClientModule } from '@angular/common/http';
-
-import { routes } from './app.routes'; // We will define app.routes.ts for clarity
+import { routes } from './app.routes';
 import { AuthService } from './services/auth.service';
 import { AuthGuard } from './guards/auth.guard';
-import {AuthInterceptor} from './interceptors/auth.interceptor'; // Import the AuthGuard
+import {AuthInterceptor} from './interceptors/auth.interceptor';
 
-// This is the configuration for your standalone Angular application.
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideHttpClient(withInterceptorsFromDi()),
@@ -17,7 +15,7 @@ export const appConfig: ApplicationConfig = {
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
-      multi: true // Essential if you plan to have multiple interceptors
+      multi: true
     },
 
     provideRouter(routes),

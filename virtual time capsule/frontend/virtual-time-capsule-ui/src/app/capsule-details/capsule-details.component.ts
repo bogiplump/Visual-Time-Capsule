@@ -78,8 +78,6 @@ export class CapsuleDetailsComponent implements OnInit, OnDestroy {
 
   currentDate: Date = new Date();
   private dateUpdateSubscription: Subscription | undefined;
-
-  // NEW: Goal Achievement Dialog properties
   showGoalAchievedDialog = false;
   goalAchievedStatus: 'achieved' | 'notAchieved' | null = null;
   submittingGoalAchievedStatus = false;
@@ -149,15 +147,11 @@ export class CapsuleDetailsComponent implements OnInit, OnDestroy {
       next: (capsuleData: CapsuleResponseDto) => {
         this.capsule = capsuleData;
         this.updatedCapsuleName = capsuleData.capsuleName;
-        // Correctly use capsuleData.openDate which is now consistent in DTOs
         this.updatedOpenDate = capsuleData.openDateTime ? this.formatDateForDateTimeLocal(capsuleData.openDateTime) : null;
-
-        // Ensure currentGoalId is correctly extracted from the nested goal object
         this.currentGoalId = capsuleData.goalId || null;
         this.memories = Array.from(capsuleData.memories || []);
         this.addMessage('Capsule details and memories loaded successfully!', 'success');
 
-        // Fetch full goal details if a goal exists
         if (this.currentGoalId !== null) {
           this.fetchGoalDetails(this.currentGoalId);
         } else {
@@ -180,16 +174,15 @@ export class CapsuleDetailsComponent implements OnInit, OnDestroy {
     this.goalService.getGoal(goalId).subscribe({
       next: (goalDto: GoalDto) => {
         this.displayingGoal = goalDto;
-        this.updatedGoalContent = goalDto.content; // Pre-populate for editing if needed
+        this.updatedGoalContent = goalDto.content;
         this.goalAchievedStatus = goalDto.achieved ? 'achieved' : 'notAchieved';
 
-        // Set goal achievement message if goal is achieved
         if (this.displayingGoal.achieved) {
           this.goalAchievementMessage = 'Congratulations! You achieved this goal.';
         } else if (this.capsule?.status === CapsuleStatus.OPEN) {
           this.goalAchievementMessage = 'You did not achieve this goal. Keep striving for your next one!';
         } else {
-          this.goalAchievementMessage = ''; // Clear message if capsule is not open or goal status not finalized
+          this.goalAchievementMessage = '';
         }
       },
       error: (error: HttpErrorResponse) => {
@@ -454,18 +447,6 @@ export class CapsuleDetailsComponent implements OnInit, OnDestroy {
     this.goalService.updateGoal(this.displayingGoal.id, updateGoalDto)
   }
 
-  // NEW: Methods for Goal Achievement Dialog
-  openGoalAchievedDialog(): void {
-    if (this.displayingGoal) {
-      this.showGoalAchievedDialog = true;
-    }
-  }
-
-  closeGoalAchievedDialog(): void {
-    this.showGoalAchievedDialog = false;
-    this.goalAchievedStatus = null; // Reset selection
-  }
-
   submitGoalAchievedStatus(): void {
     if (!this.displayingGoal || !this.displayingGoal.id || this.goalAchievedStatus === null) {
       this.addMessage('Goal data is missing or achievement status not selected.', 'error');
@@ -534,32 +515,7 @@ export class CapsuleDetailsComponent implements OnInit, OnDestroy {
       },
       error: (error: HttpErrorResponse) => {
         let errorMessage = 'Failed to add memory. Please try again.';
-        if (error.error instanceof Blob) {
-          error.error.text().then(text => {
-            try {
-              const errorObj = JSON.parse(text);
-              if (errorObj.message) errorMessage = errorObj.message;
-              else if (errorObj.error) errorMessage = errorObj.error;
-            } catch {
-              errorMessage = text || errorMessage;
-            }
-            this.addMemoryDialogMessage(errorMessage, 'error');
-          });
-        } else if (error.error && Array.isArray(error.error) && error.error.length > 0) {
-          errorMessage = error.error.map((msg: string) => {
-            const match = msg.match(/^[^:]+:\s*"(.*)"$/);
-            return match && match[1] ? match[1] : msg;
-          }).join('\n');
-          this.addMemoryDialogMessage(errorMessage, 'error');
-        } else if (error.error && typeof error.error.message === 'string') {
-          errorMessage = error.error.message;
-          this.addMemoryDialogMessage(errorMessage, 'error');
-        } else if (typeof error.error === 'string') {
-          errorMessage = error.error;
-          this.addMemoryDialogMessage(errorMessage, 'error');
-        } else {
-          this.addMemoryDialogMessage(errorMessage, 'error');
-        }
+        this.addMessage(error.error, 'error');
         this.loadingAddMemory = false;
       },
       complete: () => { this.loadingAddMemory = false; }

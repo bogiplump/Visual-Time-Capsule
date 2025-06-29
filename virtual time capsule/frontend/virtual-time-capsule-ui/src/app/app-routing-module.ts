@@ -3,7 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { AuthGuard } from './guards/auth.guard'; // Create this guard
+import { AuthGuard } from './guards/auth.guard';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -11,10 +11,10 @@ const routes: Routes = [
   {
     path: 'dashboard',
     component: DashboardComponent,
-    canActivate: [AuthGuard] // Protect this route
+    canActivate: [AuthGuard]
   },
-  { path: '', redirectTo: '/login', pathMatch: 'full' }, // Default route
-  { path: '**', redirectTo: '/login' } // Wildcard route for 404 or unknown paths
+  { path: '', redirectTo: '/login', pathMatch: 'full' },
+  { path: '**', redirectTo: '/login' }
 ];
 
 @NgModule({
