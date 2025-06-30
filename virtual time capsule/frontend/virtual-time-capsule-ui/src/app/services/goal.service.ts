@@ -4,13 +4,13 @@ import { Observable } from 'rxjs';
 import { GoalDto } from '../dtos/goal.dto';
 import { UpdateGoalDto } from '../dtos/update-goal.dto';
 import {environment} from '../../environments/environment';
-import {GoalCreateDto} from '../dtos/capsule-create.dto';
+import {GoalCreateDto} from '../dtos/goal-create.dto';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GoalService {
-  private apiUrl = `${environment.backendUrl}/api/v1/goals`; // Adjust to your backend URL
+  private apiUrl = `${environment.backendUrl}/api/v1/goals`;
 
   constructor(private http: HttpClient) { }
 
@@ -31,7 +31,7 @@ export class GoalService {
     console.log("Sending is Achieved request");
     return this.http.put<void>(
       `${this.apiUrl}/${id}/setIsAchieved?isAchieved=${isAchieved}`,
-      null // no request body
+      null
     );
   }
 }

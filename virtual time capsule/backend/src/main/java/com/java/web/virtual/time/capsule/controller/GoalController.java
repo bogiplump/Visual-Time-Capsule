@@ -41,9 +41,10 @@ public class GoalController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<Goal> createGoal(@RequestParam Long capsuleId, @RequestBody @Valid GoalCreateDto goalDto, Principal principal) {
+    public ResponseEntity<Goal> createGoal(@RequestParam Long capsuleId, @RequestBody @Valid GoalCreateDto goalDto,
+                                           Principal principal) {
         log.info("dto {}", goalDto.toString());
-        goalService.createGoal(capsuleId, goalDto,principal.getName());
+        goalService.createGoal(capsuleId, goalDto, principal.getName());
         return ResponseEntity.ok().build();
     }
 
@@ -54,15 +55,16 @@ public class GoalController {
     }
 
     @PutMapping("/{id}/update")
-    public ResponseEntity<HttpStatus> updateGoalContent(@NotNull @PathVariable Long id,@NotNull  @RequestBody UpdateGoalDto updateGoalDto) {
-        goalService.updateGoal(id,updateGoalDto);
+    public ResponseEntity<HttpStatus> updateGoalContent(@NotNull @PathVariable Long id,
+                                                        @NotNull @RequestBody UpdateGoalDto updateGoalDto) {
+        goalService.updateGoal(id, updateGoalDto);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @PutMapping("/{id}/setIsAchieved")
     public ResponseEntity<?> setIsAchieved(@NotNull @PathVariable Long id, @RequestParam Boolean isAchieved) {
         log.info("setIsAchieved with id {} {}", id, isAchieved);
-        goalService.setGoalIsAchievedAndMakeVisible(id,isAchieved);
+        goalService.setGoalIsAchievedAndMakeVisible(id, isAchieved);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
