@@ -19,16 +19,18 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController("/api/v1/groups")
+@RestController
+@RequestMapping("/api/v1/groups")
 @AllArgsConstructor
 public class CapsuleGroupsController {
-    @Autowired
+
     private final CapsuleGroupService capsuleGroupService;
 
     @GetMapping("/user/{id}")
-    public ResponseEntity<?> getGroups(@NotNull @PathVariable Long userId) {
+    public ResponseEntity<?> getGroups(@NotNull @PathVariable("id") Long userId) {
         return ResponseEntity.ok(capsuleGroupService.getAllCapsuleGroupsByUserId(userId));
     }
 
@@ -54,4 +56,5 @@ public class CapsuleGroupsController {
         capsuleGroupService.deleteGroup(id);
         return ResponseEntity.ok(HttpStatus.OK);
     }
+
 }
