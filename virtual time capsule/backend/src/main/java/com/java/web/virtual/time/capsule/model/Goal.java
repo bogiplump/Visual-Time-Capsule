@@ -11,6 +11,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,8 +35,8 @@ public class Goal {
     @Column(name = "is_achieved", nullable = false)
     private Boolean isAchieved;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDate creationDate;
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime creationDate;
 
     private String content;
 

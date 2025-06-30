@@ -37,8 +37,4 @@ public class Friendship {
     private FriendshipStatus status;
 
     private LocalDate lastUpdate;
-
-    public Friendship() {
-
-    }
 }

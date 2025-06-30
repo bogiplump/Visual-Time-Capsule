@@ -6,7 +6,7 @@
 
     <h1 class="capsule-heading">Capsule Details</h1>
 
-    <div [@If]="messages.length > 0" class="page-messages">
+    <div *ngIf="messages.length > 0" class="page-messages">
       <div *ngFor="let msg of messages" [ngClass]="{'message-box': true, 'success': msg.type === 'success', 'error': msg.type === 'error'}">
         {{ msg.text }}
       </div>

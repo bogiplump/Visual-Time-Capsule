@@ -58,6 +58,7 @@ public class MemoryServiceImpl implements MemoryService {
     public Long saveMemory(Long capsuleId, MemoryCreateDto memoryDto, String username) throws IOException {
         try {
             Path uploadPath = Paths.get(uploadDirectory).toAbsolutePath().normalize();
+
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
                 log.info("Created upload directory: {}", uploadPath);
@@ -71,6 +72,7 @@ public class MemoryServiceImpl implements MemoryService {
             if(creator == null) {
                 throw new UserNotFoundException("User not found with name: " + username);
             }
+            log.info("Saving capsule: {}", capsule.toString());
             if (creator.equals(capsule.getCreator()) && !capsule.getSharedWithUsers().contains(creator)) {
                 throw new IllegalArgumentException("User are not authorized to add memories");
             }

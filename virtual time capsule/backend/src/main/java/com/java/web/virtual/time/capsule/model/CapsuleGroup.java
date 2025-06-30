@@ -24,7 +24,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "capsule_groups")
+@Table(name = "capsule_group")
 public class CapsuleGroup {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -4,25 +4,23 @@ import com.java.web.virtual.time.capsule.dto.GoalDto;
 import com.java.web.virtual.time.capsule.model.Goal;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
 
-import javax.crypto.spec.PSource;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-@Mapper(componentModel = "spring", imports = {LocalDate.class}) // Add LocalDate to imports for expressions
+@Mapper(componentModel = "spring", imports = {LocalDateTime.class})
 public interface GoalMapper {
 
     @Mapping(target = "content", source = "content")
     @Mapping(target = "isAchieved" , source = "isAchieved")
     @Mapping(target = "isVisible",source = "isVisible")
     @Mapping(target = "creationDate", expression = "java(goal.getCreationDate() != null ? goal.getCreationDate().toString() : null)")
-    @Mapping(target = "creator", source = "creator.id") // Map creator UserModel's ID to creator Long in DTO
-    @Mapping(target = "capsuleId", source = "capsule.id") // Map capsule's ID to capsuleId Long in DTO
+    @Mapping(target = "creator", source = "creator.id")
+    @Mapping(target = "capsuleId", source = "capsule.id")
     GoalDto toDto(Goal goal);
 
-    @Mapping(target = "creationDate", expression = "java(goalDto.getCreationDate() != null ? LocalDate.parse(goalDto.getCreationDate()) : null)")
-    @Mapping(target = "creator", ignore = true) // Service layer will handle setting the UserModel object
-    @Mapping(target = "capsule", ignore = true) // Service layer will handle setting the Capsule object
+    @Mapping(target = "creationDate", expression = "java(goalDto.getCreationDate() != null ? LocalDateTime.parse(goalDto.getCreationDate()) : null)")
+    @Mapping(target = "creator", ignore = true)
+    @Mapping(target = "capsule", ignore = true)
     Goal toEntity(GoalDto goalDto);
 }
 

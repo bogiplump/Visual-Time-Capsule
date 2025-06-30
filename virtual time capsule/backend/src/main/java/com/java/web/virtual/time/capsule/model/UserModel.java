@@ -31,7 +31,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "user")
+@Table(name = "user_model")
 public class UserModel {
     @Id
     @GeneratedValue

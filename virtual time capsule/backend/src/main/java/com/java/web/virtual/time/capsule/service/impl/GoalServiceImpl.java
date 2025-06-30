@@ -13,6 +13,7 @@ import com.java.web.virtual.time.capsule.repository.GoalRepository;
 import com.java.web.virtual.time.capsule.repository.UserRepository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 
@@ -43,9 +44,11 @@ public class GoalServiceImpl implements GoalService {
         goal.setIsAchieved(false);
         goal.setCapsule(capsule);
         goal.setCreator(user);
-        goal.setCreationDate(LocalDate.now(ZoneOffset.UTC));
+        goal.setCreationDate(LocalDateTime.now(ZoneOffset.UTC));
+        capsule.setGoal(goal);
         log.info("Creating goal {}", goal);
         goalRepository.save(goal);
+        capsuleRepository.save(capsule);
     }
 
     @Override

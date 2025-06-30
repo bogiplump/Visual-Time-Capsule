@@ -46,12 +46,15 @@ public interface CapsuleMapper {
     @Mapping(target = "capsuleName", source = "capsuleName")
     @Mapping(target = "openDateTime", source = "openDateTime", qualifiedByName = "isoUtcToLocalDateTime")
     @Mapping(target = "goal", source = "goal")
+    @Mapping(target = "goal.isAchieved", constant = "false")
+    @Mapping(target = "goal.creationDate", expression = "java(LocalDateTime.now(ZoneOffset.UTC))")
+    @Mapping(target = "creationDate", expression = "java(LocalDateTime.now(ZoneOffset.UTC))")
     @Mapping(target = "sharedWithUsers", source = "sharedWithUserIds", qualifiedByName = "userIdsToUserModels")
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "creator", ignore = true)
-    @Mapping(target = "creationDate", ignore = true)
     @Mapping(target = "lockDate", ignore = true)
     @Mapping(target = "memoryEntries", ignore = true)
+    @Mapping(target = "isShared", ignore = true)
     Capsule toEntity(CapsuleCreateDto dto);
 
 

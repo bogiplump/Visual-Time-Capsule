@@ -56,14 +56,12 @@ public class CapsuleServiceImpl implements CapsuleService {
         LocalDateTime openDateTime = parseInputDateTimeToUTC(capsuleDto.getOpenDateTime());
 
         Capsule newCapsule = capsuleMapper.toEntity(capsuleDto);
+        log.info("Create new capsule {}", newCapsule.getGoal().toString());
         newCapsule.setOpenDateTime(openDateTime);
+        newCapsule.setIsShared(sharedWithUserIds != null && !sharedWithUserIds.isEmpty());
+        newCapsule.setStatus(CapsuleStatus.CREATED);
+        newCapsule.setCreator(creator);
         Capsule savedCapsule = capsuleRepository.save(newCapsule);
-
-        
-        if (savedCapsule.getGoal() != null) {
-            savedCapsule.getGoal().setCapsule(savedCapsule);
-            goalRepository.save(savedCapsule.getGoal());
-        }
 
         return capsuleMapper.toDto(savedCapsule);
     }
